@@ -1,40 +1,38 @@
 import { useState } from "react";
-import Header from "../components/Header";
-import styles from "./AuthPage.module.css";
-
 import { useNavigate } from "react-router-dom";
+import Header from "../components/Header";
 import { loginFakeUser } from "../utils/fakeAuth";
+import styles from "./AuthPage.module.css";
 
 function AuthPage() {
   const [isLogin, setIsLogin] = useState(true);
-
   const navigate = useNavigate();
 
-const handleLogin = (e) => {
-  e.preventDefault();
+  const handleLogin = (e) => {
+    e.preventDefault();
 
-  loginFakeUser({
-    name: "Yuliia",
-    username: "@yuliia",
-    email: "yuliia@email.com",
-    balance: 12450,
-  });
+    loginFakeUser({
+      name: "Yuliia",
+      username: "@yuliia",
+      email: "yuliia@email.com",
+      balance: 12450,
+    });
 
-  navigate("/profile");
-};
+    navigate("/profile");
+  };
 
-const handleRegister = (e) => {
-  e.preventDefault();
+  const handleRegister = (e) => {
+    e.preventDefault();
 
-  loginFakeUser({
-    name: "Yuliia",
-    username: "@new_user",
-    email: "newuser@email.com",
-    balance: 8000,
-  });
+    loginFakeUser({
+      name: "Yuliia",
+      username: "@new_user",
+      email: "newuser@email.com",
+      balance: 8000,
+    });
 
-  navigate("/profile");
-};
+    navigate("/profile");
+  };
 
   const content = isLogin
     ? {
@@ -148,7 +146,7 @@ const handleRegister = (e) => {
                   isLogin ? styles.showLogin : styles.showRegister
                 }`}
               >
-                <form className={styles.form}>
+                <form className={styles.form} onSubmit={handleLogin}>
                   <div className={styles.inputGroup}>
                     <label htmlFor="loginEmail">Електронна пошта</label>
                     <input
@@ -179,11 +177,11 @@ const handleRegister = (e) => {
                   </div>
 
                   <button type="submit" className={styles.submitButton}>
-                    {content.buttonText}
+                    Увійти
                   </button>
                 </form>
 
-                <form className={styles.form}>
+                <form className={styles.form} onSubmit={handleRegister}>
                   <div className={styles.inputGroup}>
                     <label htmlFor="registerName">Ім’я</label>
                     <input
@@ -228,7 +226,7 @@ const handleRegister = (e) => {
                   </label>
 
                   <button type="submit" className={styles.submitButton}>
-                    {content.buttonText}
+                    Зареєструватися
                   </button>
                 </form>
               </div>
