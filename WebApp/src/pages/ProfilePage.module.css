@@ -1,0 +1,351 @@
+.page {
+  min-height: 100vh;
+  background:
+    radial-gradient(circle at top left, var(--hero-overlay-1), transparent 30%),
+    radial-gradient(circle at bottom right, var(--hero-overlay-2), transparent 28%),
+    linear-gradient(
+      135deg,
+      var(--hero-gradient-start) 0%,
+      var(--hero-gradient-middle) 50%,
+      var(--hero-gradient-end) 100%
+    );
+}
+
+.profilePage {
+  width: 100%;
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 36px 20px 48px;
+}
+
+.heroCard {
+  padding: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  border-radius: 32px;
+  background: var(--surface);
+  border: 1px solid var(--border-color);
+  box-shadow: var(--shadow-soft);
+  backdrop-filter: blur(16px);
+}
+
+.heroLeft {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+.bigAvatar {
+  width: 96px;
+  height: 96px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(
+    135deg,
+    var(--featured-gradient-middle),
+    var(--featured-gradient-end)
+  );
+  color: var(--featured-text);
+  font-size: 34px;
+  font-weight: 700;
+  flex-shrink: 0;
+  box-shadow: var(--shadow-soft);
+}
+
+.userMeta {
+  display: flex;
+  flex-direction: column;
+}
+
+.userBadge {
+  width: fit-content;
+  padding: 8px 14px;
+  margin-bottom: 12px;
+  border-radius: 999px;
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--accent);
+  background: rgba(184, 138, 103, 0.12);
+  border: 1px solid rgba(184, 138, 103, 0.18);
+}
+
+.userName {
+  margin: 0 0 8px;
+  font-size: 36px;
+  color: var(--text-primary);
+  letter-spacing: -0.03em;
+}
+
+.userUsername {
+  margin: 0 0 6px;
+  font-size: 16px;
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.userEmail {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: 15px;
+}
+
+.heroRight {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 18px;
+}
+
+.balanceCard {
+  padding: 18px 22px;
+  min-width: 220px;
+  border-radius: 24px;
+  background: var(--surface-strong);
+  border: 1px solid var(--border-color);
+  text-align: right;
+}
+
+.balanceLabel {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 13px;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.balanceValue {
+  font-size: 32px;
+  color: var(--text-primary);
+  letter-spacing: -0.03em;
+}
+
+.heroButtons {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.primaryButton,
+.secondaryButton,
+.quickActionButton {
+  height: 48px;
+  padding: 0 18px;
+  border-radius: 999px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    transform 0.25s ease,
+    box-shadow 0.25s ease,
+    border-color 0.25s ease,
+    background 0.25s ease;
+}
+
+.primaryButton {
+  border: none;
+  background: var(--button-primary-bg);
+  color: var(--button-primary-text);
+}
+
+.primaryButton:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-soft);
+}
+
+.secondaryButton,
+.quickActionButton {
+  border: 1px solid var(--border-color);
+  background: var(--button-secondary-bg);
+  color: var(--button-secondary-text);
+}
+
+.secondaryButton:hover,
+.quickActionButton:hover {
+  transform: translateY(-2px);
+  border-color: var(--accent-soft);
+}
+
+.statsGrid {
+  margin-top: 24px;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 18px;
+}
+
+.statCard {
+  padding: 24px;
+  border-radius: 26px;
+  background: var(--surface);
+  border: 1px solid var(--border-color);
+  box-shadow: var(--shadow-soft);
+}
+
+.statLabel {
+  display: block;
+  margin-bottom: 14px;
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-secondary);
+}
+
+.statValue {
+  display: block;
+  margin-bottom: 10px;
+  font-size: 34px;
+  color: var(--text-primary);
+  letter-spacing: -0.03em;
+}
+
+.statText {
+  margin: 0;
+  font-size: 14px;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+.contentGrid {
+  margin-top: 24px;
+  display: grid;
+  grid-template-columns: 1.2fr 0.8fr;
+  gap: 18px;
+}
+
+.panel {
+  padding: 26px;
+  border-radius: 28px;
+  background: var(--surface);
+  border: 1px solid var(--border-color);
+  box-shadow: var(--shadow-soft);
+}
+
+.panelHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 22px;
+}
+
+.panelHeader h2 {
+  margin: 0;
+  font-size: 22px;
+  color: var(--text-primary);
+}
+
+.panelHeader span {
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+.activityList {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.activityItem {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  padding: 16px 0;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.activityItem:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.activityDot {
+  width: 10px;
+  height: 10px;
+  margin-top: 8px;
+  border-radius: 50%;
+  background: var(--accent);
+  flex-shrink: 0;
+}
+
+.activityTitle {
+  margin: 0 0 6px;
+  color: var(--text-primary);
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.activityTime {
+  color: var(--text-secondary);
+  font-size: 13px;
+}
+
+.quickActions {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+}
+
+.quickActionButton {
+  justify-content: flex-start;
+  text-align: left;
+}
+
+@media (max-width: 1100px) {
+  .heroCard {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .heroRight {
+    width: 100%;
+    align-items: flex-start;
+  }
+
+  .heroButtons {
+    justify-content: flex-start;
+  }
+
+  .statsGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .contentGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .profilePage {
+    padding: 20px 14px 32px;
+  }
+
+  .heroCard,
+  .statCard,
+  .panel {
+    padding: 20px;
+    border-radius: 24px;
+  }
+
+  .heroLeft {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .userName {
+    font-size: 30px;
+  }
+
+  .balanceValue {
+    font-size: 28px;
+  }
+
+  .statsGrid {
+    grid-template-columns: 1fr;
+  }
+}
