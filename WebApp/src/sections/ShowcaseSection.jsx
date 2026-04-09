@@ -3,47 +3,45 @@ import { useReveal } from "../hooks/useReveal";
 
 function ShowcaseSection() {
   const { ref, isVisible } = useReveal();
+  const imageSrc = "https://i.pinimg.com/1200x/2a/4e/c7/2a4ec7527fe2276166208c997a2d6f1f.jpg";
   return (
-    <section 
-    ref={ref}
-    className={`${styles.section} reveal ${isVisible ? "revealVisible" : ""}`}
+    <section
+      ref={ref}
+      className={`${styles.section} reveal ${isVisible ? "revealVisible" : ""}`}
     >
       <div className={styles.container}>
-        <div className={styles.left}>
-          <div className={styles.label}>Luxury showcase</div>
-          <h2 className={styles.title}>
-            Рідкісні бренди, відбірні колекції та сучасний формат подачі
-          </h2>
-          <p className={styles.text}>
-            Liorael створює не просто список товарів, а візуальний досвід, де
-            кожна деталь підкреслює статус речі. Тут важливі атмосфера, естетика
-            й зручність взаємодії.
+        <div className={styles.content}>
+          <span className={styles.badge}>Нова добірка</span>
+          <h2 className={styles.title}>Fashion-лот із відтінком аукціонної розкоші</h2>
+          <p className={styles.description}>
+            Обирайте ексклюзивні речі, які створюють атмосферу колекційної моди.
+            Кожен лот оцінений за стилем, якістю та статусом бренду.
           </p>
 
-          <div className={styles.tags}>
-            <span className={styles.tag}>Premium brands</span>
-            <span className={styles.tag}>Curated lots</span>
-            <span className={styles.tag}>Modern design</span>
-          </div>
+          <ul className={styles.benefits}>
+            <li>Найактуальніші лоти від fashion-брендів</li>
+            <li>Повна інформація про стан, розмір та терміни</li>
+            <li>Швидкий доступ до найцінніших пропозицій</li>
+          </ul>
         </div>
 
-        <div className={styles.right}>
-          <div className={styles.mainCard}>
-            <div className={styles.mainCardInner}>
-              <span className={styles.cardLabel}>Selected collection</span>
-              <h3 className={styles.cardTitle}>Timeless silhouettes with modern luxury</h3>
-            </div>
+        <div className={styles.visual}>
+          <div className={styles.imageFrame}>
+            <img
+              src={imageSrc}
+              alt="Luxury fashion auction item"
+              className={styles.image}
+            />
           </div>
 
-          <div className={styles.smallCards}>
-            <div className={styles.smallCard}>
-              <span className={styles.smallCardTitle}>Лімітовані лоти</span>
-              <span className={styles.smallCardText}>Унікальні речі з акцентом на статус</span>
+          <div className={styles.stats}>
+            <div className={styles.stat}>
+              <span className={styles.statValue}>24</span>
+              <span className={styles.statLabel}>години до старту</span>
             </div>
-
-            <div className={styles.smallCard}>
-              <span className={styles.smallCardTitle}>Актуальний стиль</span>
-              <span className={styles.smallCardText}>Естетика premium UI для живої платформи</span>
+            <div className={styles.stat}>
+              <span className={styles.statValue}>120+</span>
+              <span className={styles.statLabel}>нових лотів щотижня</span>
             </div>
           </div>
         </div>

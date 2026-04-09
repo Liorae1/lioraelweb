@@ -30,10 +30,18 @@ function BenefitsSection() {
       <div className={styles.container}>
         <div className={styles.label}>Переваги</div>
         <h2 className={styles.title}>Чому Liorael запам’ятовується з першого погляду</h2>
+        <p className={styles.description}>
+          Ми створюємо не просто платформу, а атмосферу, де кожний аукціон виглядає витонченою пропозицією і викликає бажання діяти.
+        </p>
 
         <div className={styles.grid}>
           {benefits.map((item) => (
-            <article key={item.id} className={styles.card}>
+            <article
+              key={item.id}
+              className={styles.card}
+              style={{ "--card-delay": `${item.id * 120}ms` }}
+            >
+              <div className={styles.cardBadge}>{`0${item.id}`}</div>
               <h3 className={styles.cardTitle}>{item.title}</h3>
               <p className={styles.text}>{item.text}</p>
             </article>

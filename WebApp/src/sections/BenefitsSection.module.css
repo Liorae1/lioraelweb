@@ -1,49 +1,85 @@
 .section {
-  padding: 100px 24px;
+  padding: 90px 24px;
   background: var(--bg-secondary);
 }
 
 .container {
+  position: relative;
   max-width: 1280px;
   margin: 0 auto;
+  z-index: 1;
 }
 
 .label {
+  display: inline-flex;
+  align-items: center;
+  padding: 10px 18px;
+  border-radius: 999px;
+  background: var(--surface);
+  border: 1px solid var(--border-color);
+  color: var(--accent);
   font-size: 12px;
   text-transform: uppercase;
-  letter-spacing: 0.2em;
-  color: var(--accent);
+  letter-spacing: 0.18em;
 }
 
 .title {
   margin-top: 16px;
   max-width: 780px;
-  font-size: 42px;
-  line-height: 1.15;
+  font-size: clamp(32px, 4vw, 46px);
+  line-height: 1.08;
   color: var(--text-primary);
 }
 
 .grid {
   margin-top: 40px;
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 24px;
 }
 
 .card {
-  padding: 28px;
+  position: relative;
+  min-height: 220px;
+  padding: 32px;
   border-radius: 28px;
-  background: var(--surface);
+  background: var(--surface-strong);
   border: 1px solid var(--border-color);
   box-shadow: var(--shadow-soft);
-  transition: transform 0.35s ease, border-color 0.35s ease;
+  transition: transform 0.35s ease, border-color 0.35s ease, box-shadow 0.35s ease, background 0.35s ease, opacity 0.35s ease;
+  opacity: 0;
+  transform: translateY(24px);
+}
+
+:global(.revealVisible) .card {
+  opacity: 1;
+  transform: translateY(0);
 }
 
 .card:hover {
-  transform: translateY(-6px);
+  transform: translateY(-8px);
+  border-color: rgba(184, 138, 103, 0.45);
+  box-shadow: 0 32px 64px rgba(44, 33, 29, 0.14);
+}
+
+.cardBadge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 56px;
+  min-height: 56px;
+  margin-bottom: 24px;
+  padding: 0 14px;
+  border-radius: 18px;
+  background: rgba(184, 138, 103, 0.12);
+  border: 1px solid rgba(184, 138, 103, 0.14);
+  color: var(--text-primary);
+  font-weight: 700;
+  letter-spacing: 0.08em;
 }
 
 .cardTitle {
+  margin: 0;
   font-size: 24px;
   color: var(--text-primary);
 }
@@ -51,6 +87,34 @@
 .text {
   margin-top: 16px;
   font-size: 16px;
-  line-height: 1.8;
+  line-height: 1.85;
   color: var(--text-secondary);
+}
+
+.description {
+  margin-top: 18px;
+  max-width: 720px;
+  font-size: 16px;
+  line-height: 1.75;
+  color: var(--text-secondary);
+}
+
+@media (max-width: 960px) {
+  .grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 720px) {
+  .section {
+    padding: 72px 18px;
+  }
+
+  .grid {
+    grid-template-columns: 1fr;
+  }
+
+  .card {
+    padding: 26px;
+  }
 }

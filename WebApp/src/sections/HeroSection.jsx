@@ -1,9 +1,9 @@
+import { Link } from "react-router-dom";
 import styles from "./HeroSection.module.css";
 import { useParallax } from "../hooks/useParallax";
 
 function HeroSection() {
   const slowOffset = useParallax(0.12);
-  const cardOffset = useParallax(0.08);
 
   return (
     <section className={styles.section}>
@@ -33,8 +33,12 @@ function HeroSection() {
           </p>
 
           <div className={styles.actions}>
-            <button className={styles.primaryButton}>Переглянути аукціони</button>
-            <button className={styles.secondaryButton}>Дізнатись більше</button>
+            <Link to="/auction" className={styles.primaryButton}>
+              Переглянути аукціони
+            </Link>
+            <Link to="/about" className={styles.secondaryButton}>
+              Дізнатись більше
+            </Link>
           </div>
 
           <div className={styles.stats}>
@@ -53,30 +57,13 @@ function HeroSection() {
           </div>
         </div>
 
-        <div
-          className={`${styles.visual} fade-in-up`}
-          style={{ transform: `translateY(${cardOffset}px)` }}
-        >
+        <div className={`${styles.visual} fade-in-up`}>
           <div className={styles.visualCard}>
-            <div className={styles.visualTop}>
-              <span className={styles.visualLabel}>Поточний аукціон</span>
-              <h2 className={styles.visualTitle}>Prada Limited Edition Wool Coat</h2>
-            </div>
-
-            <div className={styles.visualBottom}>
-              <div>
-                <div className={styles.infoLabel}>Поточна ставка</div>
-                <div className={styles.price}>€2,480</div>
-              </div>
-
-              <div className={styles.infoRow}>
-                <div>
-                  <div className={styles.infoLabel}>Завершиться через</div>
-                  <div className={styles.time}>03г 14хв</div>
-                </div>
-
-                <button className={styles.viewButton}>Переглянути</button>
-              </div>
+            <div className={styles.visualImage}>
+              <img
+                src="https://i.pinimg.com/736x/fc/c0/86/fcc086d622ffd9ede8c6e40a1dda0220.jpg"
+                alt="Fashion preview"
+              />
             </div>
           </div>
         </div>

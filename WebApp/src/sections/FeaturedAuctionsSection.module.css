@@ -17,10 +17,16 @@
 }
 
 .label {
+  display: inline-flex;
+  align-items: center;
+  padding: 10px 18px;
+  border-radius: 999px;
+  background: var(--surface);
+  border: 1px solid var(--border-color);
+  color: var(--accent);
   font-size: 12px;
   text-transform: uppercase;
-  letter-spacing: 0.2em;
-  color: var(--accent);
+  letter-spacing: 0.18em;
 }
 
 .title {
@@ -57,6 +63,9 @@
   overflow: hidden;
   box-shadow: var(--shadow-soft);
   transition: transform 0.35s ease, box-shadow 0.35s ease, border-color 0.35s ease;
+  display: flex;
+  flex-direction: column;
+  min-height: 560px;
 }
 
 .card:hover {
@@ -64,12 +73,20 @@
 }
 
 .image {
-  height: 260px;
-  background: linear-gradient(135deg, #d7b49a 0%, #9d7057 50%, #47322b 100%);
+  height: 280px;
+  min-height: 280px;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-color: #d7b49a;
 }
 
 .content {
   padding: 24px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  flex: 1;
 }
 
 .brand {
@@ -84,13 +101,14 @@
   font-size: 24px;
   line-height: 1.25;
   color: var(--text-primary);
+  min-height: 5.5rem;
 }
 
 .infoRow {
   display: flex;
   justify-content: space-between;
   gap: 16px;
-  margin-top: 24px;
+  margin-top: 20px;
 }
 
 .infoLabel {
@@ -108,11 +126,13 @@
 
 .bidButton {
   margin-top: 24px;
-  width: 100%;
-  padding: 14px 18px;
+  width: auto;
+  align-self: flex-start;
+  padding: 12px 26px;
   border-radius: 999px;
   background: var(--button-primary-bg);
   color: var(--button-primary-text);
+  white-space: nowrap;
   transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
