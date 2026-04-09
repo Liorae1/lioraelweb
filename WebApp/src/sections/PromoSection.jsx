@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import styles from "./PromoSection.module.css";
 import { useReveal } from "../hooks/useReveal";
 
@@ -14,14 +15,16 @@ function PromoSection() {
             <div className={styles.label}>Про платформу</div>
             <h2 className={styles.title}>Дізнайтесь більше про Liorael та принцип роботи платформи</h2>
             <p className={styles.text}>
-              На окремій сторінці можна буде красиво розмістити інформацію про
-              сайт, відповіді на часті питання, правила аукціонів та основні
-              переваги користування платформою.
+              Дізнайтесь, як працює Liorael: правила участі в аукціонах, вигоди для
+              продавців та покупців, відповіді на популярні питання та ключові
+              переваги платформи.
             </p>
           </div>
 
           <div className={styles.actions}>
-            <button className={styles.button}>Перейти до сторінки “Про сайт”</button>
+            <Link to="/about" className={styles.button}>
+              Перейти до сторінки “Про нас”
+            </Link>
           </div>
         </div>
       </div>

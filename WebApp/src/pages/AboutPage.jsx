@@ -1,60 +1,152 @@
+﻿import { useState } from "react";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import styles from "./AboutPage.module.css";
 
+const faqItems = [
+  {
+    question: "Чи всі речі перевіряються?",
+    answer:
+      "Ми ретельно обираємо продавців і працюємо над прозорістю опису лотів, щоб кожен покупець отримав впевненість у своїй покупці.",
+  },
+  {
+    question: "Чи можна відстежувати аукціони?",
+    answer:
+      "Так, на платформі доступний зручний перегляд активних лотів, ставка та таймер завершення кожного аукціону.",
+  },
+  {
+    question: "Як почати робити ставку?",
+    answer:
+      "Реєструйтесь, вибирайте лот, робіть ставку і слідкуйте за оновленнями. Ми створили платформу, щоб цей процес був швидким і зрозумілим для новачків.",
+  },
+  {
+    question: "Як зв’язатися з підтримкою?",
+    answer:
+      "Пишіть на адресу support@liorael.ua — наша команда відповідає швидко і готова допомогти з будь-яким питанням.",
+  },
+];
+
+const stepItems = [
+  {
+    label: "Огляд лотів",
+    description:
+      "Переглядайте підбірку брендового одягу, фільтруйте за стилем, розміром та статусом лоту.",
+  },
+  {
+    label: "Вивчення деталей",
+    description:
+      "Кожен лот містить опис, розміри, стан та деталі про бренд, щоб вам було легко прийняти рішення.",
+  },
+  {
+    label: "Зробити ставку",
+    description:
+      "Вкажіть бажану суму, підтвердіть дію і будьте готові до наступної ставки конкурента.",
+  },
+  {
+    label: "Стежити за завершенням",
+    description:
+      "Слідкуйте за таймером, сповіщеннями та статусом свого лоту в особистому кабінеті.",
+  },
+];
+
 function AboutPage() {
+  const [activeFaq, setActiveFaq] = useState(0);
+
+  const toggleFaq = (index) => {
+    setActiveFaq((current) => (current === index ? -1 : index));
+  };
+
   return (
     <>
       <Header />
 
       <main className={styles.page}>
         <section className={styles.hero}>
-          <div className={styles.container}>
+          <div className={styles.heroContainer}>
             <div className={`${styles.content} fade-in-up`}>
               <div className={styles.label}>Про платформу</div>
               <h1 className={styles.title}>Liorael — простір сучасних luxury-аукціонів</h1>
               <p className={styles.text}>
-                Ми створюємо платформу, де брендований одяг подається не просто
-                як товар, а як частина стилю, статусу та естетики. Liorael
-                поєднує в собі сучасний дизайн, зручну взаємодію та атмосферу
-                преміального цифрового простору.
+                Ми будуємо платформу для тих, хто цінує стиль, ексклюзивність і
+                якісну подачу. Liorael робить покупку брендового одягу простішою,
+                прозорою та приємною.
               </p>
+              <div className={styles.heroStats}>
+                <div className={`${styles.statItem} fade-in-up`} style={{ animationDelay: '0.4s' }}>
+                  <span>250+</span>
+                  <p>уникальних лотів</p>
+                </div>
+                <div className={`${styles.statItem} fade-in-up`} style={{ animationDelay: '0.5s' }}>
+                  <span>24/7</span>
+                  <p>підтримка</p>
+                </div>
+                <div className={`${styles.statItem} fade-in-up`} style={{ animationDelay: '0.6s' }}>
+                  <span>4,9</span>
+                  <p>зірки від клієнтів</p>
+                </div>
+              </div>
             </div>
 
             <div className={`${styles.imageBlock} fade-in`}>
-              {/* <img src={aboutImage} alt="Liorael" className={styles.image} /> */}
+              <img 
+                src="https://cdn.discordapp.com/attachments/1369760767334682714/1491916913901568050/fb1187a4-899b-43ef-b2fc-b4238d640b7d.png?ex=69d96f66&is=69d81de6&hm=4510640c20290823f20358dbd4531bff66e6ffc64416c7d4ae9f2721df80fc9f&" 
+                alt="Liorael luxury fashion" 
+                className={styles.heroImage}
+              />
             </div>
           </div>
         </section>
 
-        <section className={styles.infoSection}>
-          <div className={styles.infoContainer}>
-            <div className={styles.card}>
-              <h2 className={styles.cardTitle}>Що таке Liorael?</h2>
-              <p className={styles.cardText}>
-                Це платформа аукціонів брендового одягу, створена для
-                користувачів, які цінують унікальні речі, premium-подачу та
-                сучасний інтерфейс.
-              </p>
-            </div>
+        <section className={styles.aboutSection}>
+          <div className={styles.sectionHeader}>
+            <div className={`${styles.label} fade-in-up`}>Хто ми</div>
+            <h2 className={`${styles.sectionTitle} fade-in-up`}>Liorael — більше ніж маркетплейс</h2>
+          </div>
 
-            <div className={styles.card}>
-              <h2 className={styles.cardTitle}>Як це працює?</h2>
-              <p className={styles.cardText}>
-                Користувач переглядає доступні лоти, стежить за поточними
-                ставками, часом завершення та взаємодіє з платформою у зручному
-                і візуально приємному форматі.
+          <div className={styles.aboutGrid}>
+            <article className={`${styles.aboutCard} fade-in-up`} style={{ animationDelay: '0.1s' }}>
+              <h3>Наша місія</h3>
+              <p>
+                Ми створюємо екосистему, де кожен лот виглядає як витвір мистецтва,
+                а сам процес торгівлі приносить задоволення та відчуття преміальності.
               </p>
-            </div>
+            </article>
+            <article className={`${styles.aboutCard} fade-in-up`} style={{ animationDelay: '0.2s' }}>
+              <h3>Історія</h3>
+              <p>
+                Liorael стартувала з ідеї зробити luxury-аукціони доступними для
+                українського ринку. Ми поєднали класичну аукціонну драму з
+                сучасним інтерфейсом.
+              </p>
+            </article>
+            <article className={`${styles.aboutCard} fade-in-up`} style={{ animationDelay: '0.3s' }}>
+              <h3>Наш підхід</h3>
+              <p>
+                Ми працюємо з авторитетними продавцями, відбираємо лоти вручну і
+                розповідаємо про них чесно — щоб ви купували з упевненістю.
+              </p>
+            </article>
+          </div>
+        </section>
 
-            <div className={styles.card}>
-              <h2 className={styles.cardTitle}>Чому це зручно?</h2>
-              <p className={styles.cardText}>
-                Інтерфейс побудований так, щоб користувач не губився серед
-                елементів, а швидко знаходив потрібну інформацію і при цьому
-                відчував атмосферу luxury.
-              </p>
-            </div>
+        <section className={styles.stepsSection}>
+          <div className={styles.sectionHeader}>
+            <div className={styles.label}>Як це працює</div>
+            <h2 className={styles.sectionTitle}>Покроковий шлях для новачків</h2>
+            <p className={styles.sectionIntro}>
+              Простий і зрозумілий формат допомагає швидко орієнтуватися на
+              платформі та робити ставки без зайвого стресу.
+            </p>
+          </div>
+
+          <div className={styles.stepsGrid}>
+            {stepItems.map((step, index) => (
+              <div key={step.label} className={`${styles.stepCard} fade-in-up`}>
+                <div className={styles.stepIndex}>{index + 1}</div>
+                <h3>{step.label}</h3>
+                <p>{step.description}</p>
+              </div>
+            ))}
           </div>
         </section>
 
@@ -62,31 +154,31 @@ function AboutPage() {
           <div className={styles.faqContainer}>
             <div className={styles.label}>FAQ</div>
             <h2 className={styles.faqTitle}>Часті запитання</h2>
+            <p className={styles.faqIntro}>
+              Якщо не знайшли потрібну відповідь, ви завжди можете написати нам
+              на <a href="mailto:support@liorael.ua">support@liorael.ua</a>.
+            </p>
 
             <div className={styles.faqList}>
-              <div className={styles.faqItem}>
-                <h3 className={styles.faqQuestion}>Чи всі речі перевіряються?</h3>
-                <p className={styles.faqAnswer}>
-                  У майбутньому платформа може підтримувати механізми перевірки
-                  автентичності та прозорого опису лотів.
-                </p>
-              </div>
-
-              <div className={styles.faqItem}>
-                <h3 className={styles.faqQuestion}>Чи можна відстежувати аукціони?</h3>
-                <p className={styles.faqAnswer}>
-                  Так, логіка платформи передбачає зручний перегляд активних
-                  лотів, ставок та часу завершення.
-                </p>
-              </div>
-
-              <div className={styles.faqItem}>
-                <h3 className={styles.faqQuestion}>Для кого створений Liorael?</h3>
-                <p className={styles.faqAnswer}>
-                  Для людей, які хочуть бачити не просто каталог речей, а
-                  сучасний luxury-сервіс із виразною візуальною подачею.
-                </p>
-              </div>
+              {faqItems.map((item, index) => (
+                <div
+                  key={item.question}
+                  className={`${styles.faqItem} ${activeFaq === index ? styles.active : ""}`}
+                >
+                  <button
+                    type="button"
+                    className={styles.faqButton}
+                    onClick={() => toggleFaq(index)}
+                    aria-expanded={activeFaq === index}
+                  >
+                    <span>{item.question}</span>
+                    <span className={styles.arrow}>{activeFaq === index ? "−" : "+"}</span>
+                  </button>
+                  <div className={styles.faqAnswer}>
+                    <p>{item.answer}</p>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
         </section>

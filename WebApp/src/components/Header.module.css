@@ -247,3 +247,24 @@
     display: none;
   }
 }
+
+.brand {
+  text-decoration: none;
+  color: inherit;
+}
+
+.logo {
+  text-decoration: none;
+}
+
+.active {
+  color: var(--accent-color, #d6b36a);
+}
+
+.arrow {
+  transition: transform 0.25s ease;
+}
+
+.arrowOpen {
+  transform: rotate(180deg);
+}

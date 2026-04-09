@@ -1,32 +1,15 @@
+import { Link } from "react-router-dom";
 import styles from "./FeaturedAuctionsSection.module.css";
 import { useReveal } from "../hooks/useReveal";
+import { mockLots } from "../data/mockLots";
 
-const auctions = [
-  {
-    id: 1,
-    brand: "Prada",
-    title: "Limited Wool Coat",
-    price: "€2,480",
-    time: "03г 14хв",
-  },
-  {
-    id: 2,
-    brand: "Balenciaga",
-    title: "Archive Leather Bag",
-    price: "€3,180",
-    time: "05г 22хв",
-  },
-  {
-    id: 3,
-    brand: "Gucci",
-    title: "Vintage Silk Jacket",
-    price: "€1,920",
-    time: "01г 47хв",
-  },
-];
+function formatTimeLeft(timeLeft) {
+  return timeLeft.replace(/\b0+(\d+)г/, "$1г").replace(/\b0+(\d+)хв/, "$1хв");
+}
 
 function FeaturedAuctionsSection() {
   const { ref, isVisible } = useReveal();
+  const featuredLots = mockLots.slice(0, 3);
   
   return (
     <section 
@@ -40,13 +23,18 @@ function FeaturedAuctionsSection() {
             <h2 className={styles.title}>Популярні аукціони</h2>
           </div>
 
-          <button className={styles.allButton}>Усі аукціони</button>
+          <Link to="/auction" className={styles.allButton}>
+            Усі аукціони
+          </Link>
         </div>
 
         <div className={styles.grid}>
-          {auctions.map((item) => (
+          {featuredLots.map((item) => (
             <article key={item.id} className={styles.card}>
-              <div className={styles.image}></div>
+              <div
+                className={styles.image}
+                style={{ backgroundImage: `url(${item.image})` }}
+              ></div>
 
               <div className={styles.content}>
                 <div className={styles.brand}>{item.brand}</div>
@@ -55,16 +43,18 @@ function FeaturedAuctionsSection() {
                 <div className={styles.infoRow}>
                   <div>
                     <div className={styles.infoLabel}>Поточна ставка</div>
-                    <div className={styles.price}>{item.price}</div>
+                    <div className={styles.price}>{item.currentBid.toLocaleString("uk-UA")} ₴</div>
                   </div>
 
                   <div>
                     <div className={styles.infoLabel}>Завершиться через</div>
-                    <div className={styles.time}>{item.time}</div>
+                    <div className={styles.time}>{formatTimeLeft(item.timeLeft)}</div>
                   </div>
                 </div>
 
-                <button className={styles.bidButton}>Переглянути лот</button>
+                <Link to={`/auction/${item.id}`} className={styles.bidButton}>
+                  Переглянути лот
+                </Link>
               </div>
             </article>
           ))}
