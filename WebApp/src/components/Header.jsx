@@ -40,24 +40,43 @@ function Header() {
     navigate("/");
   };
 
+  const isActive = (path) => {
+    if (path === "/") {
+      return location.pathname === "/";
+    }
+
+    return location.pathname === path || location.pathname.startsWith(`${path}/`);
+  };
+
   const firstLetter = user?.name?.charAt(0)?.toUpperCase() || "U";
 
   return (
     <header className={styles.header}>
       <div className={styles.container}>
-        <div className={styles.brand}>
+        <Link to="/" className={styles.brand}>
           <div className={styles.logo}>Liorael</div>
           <div className={styles.subtitle}>Аукціони брендового одягу</div>
-        </div>
+        </Link>
 
         <nav className={styles.nav}>
-          <Link to="/" className={styles.link}>
+          <Link
+            to="/"
+            className={`${styles.link} ${isActive("/") ? styles.active : ""}`}
+          >
             Головна
           </Link>
-          <Link to="#" className={styles.link}>
+
+          <Link
+            to="/auction"
+            className={`${styles.link} ${isActive("/auction") ? styles.active : ""}`}
+          >
             Аукціони
           </Link>
-          <Link to="/about" className={styles.link}>
+
+          <Link
+            to="/about"
+            className={`${styles.link} ${isActive("/about") ? styles.active : ""}`}
+          >
             Про нас
           </Link>
         </nav>

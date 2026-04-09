@@ -3,6 +3,8 @@ import HomePage from "./pages/HomePage";
 import AboutPage from "./pages/AboutPage";
 import AuthPage from "./pages/AuthPage";
 import ProfilePage from "./pages/ProfilePage";
+import AuctionsPage from "./pages/AuctionsPage";
+import AuctionDetailsPage from "./pages/AuctionDetailsPage";
 
 function App() {
   return (
@@ -11,6 +13,8 @@ function App() {
       <Route path="/about" element={<AboutPage />} />
       <Route path="/auth" element={<AuthPage />} />
       <Route path="/profile" element={<ProfilePage />} />
+      <Route path="/auction" element={<AuctionsPage />} />
+      <Route path="/auction/:id" element={<AuctionDetailsPage />} />
     </Routes>
   );
 }
