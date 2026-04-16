@@ -1,37 +1,62 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
 import Header from "../components/Header";
-import { loginFakeUser } from "../utils/fakeAuth";
 import styles from "./AuthPage.module.css";
+import api from "../api/axios";
 
 function AuthPage() {
   const [isLogin, setIsLogin] = useState(true);
   const navigate = useNavigate();
 
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
 
-    loginFakeUser({
-      name: "Yuliia",
-      username: "@yuliia",
-      email: "yuliia@email.com",
-      balance: 12450,
-    });
+    try {
+      const email = e.target.loginEmail.value;
+      const password = e.target.loginPassword.value;
 
-    navigate("/profile");
+      const res = await api.post("/api/Auth/login", {
+        email,
+        password,
+      });
+
+      localStorage.setItem("token", res.data.token);
+
+      navigate("/profile");
+    } catch (err) {
+      console.error(err);
+      alert("Ошибка входа");
+    }
   };
 
-  const handleRegister = (e) => {
+  const handleRegister = async (e) => {
     e.preventDefault();
 
-    loginFakeUser({
-      name: "Yuliia",
-      username: "@new_user",
-      email: "newuser@email.com",
-      balance: 8000,
-    });
+    try {
+      const name = e.target.registerName.value;
+      const email = e.target.registerEmail.value;
+      const password = e.target.registerPassword.value;
+      const repeatPassword = e.target.registerPasswordRepeat.value;
 
-    navigate("/profile");
+      if (password !== repeatPassword) {
+        alert("Пароли не совпадают");
+        return;
+      }
+
+      const res = await axios.post("/api/Auth/register", {
+        name,
+        email,
+        password,
+      });
+
+      localStorage.setItem("token", res.data.token);
+
+      navigate("/profile");
+    } catch (err) {
+      console.error(err);
+      alert("Ошибка регистрации");
+    }
   };
 
   const content = isLogin
@@ -41,8 +66,7 @@ function AuthPage() {
         text: "Увійдіть до свого акаунта, щоб переглядати преміальні лоти, зберігати обрані речі та брати участь в аукціонах.",
         formLabel: "Вхід до акаунта",
         formTitle: "Раді бачити вас знову",
-        formSubtitle:
-          "Увійдіть, щоб продовжити покупки та участь в аукціонах.",
+        formSubtitle: "Увійдіть, щоб продовжити покупки та участь в аукціонах.",
         buttonText: "Увійти",
       }
     : {
@@ -104,33 +128,34 @@ function AuthPage() {
           </div>
 
           <div className={styles.formPanel}>
-            <div className={styles.switcherWrapper}>
-              <p className={styles.switcherHint}>Оберіть режим</p>
-
-              <div className={styles.modeSwitcher}>
+            <div className={styles.accountSwitch}>
+              <div className={styles.segmentedControl}>
                 <button
                   type="button"
                   onClick={() => setIsLogin(true)}
-                  className={`${styles.modeButton} ${
-                    isLogin ? styles.modeButtonActive : ""
+                  className={`${styles.segmentButton} ${
+                    isLogin ? styles.segmentActive : ""
                   }`}
-                  aria-label="Переключити на вхід"
                 >
-                  <span className={styles.modeIcon}>↪</span>
-                  <span className={styles.modeText}>Вхід</span>
+                  Увійти
                 </button>
 
                 <button
                   type="button"
                   onClick={() => setIsLogin(false)}
-                  className={`${styles.modeButton} ${
-                    !isLogin ? styles.modeButtonActive : ""
+                  className={`${styles.segmentButton} ${
+                    !isLogin ? styles.segmentActive : ""
                   }`}
-                  aria-label="Переключити на реєстрацію"
                 >
-                  <span className={styles.modeIcon}>✦</span>
-                  <span className={styles.modeText}>Реєстрація</span>
+                  Реєстрація
                 </button>
+
+                <div
+                  className={styles.segmentSlider}
+                  style={{
+                    transform: isLogin ? "translateX(0%)" : "translateX(100%)",
+                  }}
+                />
               </div>
             </div>
 

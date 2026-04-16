@@ -2,6 +2,7 @@
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import styles from "./AboutPage.module.css";
+import img from "../app/images/lioraelaboutimg.png";
 
 const faqItems = [
   {
@@ -89,7 +90,7 @@ function AboutPage() {
 
             <div className={`${styles.imageBlock} fade-in`}>
               <img 
-                src="https://cdn.discordapp.com/attachments/1369760767334682714/1491916913901568050/fb1187a4-899b-43ef-b2fc-b4238d640b7d.png?ex=69d96f66&is=69d81de6&hm=4510640c20290823f20358dbd4531bff66e6ffc64416c7d4ae9f2721df80fc9f&" 
+                src={img} 
                 alt="Liorael luxury fashion" 
                 className={styles.heroImage}
               />
