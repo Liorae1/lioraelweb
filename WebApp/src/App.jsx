@@ -1,13 +1,34 @@
+import { useEffect, useState } from "react";
 import { Routes, Route } from "react-router-dom";
+import Loader from "./components/Loader.jsx";
+import FloatingMenu from "./components/FloatingMenu";
 import HomePage from "./pages/HomePage";
 import AboutPage from "./pages/AboutPage";
 import AuthPage from "./pages/AuthPage";
 import ProfilePage from "./pages/ProfilePage";
 import AuctionsPage from "./pages/AuctionsPage";
 import AuctionDetailsPage from "./pages/AuctionDetailsPage";
-import FloatingMenu from "./components/FloatingMenu";
+import VerifyEmailPage from "./pages/VerifyEmailPage";
 
 function App() {
+  const [loading, setLoading] = useState(true);
+
+   useEffect(() => {
+    const wakeUp = async () => {
+      try {
+        await fetch("https://liorael-b9hugjgvbygshzgy.swedencentral-01.azurewebsites.net/health");
+      } catch (e) {
+        console.log("Server wake error:", e);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    wakeUp();
+  }, []);
+
+  if (loading) return <Loader />;
+
   return (
     <>
       <FloatingMenu />
@@ -18,6 +39,7 @@ function App() {
         <Route path="/profile" element={<ProfilePage />} />
         <Route path="/auction" element={<AuctionsPage />} />
         <Route path="/auction/:id" element={<AuctionDetailsPage />} />
+        <Route path="/verify-email" element={<VerifyEmailPage />} />
       </Routes>
     </>
   );

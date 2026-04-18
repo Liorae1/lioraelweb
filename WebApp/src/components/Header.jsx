@@ -108,7 +108,7 @@ function Header() {
     user?.email ||
     "Користувач";
 
-  const nickname = user?.userName ? `@${user.userName}` : displayName;
+  const nickname = user?.userName ? `${user.userName}` : displayName;
   const balanceLabel = `${(user?.balance ?? 0).toLocaleString("uk-UA")} ₴`;
   const firstLetter = displayName.charAt(0).toUpperCase();
   const isAuth = !!user;
