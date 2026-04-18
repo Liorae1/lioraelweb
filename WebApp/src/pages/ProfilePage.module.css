@@ -49,8 +49,8 @@
 }
 
 .bigAvatar {
-  width: 96px;
-  height: 96px;
+  width: 120px;
+  height: 120px;
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -61,7 +61,7 @@
     var(--featured-gradient-end)
   );
   color: var(--featured-text);
-  font-size: 34px;
+  font-size: 42px;
   font-weight: 700;
   flex-shrink: 0;
   box-shadow: var(--shadow-soft);
@@ -123,35 +123,71 @@
   gap: 18px;
 }
 
-.balanceCard {
-  padding: 18px 22px;
-  min-width: 220px;
-  border-radius: 24px;
-  background: var(--surface-strong);
-  border: 1px solid var(--border-color);
-  text-align: right;
-}
-
-.balanceLabel {
-  display: block;
-  margin-bottom: 8px;
-  font-size: 13px;
-  color: var(--text-secondary);
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-}
-
-.balanceValue {
-  font-size: 32px;
-  color: var(--text-primary);
-  letter-spacing: -0.03em;
-}
-
 .heroButtons {
   display: flex;
   gap: 12px;
   flex-wrap: wrap;
   justify-content: flex-end;
+}
+
+.balanceCard {
+  width: min(240px, 100%);
+  padding: 18px 22px;
+  border-radius: 24px;
+  background: var(--surface-strong);
+  border: 1px solid var(--border-color);
+  text-align: right;
+  margin-bottom: 18px;
+}
+
+.balanceLabel {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--text-secondary);
+}
+
+.balanceValue {
+  display: block;
+  font-size: 32px;
+  color: var(--text-primary);
+  letter-spacing: -0.03em;
+  margin-bottom: 8px;
+}
+
+.balanceText {
+  margin: 0;
+  font-size: 13px;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+.iconButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 48px;
+  padding: 0 18px;
+  border-radius: 999px;
+  border: 1px solid var(--border-color);
+  background: var(--button-secondary-bg);
+  color: var(--button-secondary-text);
+  font-size: 14px;
+  font-weight: 600;
+  transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease, background 0.25s ease, color 0.25s ease;
+}
+
+.iconButton:hover {
+  transform: translateY(-2px);
+  border-color: var(--accent-soft);
+}
+
+.heartIcon {
+  font-size: 16px;
+  line-height: 1;
+  color: var(--accent);
 }
 
 .primaryButton,
@@ -209,17 +245,26 @@
 .statsGrid {
   margin-top: 24px;
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(2, 1fr);
+  grid-template-rows: repeat(2, 1fr);
   gap: 18px;
 }
 
 .statCard {
-  padding: 24px;
+  padding: 32px;
   border-radius: 26px;
   background: var(--surface);
   border: 1px solid var(--border-color);
   box-shadow: var(--shadow-soft);
   animation: cardSlide 0.45s ease;
+  transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+  cursor: pointer;
+}
+
+.statCard:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.15);
+  border-color: var(--accent-soft);
 }
 
 .statLabel {
@@ -237,29 +282,85 @@
   font-size: 34px;
   color: var(--text-primary);
   letter-spacing: -0.03em;
+  font-weight: 700;
 }
 
-.statText {
-  margin: 0;
-  font-size: 14px;
-  color: var(--text-secondary);
-  line-height: 1.6;
+.statCard button {
+  margin-top: 12px;
+  background: linear-gradient(135deg, var(--accent) 0%, var(--accent-soft) 100%);
+  color: white;
+  border: none;
+  font-weight: 600;
+}
+
+.statCard button:hover {
+  background: linear-gradient(135deg, var(--accent-soft) 0%, var(--accent) 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(184, 138, 103, 0.3);
 }
 
 .profileOverviewGrid {
   margin-top: 24px;
   display: grid;
-  grid-template-columns: 1.2fr 0.8fr;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-auto-rows: auto;
   gap: 18px;
 }
 
 .panel {
-  padding: 26px;
+  padding: 32px;
   border-radius: 28px;
   background: var(--surface);
   border: 1px solid var(--border-color);
   box-shadow: var(--shadow-soft);
   animation: cardSlide 0.45s ease;
+}
+
+.panelWide {
+  grid-column: 1 / -1;
+}
+
+.subscriptionSummary {
+  display: grid;
+  gap: 18px;
+}
+
+.subscriptionText {
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.75;
+  color: var(--text-secondary);
+}
+
+.subscriptionChips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.subscriptionChip {
+  padding: 10px 16px;
+  border-radius: 999px;
+  background: var(--surface-strong);
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.subscriptionDetails {
+  display: grid;
+  gap: 10px;
+}
+
+.subscriptionItem {
+  padding: 16px;
+  border-radius: 20px;
+  background: rgba(184, 138, 103, 0.08);
+  border: 1px solid rgba(184, 138, 103, 0.15);
+  color: var(--text-primary);
+  font-size: 14px;
+  line-height: 1.65;
 }
 
 .panelHeader {
@@ -357,12 +458,15 @@
 
 .actionStack {
   display: grid;
-  gap: 12px;
+  gap: 18px;
 }
 
 .quickActionButton {
   justify-content: flex-start;
   text-align: left;
+  min-height: 64px;
+  padding: 0 28px;
+  font-size: 16px;
 }
 
 .fullscreenSection {
@@ -385,6 +489,16 @@
 }
 
 .fullscreenCard {
+  padding: 32px;
+  border-radius: 32px;
+  background: var(--surface);
+  border: 1px solid var(--border-color);
+  box-shadow: var(--shadow-soft);
+  backdrop-filter: blur(16px);
+  animation: panelReveal 0.35s ease;
+}
+
+.upgradeContainer {
   padding: 32px;
   border-radius: 32px;
   background: var(--surface);
@@ -426,6 +540,25 @@
   grid-template-columns: 320px 1fr;
   gap: 24px;
   align-items: start;
+}
+
+.accountSettingsGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+}
+
+.settingsCard {
+  padding: 28px;
+  border-radius: 28px;
+  background: var(--surface);
+  border: 1px solid var(--border-color);
+  box-shadow: var(--shadow-soft);
+}
+
+.settingsForm {
+  display: grid;
+  gap: 18px;
 }
 
 .avatarEditorCard {
@@ -616,10 +749,135 @@
   }
 }
 
+.upgradeGrid {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 30px;
+  margin-top: 24px;
+  perspective: 1200px;
+  min-height: 60vh;
+}
+
+.upgradeCard {
+  padding: 44px 32px 32px;
+  border-radius: 32px;
+  background: var(--surface);
+  border: 1px solid var(--border-color);
+  box-shadow: var(--shadow-soft);
+  animation: cardSlide 0.45s ease;
+  transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+  flex: 1;
+  max-width: 350px;
+  min-height: 560px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  justify-content: flex-start;
+  position: relative;
+  overflow: hidden;
+}
+
+.currentSubscription {
+  border-color: var(--accent);
+  box-shadow: 0 0 30px rgba(184, 138, 103, 0.5), 0 8px 32px rgba(0, 0, 0, 0.15);
+}
+
+.statusRibbon {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  background: linear-gradient(135deg, var(--accent) 0%, var(--accent-soft) 100%);
+  color: white;
+  text-align: center;
+  padding: 8px 16px;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  box-shadow: 0 2px 8px rgba(184, 138, 103, 0.4);
+  z-index: 1;
+}
+
+.upgradeCard:nth-child(1) {
+  transform: rotateY(10deg) translateZ(30px);
+}
+
+.upgradeCard:nth-child(2) {
+  transform: translateZ(-30px);
+}
+
+.upgradeCard:nth-child(3) {
+  transform: rotateY(-10deg) translateZ(30px);
+}
+
+.upgradeCard:hover {
+  transform: translateY(-4px) translateZ(50px);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.15);
+  border-color: var(--accent-soft);
+}
+
+.upgradeHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 22px;
+}
+
+.upgradeHeader h3 {
+  margin: 0;
+  font-size: 28px;
+  color: var(--text-primary);
+}
+
+.upgradePrice {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--accent);
+}
+
+.upgradeDescription {
+  margin: 0 0 18px;
+  font-size: 17px;
+  line-height: 1.75;
+  color: var(--text-secondary);
+}
+
+.advantagesList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  flex: 1;
+}
+
+.advantagesList li {
+  font-size: 16px;
+  color: var(--text-primary);
+  position: relative;
+  padding-left: 20px;
+  line-height: 1.6;
+}
+
+.advantagesList li::before {
+  content: "✓";
+  position: absolute;
+  left: 0;
+  color: var(--accent);
+  font-weight: 700;
+}
+
 @media (max-width: 1100px) {
   .heroCard {
     flex-direction: column;
     align-items: flex-start;
+  }
+
+  .accountSettingsGrid {
+    grid-template-columns: 1fr;
   }
 
   .heroRight {
@@ -717,4 +975,25 @@
 
 .infoRow strong {
   white-space: pre-wrap;
+}
+
+@media (max-width: 1100px) {
+  .upgradeGrid {
+    flex-direction: column;
+    perspective: none;
+  }
+
+  .upgradeCard {
+    max-width: none;
+    transform: none !important;
+  }
+
+  .upgradeCard:hover {
+    transform: translateY(-4px) !important;
+  }
+
+  .upgradeContainer {
+    padding: 20px;
+    border-radius: 24px;
+  }
 }

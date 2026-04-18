@@ -1,63 +1,260 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
 import Header from "../components/Header";
 import styles from "./AuthPage.module.css";
 import api from "../api/axios";
 
 function AuthPage() {
   const [isLogin, setIsLogin] = useState(true);
+  const [loginData, setLoginData] = useState({ email: "", password: "", rememberMe: false });
+  const [registerData, setRegisterData] = useState({
+    username: "",
+    email: "",
+    password: "",
+    passwordRepeat: "",
+    agreeTerms: false,
+  });
+
+  const [verificationNotice, setVerificationNotice] = useState({
+  open: false,
+  email: "",
+  message: "",
+});
+const [resendLoading, setResendLoading] = useState(false);
+const [resendMessage, setResendMessage] = useState("");
+  const [errors, setErrors] = useState({});
+  const [touched, setTouched] = useState({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState("");
   const navigate = useNavigate();
 
-  const handleLogin = async (e) => {
-    e.preventDefault();
+  const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  const usernamePattern = /^[^\s]{3,}$/;
+  const passwordPattern = /^(?=.*[A-Z])(?=.*\d).{8,}$/;
 
-    try {
-      const email = e.target.loginEmail.value;
-      const password = e.target.loginPassword.value;
+  const getFieldKey = (section, field) => `${section}${field.charAt(0).toUpperCase()}${field.slice(1)}`;
+  const shouldShowError = (section, field) => (touched[getFieldKey(section, field)] || isSubmitting) && !!errors[getFieldKey(section, field)];
+  const getFieldError = (section, field) => errors[getFieldKey(section, field)];
+  const getFieldHint = (section, field) => {
+    if (section !== "register") return "";
 
-      const res = await api.post("/api/Auth/login", {
-        email,
-        password,
-      });
+    const hints = {
+      username: "Мінімум 3 символи, без пробілів.",
+      email: "Дійсний email, який ще не використовувався.",
+      password: "8+ символів, одна велика літера та цифра.",
+      passwordRepeat: "Повторіть пароль точно так само.",
+    };
 
-      localStorage.setItem("token", res.data.token);
-
-      navigate("/profile");
-    } catch (err) {
-      console.error(err);
-      alert("Ошибка входа");
-    }
+    return hints[field] || "";
   };
+
+  const handleFieldChange = (section, field, value) => {
+    if (section === "login") {
+      setLoginData((prev) => ({ ...prev, [field]: value }));
+    } else {
+      setRegisterData((prev) => ({ ...prev, [field]: value }));
+    }
+
+    setErrors((prev) => ({ ...prev, [getFieldKey(section, field)]: undefined }));
+    if (submitError) setSubmitError("");
+  };
+
+  const handleFieldBlur = (section, field) => {
+    setTouched((prev) => ({ ...prev, [getFieldKey(section, field)]: true }));
+  };
+
+  const validateLogin = () => {
+    const nextErrors = {};
+    if (!loginData.email.trim()) {
+      nextErrors.loginEmail = "Введите email";
+    } else if (!emailPattern.test(loginData.email.trim())) {
+      nextErrors.loginEmail = "Введите корректный email";
+    }
+
+    if (!loginData.password) {
+      nextErrors.loginPassword = "Введите пароль";
+    } else if (!passwordPattern.test(loginData.password)) {
+      nextErrors.loginPassword = "Пароль должен содержать 8+ символов, заглавную букву и цифру";
+    }
+
+    return nextErrors;
+  };
+
+  const validateRegister = () => {
+    const nextErrors = {};
+    if (!registerData.username.trim()) {
+      nextErrors.registerUsername = "Введите имя пользователя";
+    } else if (!usernamePattern.test(registerData.username.trim())) {
+      nextErrors.registerUsername = "Имя пользователя должно быть не менее 3 символов и без пробелов";
+    }
+
+    if (!registerData.email.trim()) {
+      nextErrors.registerEmail = "Введите email";
+    } else if (!emailPattern.test(registerData.email.trim())) {
+      nextErrors.registerEmail = "Введите корректный email";
+    }
+
+    if (!registerData.password) {
+      nextErrors.registerPassword = "Введите пароль";
+    } else if (!passwordPattern.test(registerData.password)) {
+      nextErrors.registerPassword = "Пароль должен быть 8+ символов, с заглавной буквой и цифрой";
+    }
+
+    if (!registerData.passwordRepeat) {
+      nextErrors.registerPasswordRepeat = "Повторите пароль";
+    } else if (registerData.passwordRepeat !== registerData.password) {
+      nextErrors.registerPasswordRepeat = "Пароли не совпадают";
+    }
+
+    if (!registerData.agreeTerms) {
+      nextErrors.registerAgreeTerms = "Требуется согласие с условиями";
+    }
+
+    return nextErrors;
+  };
+
+ const handleLogin = async (e) => {
+  e.preventDefault();
+  setIsSubmitting(true);
+  setSubmitError("");
+
+  const validation = validateLogin();
+  setErrors(validation);
+  setTouched((prev) => ({
+    ...prev,
+    loginEmail: true,
+    loginPassword: true,
+  }));
+
+  if (Object.keys(validation).length) {
+    setIsSubmitting(false);
+    return;
+  }
+
+  try {
+    const res = await api.post("/api/Auth/login", {
+      Email: loginData.email.trim(),
+      Password: loginData.password,
+    });
+
+    localStorage.setItem("token", res.data.token);
+    navigate("/profile");
+  } catch (err) {
+    console.error(err);
+
+    const serverMessage =
+      err?.response?.data?.message ||
+      err?.response?.data ||
+      "Ошибка входа. Проверьте данные и попробуйте снова.";
+
+    if (serverMessage.toString().toLowerCase().includes("confirm your email")) {
+      setVerificationNotice({
+        open: true,
+        email: loginData.email.trim(),
+        message: "Спочатку підтвердіть email. Ми вже надіслали або можемо надіслати лист повторно.",
+      });
+    }
+
+    setSubmitError(serverMessage);
+  } finally {
+    setIsSubmitting(false);
+  }
+};
 
   const handleRegister = async (e) => {
-    e.preventDefault();
+  e.preventDefault();
+  setIsSubmitting(true);
+  setSubmitError("");
+  setResendMessage("");
 
-    try {
-      const name = e.target.registerName.value;
-      const email = e.target.registerEmail.value;
-      const password = e.target.registerPassword.value;
-      const repeatPassword = e.target.registerPasswordRepeat.value;
+  const validation = validateRegister();
+  setErrors(validation);
+  setTouched((prev) => ({
+    ...prev,
+    registerUsername: true,
+    registerEmail: true,
+    registerPassword: true,
+    registerPasswordRepeat: true,
+    registerAgreeTerms: true,
+  }));
 
-      if (password !== repeatPassword) {
-        alert("Пароли не совпадают");
-        return;
-      }
+  if (Object.keys(validation).length) {
+    setIsSubmitting(false);
+    return;
+  }
 
-      const res = await axios.post("/api/Auth/register", {
-        name,
-        email,
-        password,
-      });
+  try {
+    const res = await api.post("/api/Auth/register", {
+      UserName: registerData.username.trim(),
+      Email: registerData.email.trim(),
+      Password: registerData.password,
+    });
 
-      localStorage.setItem("token", res.data.token);
+    setVerificationNotice({
+      open: true,
+      email: registerData.email.trim(),
+      message: res?.data?.message || "Ми надіслали лист для підтвердження пошти.",
+    });
 
-      navigate("/profile");
-    } catch (err) {
-      console.error(err);
-      alert("Ошибка регистрации");
+    setRegisterData({
+      username: "",
+      email: "",
+      password: "",
+      passwordRepeat: "",
+      agreeTerms: false,
+    });
+
+    setIsLogin(true);
+  } catch (err) {
+    console.error(err);
+
+    const serverMessage =
+      err?.response?.data?.message ||
+      err?.response?.data ||
+      "Ошибка регистрации. Проверьте данные и попробуйте снова.";
+
+    const conflictEmail =
+      err?.response?.status === 409 ||
+      serverMessage?.toString().toLowerCase().includes("email already exists");
+
+    if (conflictEmail) {
+      setErrors((prev) => ({
+        ...prev,
+        registerEmail: "Этот email уже используется",
+      }));
+      setTouched((prev) => ({ ...prev, registerEmail: true }));
     }
-  };
+
+    setSubmitError(serverMessage);
+  } finally {
+    setIsSubmitting(false);
+  }
+};
+
+const handleResendVerification = async () => {
+  if (!verificationNotice.email) return;
+
+  try {
+    setResendLoading(true);
+    setResendMessage("");
+
+    const res = await api.post("/api/Auth/resend-verification", {
+      email: verificationNotice.email,
+    });
+
+    setResendMessage(
+      res?.data?.message || "Лист для підтвердження відправлено повторно."
+    );
+  } catch (err) {
+    console.error(err);
+    setResendMessage(
+      err?.response?.data?.message ||
+        "Не вдалося повторно надіслати лист. Спробуйте пізніше."
+    );
+  } finally {
+    setResendLoading(false);
+  }
+};
 
   const content = isLogin
     ? {
@@ -166,33 +363,69 @@ function AuthPage() {
             </div>
 
             <div className={styles.formViewport}>
+              {submitError && (
+                <div className={styles.submitError}>{submitError}</div>
+              )}
+
               <div
                 className={`${styles.formsTrack} ${
                   isLogin ? styles.showLogin : styles.showRegister
                 }`}
               >
                 <form className={styles.form} onSubmit={handleLogin}>
-                  <div className={styles.inputGroup}>
+                  <div
+                    className={`${styles.inputGroup} ${
+                      shouldShowError("login", "email") ? styles.inputInvalid : ""
+                    }`}
+                  >
                     <label htmlFor="loginEmail">Електронна пошта</label>
                     <input
                       id="loginEmail"
                       type="email"
                       placeholder="Введіть вашу пошту"
+                      value={loginData.email}
+                      onChange={(e) => handleFieldChange("login", "email", e.target.value)}
+                      onBlur={() => handleFieldBlur("login", "email")}
+                      aria-invalid={!!getFieldError("login", "email")}
+                      aria-describedby="loginEmailError"
                     />
+                    {shouldShowError("login", "email") && (
+                      <p id="loginEmailError" className={styles.errorMessage}>
+                        {getFieldError("login", "email")}
+                      </p>
+                    )}
                   </div>
 
-                  <div className={styles.inputGroup}>
+                  <div
+                    className={`${styles.inputGroup} ${
+                      shouldShowError("login", "password") ? styles.inputInvalid : ""
+                    }`}
+                  >
                     <label htmlFor="loginPassword">Пароль</label>
                     <input
                       id="loginPassword"
                       type="password"
                       placeholder="Введіть пароль"
+                      value={loginData.password}
+                      onChange={(e) => handleFieldChange("login", "password", e.target.value)}
+                      onBlur={() => handleFieldBlur("login", "password")}
+                      aria-invalid={!!getFieldError("login", "password")}
+                      aria-describedby="loginPasswordError"
                     />
+                    {shouldShowError("login", "password") && (
+                      <p id="loginPasswordError" className={styles.errorMessage}>
+                        {getFieldError("login", "password")}
+                      </p>
+                    )}
                   </div>
 
                   <div className={styles.rowBetween}>
                     <label className={styles.checkbox}>
-                      <input type="checkbox" />
+                      <input
+                        type="checkbox"
+                        checked={loginData.rememberMe}
+                        onChange={(e) => handleFieldChange("login", "rememberMe", e.target.checked)}
+                      />
                       <span>Запам’ятати мене</span>
                     </label>
 
@@ -201,40 +434,104 @@ function AuthPage() {
                     </button>
                   </div>
 
-                  <button type="submit" className={styles.submitButton}>
-                    Увійти
+                  <button
+                    type="submit"
+                    className={styles.submitButton}
+                    disabled={isSubmitting}
+                  >
+                    {isSubmitting ? (
+                      <div className={styles.loader}>
+                        <div className={styles.progress}>
+                          <div className={styles.bar}></div>
+                        </div>
+                      </div>
+                    ) : (
+                      content.buttonText
+                    )}
                   </button>
                 </form>
 
                 <form className={styles.form} onSubmit={handleRegister}>
-                  <div className={styles.inputGroup}>
-                    <label htmlFor="registerName">Ім’я</label>
+                  <div
+                    className={`${styles.inputGroup} ${
+                      shouldShowError("register", "username") ? styles.inputInvalid : ""
+                    }`}
+                  >
+                    <label htmlFor="registerUsername">Username</label>
                     <input
-                      id="registerName"
+                      id="registerUsername"
                       type="text"
-                      placeholder="Введіть ваше ім’я"
+                      placeholder="Введіть ваш username"
+                      value={registerData.username}
+                      onChange={(e) => handleFieldChange("register", "username", e.target.value)}
+                      onBlur={() => handleFieldBlur("register", "username")}
+                      aria-invalid={!!getFieldError("register", "username")}
+                      aria-describedby="registerUsernameError"
                     />
+                    {shouldShowError("register", "username") ? (
+                      <p id="registerUsernameError" className={styles.errorMessage}>
+                        {getFieldError("register", "username")}
+                      </p>
+                    ) : (
+                      <p className={styles.hintText}>{getFieldHint("register", "username")}</p>
+                    )}
                   </div>
 
-                  <div className={styles.inputGroup}>
+                  <div
+                    className={`${styles.inputGroup} ${
+                      shouldShowError("register", "email") ? styles.inputInvalid : ""
+                    }`}
+                  >
                     <label htmlFor="registerEmail">Електронна пошта</label>
                     <input
                       id="registerEmail"
                       type="email"
                       placeholder="Введіть вашу пошту"
+                      value={registerData.email}
+                      onChange={(e) => handleFieldChange("register", "email", e.target.value)}
+                      onBlur={() => handleFieldBlur("register", "email")}
+                      aria-invalid={!!getFieldError("register", "email")}
+                      aria-describedby="registerEmailError"
                     />
+                    {shouldShowError("register", "email") ? (
+                      <p id="registerEmailError" className={styles.errorMessage}>
+                        {getFieldError("register", "email")}
+                      </p>
+                    ) : (
+                      <p className={styles.hintText}>{getFieldHint("register", "email")}</p>
+                    )}
                   </div>
 
-                  <div className={styles.inputGroup}>
+                  <div
+                    className={`${styles.inputGroup} ${
+                      shouldShowError("register", "password") ? styles.inputInvalid : ""
+                    }`}
+                  >
                     <label htmlFor="registerPassword">Пароль</label>
                     <input
                       id="registerPassword"
                       type="password"
                       placeholder="Створіть пароль"
+                      value={registerData.password}
+                      onChange={(e) => handleFieldChange("register", "password", e.target.value)}
+                      onBlur={() => handleFieldBlur("register", "password")}
+                      aria-invalid={!!getFieldError("register", "password")}
+                      aria-describedby="registerPasswordError"
                     />
+                    {shouldShowError("register", "password") ? (
+                      <p id="registerPasswordError" className={styles.errorMessage}>
+                        {getFieldError("register", "password")}
+                      </p>
+                    ) : (
+                      <p className={styles.hintText}>{getFieldHint("register", "password")}</p>
+                    )}
                   </div>
 
-                  <div className={styles.inputGroup}>
+                  <div
+                    className={`${styles.inputGroup} ${
+                      shouldShowError("register", "passwordRepeat") ? styles.inputInvalid : ""
+                    }`}
+                  >
                     <label htmlFor="registerPasswordRepeat">
                       Підтвердження пароля
                     </label>
@@ -242,16 +539,56 @@ function AuthPage() {
                       id="registerPasswordRepeat"
                       type="password"
                       placeholder="Повторіть пароль"
+                      value={registerData.passwordRepeat}
+                      onChange={(e) => handleFieldChange("register", "passwordRepeat", e.target.value)}
+                      onBlur={() => handleFieldBlur("register", "passwordRepeat")}
+                      aria-invalid={!!getFieldError("register", "passwordRepeat")}
+                      aria-describedby="registerPasswordRepeatError"
                     />
+                    {shouldShowError("register", "passwordRepeat") ? (
+                      <p id="registerPasswordRepeatError" className={styles.errorMessage}>
+                        {getFieldError("register", "passwordRepeat")}
+                      </p>
+                    ) : (
+                      <p className={styles.hintText}>{getFieldHint("register", "passwordRepeat")}</p>
+                    )}
                   </div>
 
-                  <label className={styles.checkbox}>
-                    <input type="checkbox" />
-                    <span>Я погоджуюсь з умовами користування</span>
-                  </label>
+                  <div className={styles.checkboxGroup}>
+                    <label
+                      className={`${styles.checkbox} ${
+                        shouldShowError("register", "agreeTerms") ? styles.checkboxInvalid : ""
+                      }`}
+                    >
+                      <input
+                        type="checkbox"
+                        checked={registerData.agreeTerms}
+                        onChange={(e) => handleFieldChange("register", "agreeTerms", e.target.checked)}
+                        onBlur={() => handleFieldBlur("register", "agreeTerms")}
+                      />
+                      <span>Я погоджуюсь з умовами користування</span>
+                    </label>
+                    {shouldShowError("register", "agreeTerms") && (
+                      <p className={styles.errorMessage}>
+                        {getFieldError("register", "agreeTerms")}
+                      </p>
+                    )}
+                  </div>
 
-                  <button type="submit" className={styles.submitButton}>
-                    Зареєструватися
+                  <button
+                    type="submit"
+                    className={styles.submitButton}
+                    disabled={isSubmitting}
+                  >
+                    {isSubmitting ? (
+                      <div className={styles.loader}>
+                        <div className={styles.progress}>
+                          <div className={styles.bar}></div>
+                        </div>
+                      </div>
+                    ) : (
+                      content.buttonText
+                    )}
                   </button>
                 </form>
               </div>
@@ -259,6 +596,48 @@ function AuthPage() {
           </div>
         </div>
       </section>
+      {verificationNotice.open && (
+  <div className={styles.verifyOverlay}>
+    <div className={styles.verifyModal}>
+      <h3 className={styles.verifyTitle}>Підтвердження пошти</h3>
+
+      <p className={styles.verifyText}>
+        {verificationNotice.message}
+      </p>
+
+      <p className={styles.verifyEmail}>
+        <strong>{verificationNotice.email}</strong>
+      </p>
+
+      <p className={styles.verifyHint}>
+        Перейдіть за посиланням у листі, щоб активувати акаунт.
+      </p>
+
+      {resendMessage && (
+        <div className={styles.verifyInfo}>{resendMessage}</div>
+      )}
+
+      <div className={styles.verifyActions}>
+        <button
+          type="button"
+          className={styles.submitButton}
+          onClick={handleResendVerification}
+          disabled={resendLoading}
+        >
+          {resendLoading ? "Надсилаємо..." : "Надіслати ще раз"}
+        </button>
+
+        <button
+          type="button"
+          className={styles.linkButton}
+          onClick={() => setVerificationNotice({ open: false, email: "", message: "" })}
+        >
+          Закрити
+        </button>
+      </div>
+    </div>
+  </div>
+)}
     </div>
   );
 }
