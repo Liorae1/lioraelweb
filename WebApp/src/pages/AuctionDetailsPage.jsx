@@ -217,6 +217,30 @@ function getStatusLabel(status) {
   return status || "Лот";
 }
 
+function isAuctionAvailableForBids(auction, now) {
+  const normalizedStatus = String(auction?.status || "").toLowerCase();
+  const startTime = auction?.startTime ? new Date(auction.startTime).getTime() : null;
+  const endTime = auction?.endTime ? new Date(auction.endTime).getTime() : null;
+
+  if (["finished", "closed"].includes(normalizedStatus)) {
+    return false;
+  }
+
+  if (normalizedStatus === "draft") {
+    return false;
+  }
+
+  if (startTime && !Number.isNaN(startTime) && startTime > now) {
+    return false;
+  }
+
+  if (endTime && !Number.isNaN(endTime) && endTime <= now) {
+    return false;
+  }
+
+  return true;
+}
+
 function getShortDescription(description) {
   if (!description?.trim()) {
     return "Коротка картка для клієнта: головне фото, поточна ставка та дедлайн. Детальна історія торгів уже нижче.";
@@ -365,18 +389,7 @@ function AuctionDetailsPage() {
   }, [auction]);
 
   const isAuctionActive = useMemo(() => {
-    const status = String(auction?.status || "").toLowerCase();
-    const endTime = auction?.endTime ? new Date(auction.endTime).getTime() : null;
-
-    if (status && !["active", "live", "running"].includes(status)) {
-      return false;
-    }
-
-    if (endTime && !Number.isNaN(endTime) && endTime <= now) {
-      return false;
-    }
-
-    return true;
+    return isAuctionAvailableForBids(auction, now);
   }, [auction, now]);
 
   const auctionProgress = useMemo(() => {
@@ -421,6 +434,24 @@ function AuctionDetailsPage() {
     return [minimumBid, minimumBid + Number(auction?.minBidStep || 0), minimumBid + Number(auction?.minBidStep || 0) * 2];
   }, [auction?.minBidStep, minimumBid]);
 
+  useEffect(() => {
+    if (!minimumBid) return;
+
+    setBidAmount((currentValue) => {
+      if (!currentValue) {
+        return String(minimumBid);
+      }
+
+      const numericValue = Number(currentValue);
+
+      if (!Number.isFinite(numericValue) || numericValue < minimumBid) {
+        return String(minimumBid);
+      }
+
+      return currentValue;
+    });
+  }, [minimumBid]);
+
   const bidGuardMessage = useMemo(() => {
     if (!isAuthenticated) {
       return "Щоб зробити ставку, потрібно увійти в акаунт.";
@@ -448,8 +479,6 @@ function AuctionDetailsPage() {
     minimumBid,
     requestedBidAmount,
   ]);
-
-  const isBidDisabled = bidLoading || Boolean(bidGuardMessage);
 
   const handleBidSubmit = async (event) => {
     event.preventDefault();
@@ -711,7 +740,7 @@ function AuctionDetailsPage() {
                 <button
                   type="submit"
                   className={styles.primaryButton}
-                  disabled={isBidDisabled}
+                  disabled={bidLoading}
                 >
                   {bidLoading ? "Відправка..." : "Поставити ставку"}
                 </button>
