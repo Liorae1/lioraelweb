@@ -10,6 +10,7 @@ function FloatingMenu() {
   const [isOpen, setIsOpen] = useState(false);
   const menuRef = useRef(null);
 
+  
   const showMenu = !["/", "/about", "/profile", "/auth"].includes(
     location.pathname
   );

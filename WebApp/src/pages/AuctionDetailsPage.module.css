@@ -18,6 +18,10 @@
   color: var(--text-secondary, rgba(255, 255, 255, 0.72));
 }
 
+.breadcrumbs a {
+  color: inherit;
+}
+
 .breadcrumbs button {
   border: none;
   background: transparent;
@@ -52,6 +56,17 @@
 .galleryCard {
   position: relative;
   padding: 18px;
+}
+
+.mainImagePlaceholder {
+  width: 100%;
+  height: 560px;
+  border-radius: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--surface-soft, rgba(255, 255, 255, 0.045));
+  color: var(--text-secondary, rgba(255, 255, 255, 0.72));
 }
 
 .imageBadge {
@@ -210,6 +225,9 @@
 }
 
 .secondaryButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   border: 1px solid var(--border-color, rgba(255, 255, 255, 0.1));
   background: transparent;
   color: var(--text-primary, inherit);
@@ -625,6 +643,53 @@
   border-radius: 18px;
   background: var(--surface-soft, rgba(255, 255, 255, 0.04));
   border: 1px solid var(--border-soft, rgba(255, 255, 255, 0.06));
+}
+
+.bidForm {
+  display: grid;
+  gap: 12px;
+}
+
+.fieldLabel {
+  color: var(--text-secondary, rgba(255, 255, 255, 0.76));
+  font-size: 0.92rem;
+}
+
+.bidInput {
+  width: 100%;
+  height: 54px;
+  border-radius: 16px;
+  border: 1px solid var(--border-color, rgba(255, 255, 255, 0.1));
+  background: var(--surface-soft, rgba(255, 255, 255, 0.045));
+  color: var(--text-primary, inherit);
+  padding: 0 16px;
+  font-size: 1rem;
+  outline: none;
+}
+
+.bidInput:focus {
+  border-color: var(--accent-color, #d6b36a);
+  box-shadow: 0 0 0 4px rgba(214, 179, 106, 0.12);
+}
+
+.alertError,
+.alertSuccess {
+  margin-bottom: 18px;
+  padding: 14px 16px;
+  border-radius: 16px;
+  border: 1px solid transparent;
+}
+
+.alertError {
+  background: rgba(168, 67, 67, 0.12);
+  border-color: rgba(168, 67, 67, 0.2);
+  color: #c95c5c;
+}
+
+.alertSuccess {
+  background: rgba(69, 140, 95, 0.12);
+  border-color: rgba(69, 140, 95, 0.2);
+  color: #63a77b;
 }
 
 .timelineMain {

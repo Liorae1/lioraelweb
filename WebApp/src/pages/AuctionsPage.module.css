@@ -1,313 +1,404 @@
 .page {
   min-height: 100vh;
-  padding: 40px 20px 80px;
-  color: var(--text-primary, #f5f5f7);
+  padding: 40px 20px 84px;
+  background:
+    radial-gradient(circle at top left, color-mix(in srgb, var(--accent) 14%, transparent) 0%, transparent 30%),
+    radial-gradient(circle at top right, color-mix(in srgb, var(--accent-soft) 16%, transparent) 0%, transparent 26%),
+    linear-gradient(180deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
+  color: var(--text-primary);
+}
+
+.container {
+  max-width: 1280px;
+  margin: 0 auto;
 }
 
 .hero {
-  max-width: 1240px;
-  margin: 0 auto 28px;
   display: grid;
-  grid-template-columns: 1.4fr 0.9fr;
+  grid-template-columns: minmax(0, 1.2fr) minmax(320px, 0.8fr);
   gap: 24px;
-  align-items: stretch;
+  margin-bottom: 34px;
 }
 
-.heroText,
-.heroStats {
-  background: var(--surface-elevated, rgba(255, 255, 255, 0.05));
-  border: 1px solid var(--border-color, rgba(255, 255, 255, 0.08));
-  backdrop-filter: blur(14px);
-  border-radius: 28px;
-  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.12);
+.heroContent,
+.heroPanel,
+.card,
+.empty,
+.error {
+  border: 1px solid var(--border-color);
+  box-shadow: var(--shadow-soft);
 }
 
-.heroText {
-  padding: 32px;
+.heroContent {
+  position: relative;
+  overflow: hidden;
+  padding: 36px;
+  border-radius: 32px;
+  background:
+    linear-gradient(135deg, color-mix(in srgb, var(--surface-strong) 94%, transparent), color-mix(in srgb, var(--surface) 88%, transparent)),
+    linear-gradient(135deg, color-mix(in srgb, var(--accent) 9%, transparent), transparent);
+}
+
+.heroContent::after {
+  content: "";
+  position: absolute;
+  inset: auto -80px -120px auto;
+  width: 240px;
+  height: 240px;
+  border-radius: 50%;
+  background: radial-gradient(circle, color-mix(in srgb, var(--accent) 18%, transparent), transparent 68%);
+  pointer-events: none;
 }
 
 .kicker {
-  display: inline-block;
-  margin-bottom: 14px;
-  font-size: 0.85rem;
-  letter-spacing: 0.14em;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 18px;
+  padding: 8px 14px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--surface) 82%, transparent);
+  border: 1px solid var(--border-color);
+  color: var(--accent);
   text-transform: uppercase;
-  color: var(--accent-color, #d6b36a);
+  letter-spacing: 0.18em;
+  font-size: 0.74rem;
+  font-weight: 700;
 }
 
-.heroText h1 {
+.title {
   margin: 0 0 14px;
-  font-size: clamp(2.2rem, 4vw, 4rem);
-  line-height: 1;
-  color: var(--text-primary, inherit);
+  font-size: clamp(2.8rem, 6vw, 4.8rem);
+  line-height: 0.94;
+  letter-spacing: -0.05em;
 }
 
-.heroText p {
+.subtitle {
+  max-width: 620px;
   margin: 0;
-  max-width: 700px;
-  color: var(--text-secondary, rgba(255, 255, 255, 0.72));
+  color: var(--text-secondary);
   font-size: 1.05rem;
   line-height: 1.7;
 }
 
-.heroStats {
-  padding: 24px;
+.heroPanel {
   display: grid;
+  gap: 20px;
+  align-content: start;
+  padding: 28px;
+  border-radius: 32px;
+  background: color-mix(in srgb, var(--surface-strong) 92%, transparent);
+  backdrop-filter: blur(16px);
+}
+
+.heroPanelTop {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
   gap: 16px;
 }
 
-.statCard {
-  padding: 20px;
-  border-radius: 22px;
-  background: var(--surface-soft, rgba(255, 255, 255, 0.045));
-  border: 1px solid var(--border-soft, rgba(255, 255, 255, 0.06));
-}
-
-.statValue {
+.panelLabel {
   display: block;
-  font-size: 1.7rem;
+  margin-bottom: 8px;
+  color: var(--text-secondary);
+  font-size: 0.88rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.panelValue {
+  font-size: clamp(1.5rem, 4vw, 2.5rem);
+  line-height: 1.05;
+}
+
+.statusPill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 42px;
+  padding: 10px 16px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--accent) 16%, transparent);
+  color: var(--accent);
   font-weight: 700;
-  margin-bottom: 6px;
-  color: var(--text-primary, #ffffff);
 }
 
-.statLabel {
-  color: var(--text-secondary, rgba(255, 255, 255, 0.65));
-}
-
-.filtersSection {
-  max-width: 1240px;
-  margin: 0 auto 20px;
-  padding: 22px;
-  border-radius: 28px;
-  background: var(--surface-elevated, rgba(255, 255, 255, 0.045));
-  border: 1px solid var(--border-color, rgba(255, 255, 255, 0.08));
-  backdrop-filter: blur(14px);
-}
-
-.searchBox {
-  margin-bottom: 16px;
-}
-
-.searchBox input,
-.filtersGrid select {
-  width: 100%;
-  height: 54px;
-  border-radius: 16px;
-  border: 1px solid var(--input-border, rgba(255, 255, 255, 0.1));
-  background: var(--input-bg, rgba(17, 20, 28, 0.9));
-  color: var(--text-primary, #fff);
-  padding: 0 16px;
-  font-size: 0.98rem;
-  outline: none;
-  transition: 0.25s ease;
-}
-
-.searchBox input::placeholder {
-  color: var(--text-muted, rgba(255, 255, 255, 0.55));
-}
-
-.searchBox input:focus,
-.filtersGrid select:focus {
-  border-color: var(--accent-color, rgba(214, 179, 106, 0.7));
-  box-shadow: 0 0 0 4px rgba(214, 179, 106, 0.12);
-}
-
-.filtersGrid {
+.statsGrid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 14px;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
 }
 
-.resultsHeader {
-  max-width: 1240px;
-  margin: 0 auto 18px;
-  color: var(--text-secondary, rgba(255, 255, 255, 0.76));
-}
-
-.lotsList {
-  max-width: 1240px;
-  margin: 0 auto;
-  display: grid;
-  gap: 18px;
-}
-
-.lotCard {
-  display: grid;
-  grid-template-columns: 220px 1fr 240px;
-  gap: 20px;
+.statCard {
   padding: 18px;
-  border-radius: 28px;
-  background: var(--surface-elevated, rgba(255, 255, 255, 0.045));
-  border: 1px solid var(--border-color, rgba(255, 255, 255, 0.08));
-  backdrop-filter: blur(14px);
-  transition:
-    transform 0.25s ease,
-    border-color 0.25s ease,
-    box-shadow 0.25s ease;
+  border-radius: 22px;
+  background: color-mix(in srgb, var(--surface) 88%, transparent);
+  border: 1px solid var(--border-color);
 }
 
-.lotCard:hover {
-  transform: translateY(-4px);
-  border-color: color-mix(in srgb, var(--accent-color, #d6b36a) 50%, transparent);
-  box-shadow: 0 20px 45px rgba(0, 0, 0, 0.14);
+.statCard span {
+  display: block;
+  margin-bottom: 10px;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+}
+
+.statCard strong {
+  font-size: 1.15rem;
+  line-height: 1.3;
+}
+
+.header {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 22px;
+}
+
+.sectionTitle {
+  margin: 0;
+  font-size: clamp(1.6rem, 3vw, 2.25rem);
+}
+
+.error {
+  margin-bottom: 20px;
+  padding: 16px 18px;
+  border-radius: 18px;
+  background: color-mix(in srgb, #a84343 12%, var(--surface-strong));
+  color: color-mix(in srgb, #a84343 78%, var(--text-primary));
+}
+
+.empty {
+  padding: 36px;
+  border-radius: 30px;
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--surface-strong) 95%, transparent), color-mix(in srgb, var(--surface) 92%, transparent)),
+    radial-gradient(circle at top right, color-mix(in srgb, var(--accent) 14%, transparent), transparent 30%);
+}
+
+.emptyLabel {
+  display: inline-block;
+  margin-bottom: 14px;
+  color: var(--accent);
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  font-size: 0.76rem;
+  font-weight: 700;
+}
+
+.empty h3 {
+  margin: 0 0 12px;
+  font-size: clamp(1.8rem, 4vw, 2.4rem);
+}
+
+.empty p {
+  max-width: 540px;
+  color: var(--text-secondary);
+  line-height: 1.7;
+}
+
+.muted {
+  color: var(--text-secondary);
+}
+
+.loadingPulse {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: radial-gradient(circle, color-mix(in srgb, var(--accent) 24%, transparent), color-mix(in srgb, var(--accent) 2%, transparent));
+  animation: pulse 2.2s ease-in-out infinite;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 22px;
+}
+
+.card {
+  display: block;
+  overflow: hidden;
+  border-radius: 30px;
+  background: var(--surface-strong);
+  transition:
+    transform 0.24s ease,
+    box-shadow 0.24s ease,
+    border-color 0.24s ease;
+}
+
+.card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 22px 48px color-mix(in srgb, var(--text-primary) 12%, transparent);
+  border-color: color-mix(in srgb, var(--accent) 34%, var(--border-color));
 }
 
 .imageWrap {
   position: relative;
-  overflow: hidden;
-  border-radius: 22px;
-  min-height: 220px;
-}
-
-.imageWrap img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
-  transition: transform 0.35s ease;
-}
-
-.lotCard:hover .imageWrap img {
-  transform: scale(1.04);
-}
-
-.badge {
-  position: absolute;
-  top: 14px;
-  left: 14px;
-  padding: 8px 12px;
-  border-radius: 999px;
-  font-size: 0.8rem;
-  font-weight: 600;
-  backdrop-filter: blur(8px);
-  border: 1px solid rgba(255, 255, 255, 0.14);
-}
-
-.Hot {
-  background: rgba(255, 115, 115, 0.18);
-  color: #c84e4e;
-}
-
-.Active {
-  background: rgba(107, 208, 152, 0.18);
-  color: #2d8f55;
-}
-
-.EndingSoon {
-  background: rgba(255, 193, 94, 0.2);
-  color: #b07100;
-}
-
-.Premium {
-  background: rgba(214, 179, 106, 0.18);
-  color: #8c6a18;
-}
-
-.lotInfo {
+  height: 320px;
+  background:
+    linear-gradient(180deg, transparent, color-mix(in srgb, var(--text-primary) 18%, transparent)),
+    color-mix(in srgb, var(--bg-secondary) 88%, var(--surface));
   display: flex;
-  flex-direction: column;
+  align-items: center;
   justify-content: center;
 }
 
-.brand {
-  margin: 0 0 8px;
-  font-size: 0.9rem;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: var(--accent-color, #d6b36a);
+.imageOverlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, transparent 0%, color-mix(in srgb, var(--text-primary) 34%, transparent) 100%);
+  pointer-events: none;
 }
 
-.lotInfo h2 {
-  margin: 0 0 16px;
-  font-size: 1.45rem;
-  line-height: 1.25;
-  color: var(--text-primary, inherit);
+.imageMeta {
+  position: absolute;
+  inset: 18px 18px auto;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  color: #fffaf6;
 }
 
-.meta {
+.imageMeta span,
+.imageMeta strong {
+  padding: 9px 14px;
+  border-radius: 999px;
+  backdrop-filter: blur(10px);
+  background: rgba(20, 17, 15, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  font-size: 0.82rem;
+}
+
+.image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.noImage {
+  color: var(--text-secondary);
+}
+
+.cardBody {
+  padding: 22px;
+}
+
+.badges {
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
+  margin-bottom: 16px;
 }
 
-.meta span {
-  padding: 10px 14px;
+.badge {
+  padding: 8px 12px;
   border-radius: 999px;
-  background: var(--surface-soft, rgba(255, 255, 255, 0.055));
-  color: var(--text-secondary, rgba(255, 255, 255, 0.78));
-  font-size: 0.92rem;
-  border: 1px solid var(--border-soft, rgba(255, 255, 255, 0.05));
+  background: color-mix(in srgb, var(--accent) 12%, transparent);
+  color: var(--accent);
+  border: 1px solid color-mix(in srgb, var(--accent) 18%, var(--border-color));
+  font-size: 0.8rem;
+  font-weight: 700;
 }
 
-.lotSide {
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  gap: 18px;
-  padding: 8px 0 8px 8px;
+.cardTitle {
+  margin: 0 0 12px;
+  font-size: 1.7rem;
+  line-height: 1.1;
+}
+
+.description {
+  display: -webkit-box;
+  margin: 0 0 16px;
+  overflow: hidden;
+  color: var(--text-secondary);
+  line-height: 1.65;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.meta {
+  display: grid;
+  gap: 10px;
+  margin-bottom: 18px;
+  color: color-mix(in srgb, var(--text-primary) 86%, black 14%);
+}
+
+.label {
+  color: var(--text-secondary);
+}
+
+.prices {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+  margin-bottom: 20px;
 }
 
 .priceBlock {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
+  padding: 16px;
+  border-radius: 18px;
+  background: color-mix(in srgb, var(--surface) 90%, transparent);
+  border: 1px solid var(--border-color);
 }
 
 .priceLabel {
-  color: var(--text-secondary, rgba(255, 255, 255, 0.62));
-  font-size: 0.92rem;
+  display: block;
+  margin-bottom: 8px;
+  color: var(--text-secondary);
+  font-size: 0.82rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
 }
 
 .priceBlock strong {
-  font-size: 1.8rem;
-  line-height: 1.1;
-  color: var(--text-primary, inherit);
+  font-size: 1.08rem;
 }
 
-.sideMeta {
-  display: grid;
-  gap: 10px;
-  color: var(--text-secondary, rgba(255, 255, 255, 0.78));
+.footer {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 16px;
+  padding-top: 6px;
 }
 
-.detailsBtn {
-  height: 52px;
-  border: none;
-  border-radius: 16px;
-  cursor: pointer;
+.footerValue {
+  margin-top: 4px;
+  font-weight: 600;
+}
+
+.openLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 16px;
+  border-radius: 999px;
+  background: var(--button-primary-bg);
+  color: var(--button-primary-text);
+  font-size: 0.92rem;
   font-weight: 700;
-  font-size: 0.96rem;
-  background: linear-gradient(
-    135deg,
-    var(--accent-color, #d6b36a),
-    var(--accent-color-soft, #f1d18b)
-  );
-  color: #111;
-  transition: transform 0.2s ease, box-shadow 0.25s ease;
+  transition: transform 0.24s ease, box-shadow 0.24s ease;
 }
 
-.detailsBtn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 12px 30px rgba(214, 179, 106, 0.25);
+.card:hover .openLink {
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-soft);
 }
 
-.emptyState {
-  text-align: center;
-  padding: 56px 24px;
-  border-radius: 28px;
-  background: var(--surface-elevated, rgba(255, 255, 255, 0.045));
-  border: 1px solid var(--border-color, rgba(255, 255, 255, 0.08));
-}
-
-.emptyState h3 {
-  margin-bottom: 10px;
-  color: var(--text-primary, inherit);
-}
-
-.emptyState p {
-  margin: 0;
-  color: var(--text-secondary, rgba(255, 255, 255, 0.7));
+@keyframes pulse {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 0.72;
+  }
+  50% {
+    transform: scale(1.08);
+    opacity: 1;
+  }
 }
 
 @media (max-width: 1024px) {
@@ -315,53 +406,48 @@
     grid-template-columns: 1fr;
   }
 
-  .filtersGrid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-
-  .lotCard {
-    grid-template-columns: 1fr;
-  }
-
-  .imageWrap {
-    min-height: 280px;
-  }
-
-  .lotSide {
-    padding: 0;
+  .heroPanelTop,
+  .header {
+    align-items: flex-start;
+    flex-direction: column;
   }
 }
 
-@media (max-width: 640px) {
+@media (max-width: 768px) {
   .page {
-    padding: 24px 14px 60px;
+    padding: 24px 14px 64px;
   }
 
-  .heroText,
-  .heroStats,
-  .filtersSection,
-  .lotCard,
-  .emptyState {
-    border-radius: 22px;
+  .heroContent,
+  .heroPanel,
+  .card,
+  .empty {
+    border-radius: 24px;
   }
 
-  .heroText {
-    padding: 24px;
+  .heroContent,
+  .heroPanel,
+  .cardBody,
+  .empty {
+    padding: 22px;
   }
 
-  .filtersGrid {
+  .statsGrid,
+  .prices {
     grid-template-columns: 1fr;
   }
 
   .imageWrap {
-    min-height: 220px;
+    height: 280px;
   }
 
-  .lotInfo h2 {
-    font-size: 1.2rem;
+  .footer {
+    align-items: flex-start;
+    flex-direction: column;
   }
 
-  .priceBlock strong {
-    font-size: 1.45rem;
+  .openLink {
+    width: 100%;
+    justify-content: center;
   }
 }
