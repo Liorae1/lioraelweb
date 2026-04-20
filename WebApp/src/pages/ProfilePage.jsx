@@ -1,11 +1,34 @@
-import { useEffect, useMemo, useState } from "react";
-import { Navigate } from "react-router-dom";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { Navigate, useNavigate } from "react-router-dom";
 import api from "../api/axios";
 import Header from "../components/Header";
+import Footer from "../components/Footer";
 import Toast from "../components/Toast";
 import styles from "./ProfilePage.module.css";
+import AvatarUpload from "../components/AvatarUpload";
+
+const getAuthConfig = () => {
+  const token = localStorage.getItem("token");
+
+  return {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  };
+};
+
+const mapUserToProfileForm = (userData) => ({
+  firstName: userData.firstName || "",
+  lastName: userData.lastName || "",
+  userName: userData.userName || "",
+  bio: userData.bio || "",
+  birthDate: userData.birthDate
+    ? new Date(userData.birthDate).toISOString().split("T")[0]
+    : "",
+});
 
 function ProfilePage() {
+  const navigate = useNavigate();
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [auth, setAuth] = useState(true);
@@ -19,7 +42,6 @@ function ProfilePage() {
     lastName: "",
     userName: "",
     bio: "",
-    avatarUrl: "",
     birthDate: "",
   });
 
@@ -65,28 +87,7 @@ function ProfilePage() {
     },
   ];
 
-  const getAuthConfig = () => {
-    const token = localStorage.getItem("token");
-
-    return {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    };
-  };
-
-  const mapUserToProfileForm = (userData) => ({
-    firstName: userData.firstName || "",
-    lastName: userData.lastName || "",
-    userName: userData.userName || "",
-    bio: userData.bio || "",
-    avatarUrl: userData.avatarUrl || "",
-    birthDate: userData.birthDate
-      ? new Date(userData.birthDate).toISOString().split("T")[0]
-      : "",
-  });
-
-  const fetchUser = async () => {
+  const fetchUser = useCallback(async () => {
     try {
       const token = localStorage.getItem("token");
 
@@ -108,11 +109,11 @@ function ProfilePage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
     fetchUser();
-  }, []);
+  }, [fetchUser]);
 
   useEffect(() => {
     if (!toast) return;
@@ -162,9 +163,10 @@ function ProfilePage() {
           userName: profileForm.userName.trim(),
           firstName: profileForm.firstName.trim(),
           lastName: profileForm.lastName.trim(),
-          avatarUrl: profileForm.avatarUrl.trim(),
           bio: profileForm.bio.trim(),
-        birthDate: profileForm.birthDate ? new Date(profileForm.birthDate).toISOString() : null,
+          birthDate: profileForm.birthDate
+            ? new Date(profileForm.birthDate).toISOString()
+            : null,
         },
         getAuthConfig(),
       );
@@ -174,10 +176,20 @@ function ProfilePage() {
       showToast("Профіль оновлено", "success");
     } catch (err) {
       console.error("Profile update error:", err);
-      showToast(err?.response?.data?.message || "Не вдалося оновити профіль", "error");
+      showToast(
+        err?.response?.data?.message || "Не вдалося оновити профіль",
+        "error",
+      );
     } finally {
       setSaving(false);
     }
+  };
+
+  const handleAvatarUploaded = (avatarUrl) => {
+    setUser((prev) => ({
+      ...prev,
+      avatarUrl,
+    }));
   };
 
   const handleChangePassword = async (e) => {
@@ -220,36 +232,10 @@ function ProfilePage() {
       setView("profile");
     } catch (err) {
       console.error("Change password error:", err);
-      showToast(err?.response?.data?.message || "Не вдалося змінити пароль", "error");
-    } finally {
-      setSaving(false);
-    }
-  };
-
-  const handleUpgradeStatus = async (newStatus) => {
-    const statusData = statuses.find((s) => s.name === newStatus);
-    if (!statusData) return;
-
-    if (user.balance < statusData.price) {
-      showToast("Недостатньо коштів на балансі", "error");
-      return;
-    }
-
-    try {
-      setSaving(true);
-
-      await api.post(
-        "/api/profile/upgrade-status",
-        { status: newStatus },
-        getAuthConfig(),
+      showToast(
+        err?.response?.data?.message || "Не вдалося змінити пароль",
+        "error",
       );
-
-      await refreshUser();
-      setView("profile");
-      showToast(`Статус підвищено до ${newStatus}`, "success");
-    } catch (err) {
-      console.error("Upgrade status error:", err);
-      showToast(err?.response?.data?.message || "Не вдалося підвищити статус", "error");
     } finally {
       setSaving(false);
     }
@@ -283,18 +269,56 @@ function ProfilePage() {
     "U"
   ).toUpperCase();
 
-  const isNewUser =
-    !user?.firstName &&
-    !user?.lastName &&
-    !user?.userName &&
-    !user?.bio &&
-    !user?.avatarUrl;
-
   if (loading) {
     return (
       <div className={styles.page}>
         <Header />
-        <p className={styles.loading}>Завантаження профілю...</p>
+        <main className={styles.profilePage}>
+          <div className={styles.loadingShell}>
+            <section className={styles.loadingHero}>
+              <div className={styles.loadingHeroMain}>
+                <div className={styles.loadingAvatar} />
+
+                <div className={styles.loadingIdentity}>
+                  <span className={styles.loadingBadge} />
+                  <span className={styles.loadingTitle} />
+                  <span className={styles.loadingSubtitle} />
+                </div>
+              </div>
+
+              <div className={styles.loadingActions}>
+                <div className={styles.loadingBalance} />
+                <div className={styles.loadingButtons}>
+                  <span className={styles.loadingButton} />
+                  <span className={styles.loadingButton} />
+                </div>
+              </div>
+            </section>
+
+            <section className={styles.loadingGrid}>
+              <article className={styles.loadingPanel}>
+                <span className={styles.loadingPanelTitle} />
+                <div className={styles.loadingStats}>
+                  <span className={styles.loadingStatCard} />
+                  <span className={styles.loadingStatCard} />
+                  <span className={styles.loadingStatCard} />
+                  <span className={styles.loadingStatCard} />
+                </div>
+              </article>
+
+              <article className={styles.loadingPanel}>
+                <span className={styles.loadingPanelTitle} />
+                <div className={styles.loadingLinks}>
+                  <span className={styles.loadingLink} />
+                  <span className={styles.loadingLink} />
+                  <span className={styles.loadingLink} />
+                  <span className={styles.loadingLink} />
+                </div>
+              </article>
+            </section>
+          </div>
+        </main>
+        <Footer />
       </div>
     );
   }
@@ -335,7 +359,9 @@ function ProfilePage() {
                 <div className={styles.userMeta}>
                   <span className={styles.userBadge}>{statusLabel}</span>
                   <h1 className={styles.userName}>@{user.userName || "—"}</h1>
-                  <p className={styles.userUsername}>{fullName || "користувач"}</p>
+                  <p className={styles.userUsername}>
+                    {fullName || "користувач"}
+                  </p>
                 </div>
               </div>
 
@@ -351,7 +377,9 @@ function ProfilePage() {
                   <button
                     type="button"
                     className={styles.iconButton}
-                    onClick={() => showToast("Обране скоро буде доступне", "success")}
+                    onClick={() =>
+                      showToast("Обране скоро буде доступне", "success")
+                    }
                   >
                     <span className={styles.heartIcon}>♥</span>
                     Обране
@@ -414,8 +442,6 @@ function ProfilePage() {
                 </div>
 
                 <div className={styles.actionStack}>
-                 
-
                   <button
                     type="button"
                     className={styles.quickActionButton}
@@ -427,7 +453,7 @@ function ProfilePage() {
                   <button
                     type="button"
                     className={styles.quickActionButton}
-                    onClick={() => showToast("Функція буде доступна пізніше", "success")}
+                    onClick={() => navigate("/wallet#transactions")}
                   >
                     Історія транзакцій
                   </button>
@@ -435,7 +461,7 @@ function ProfilePage() {
                   <button
                     type="button"
                     className={styles.quickActionButton}
-                    onClick={() => showToast("Поповнення балансу скоро з'явиться", "success")}
+                    onClick={() => navigate("/wallet#topup")}
                   >
                     Поповнення балансу
                   </button>
@@ -443,7 +469,7 @@ function ProfilePage() {
                   <button
                     type="button"
                     className={styles.quickActionButton}
-                    onClick={() => showToast("Функція буде доступна пізніше", "success")}
+                    onClick={() => navigate("/wallet#bids")}
                   >
                     Мої ставки
                   </button>
@@ -452,7 +478,7 @@ function ProfilePage() {
             </section>
           </div>
         )}
-
+        
         {view === "edit-profile" && (
           <section className={styles.fullscreenSection}>
             <div className={styles.sectionTopbar}>
@@ -461,109 +487,89 @@ function ProfilePage() {
                 className={styles.backArrowButton}
                 onClick={() => setView("profile")}
               >
-                <span className={styles.backArrow}>←</span>
-                <span>Назад до профілю</span>
+                ← Назад
               </button>
             </div>
 
             <div className={styles.fullscreenCard}>
               <div className={styles.fullscreenHeader}>
-                <div>
-                  <p className={styles.sectionEyebrow}>Профіль</p>
-                  <h2>Редагування профілю</h2>
-                  <p className={styles.sectionDescription}>
-                    Тут можна змінити тільки нік, аватар та опис.
-                  </p>
-                </div>
+                <p className={styles.sectionEyebrow}>Профіль</p>
+                <h2>Редагування профілю</h2>
+                <p className={styles.sectionDescription}>
+                  Тут можна змінити тільки нік, аватар та опис.
+                </p>
               </div>
 
-              <div className={styles.editProfileLayout}>
-                <div className={styles.avatarEditorCard}>
-                  <div className={styles.avatarPreviewLarge}>
-                    {profileForm.avatarUrl ? (
-                      <img
-                        src={profileForm.avatarUrl}
-                        alt={previewName || profileForm.userName || "Користувач"}
-                        className={styles.bigAvatarImage}
-                      />
-                    ) : (
-                      (
-                        previewName?.charAt(0) ||
-                        profileForm.userName?.charAt(0) ||
-                        "U"
-                      ).toUpperCase()
-                    )}
-                  </div>
+              <div className={styles.editGrid}>
+                <div className={styles.leftColumn}>
+                  <div className={styles.avatarEditorCard}>
+                    <div className={styles.cardHeading}>
+                      <h3>Аватарка</h3>
+                    </div>
 
-                  <div className={styles.avatarEditorText}>
-                    <h3>Аватарка</h3>
-                    <p>
-                      Вставте посилання на зображення або залиште стандартну аватарку.
-                    </p>
+                    <AvatarUpload
+                      currentAvatarUrl={user.avatarUrl}
+                      userName={profileForm.userName || user.userName}
+                      fullName={previewName}
+                      getAuthConfig={getAuthConfig}
+                      onUploaded={handleAvatarUploaded}
+                      showToast={showToast}
+                    />
                   </div>
                 </div>
 
-                <form
-                  className={styles.fullscreenForm}
-                  onSubmit={handleSaveProfile}
-                >
-                  <div className={styles.formGroup}>
-                    <label htmlFor="userName">Нік</label>
-                    <input
-                      id="userName"
-                      name="userName"
-                      type="text"
-                      value={profileForm.userName}
-                      onChange={handleProfileChange}
-                      className={styles.input}
-                      placeholder="Ваш нік"
-                    />
-                  </div>
+                <div className={styles.rightColumn}>
+                  <form
+                    className={styles.formColumn}
+                    onSubmit={handleSaveProfile}
+                  >
+                    <div className={styles.cardHeading}>
+                      <h3>Основна інформація</h3>
+                    </div>
 
-                  <div className={styles.formGroup}>
-                    <label htmlFor="avatarUrl">URL аватарки</label>
-                    <input
-                      id="avatarUrl"
-                      name="avatarUrl"
-                      type="text"
-                      value={profileForm.avatarUrl}
-                      onChange={handleProfileChange}
-                      className={styles.input}
-                      placeholder="https://..."
-                    />
-                  </div>
+                    <div className={styles.formGroup}>
+                      <label htmlFor="userName">Нік</label>
+                      <input
+                        id="userName"
+                        name="userName"
+                        value={profileForm.userName}
+                        onChange={handleProfileChange}
+                        className={styles.input}
+                        placeholder="Вкажіть нік"
+                      />
+                    </div>
 
-                  <div className={styles.formGroup}>
-                    <label htmlFor="bio">Про себе</label>
-                    <textarea
-                      id="bio"
-                      name="bio"
-                      rows="5"
-                      value={profileForm.bio}
-                      onChange={handleProfileChange}
-                      className={styles.textarea}
-                      placeholder="Коротко розкажіть про себе"
-                    />
-                  </div>
+                    <div className={styles.formGroup}>
+                      <label htmlFor="bio">Про себе</label>
+                      <textarea
+                        id="bio"
+                        name="bio"
+                        value={profileForm.bio}
+                        onChange={handleProfileChange}
+                        className={styles.textarea}
+                        placeholder="Коротко розкажіть про себе"
+                      />
+                    </div>
 
-                  <div className={styles.formActions}>
-                    <button
-                      type="button"
-                      className={styles.secondaryButton}
-                      onClick={() => setView("profile")}
-                    >
-                      Назад
-                    </button>
+                    <div className={styles.formActions}>
+                      <button
+                        type="button"
+                        className={styles.secondaryButton}
+                        onClick={() => setView("profile")}
+                      >
+                        Назад
+                      </button>
 
-                    <button
-                      type="submit"
-                      className={styles.primaryButton}
-                      disabled={saving}
-                    >
-                      {saving ? "Зберігаємо..." : "Зберегти"}
-                    </button>
-                  </div>
-                </form>
+                      <button
+                        type="submit"
+                        className={styles.primaryButton}
+                        disabled={saving}
+                      >
+                        {saving ? "Зберігаємо..." : "Зберегти"}
+                      </button>
+                    </div>
+                  </form>
+                </div>
               </div>
             </div>
           </section>
@@ -594,7 +600,10 @@ function ProfilePage() {
                   </div>
                 </div>
 
-                <form onSubmit={handleSaveProfile} className={styles.settingsForm}>
+                <form
+                  onSubmit={handleSaveProfile}
+                  className={styles.settingsForm}
+                >
                   <div className={styles.formGroup}>
                     <label htmlFor="firstName">Ім'я</label>
                     <input
@@ -706,9 +715,7 @@ function ProfilePage() {
                   </div>
 
                   <div className={styles.formGroup}>
-                    <label htmlFor="confirmNewPassword">
-                      Повторіть пароль
-                    </label>
+                    <label htmlFor="confirmNewPassword">Повторіть пароль</label>
                     <input
                       id="confirmNewPassword"
                       name="confirmNewPassword"
@@ -734,7 +741,6 @@ function ProfilePage() {
             </div>
           </section>
         )}
-
         {view === "upgrade" && (
           <section className={styles.fullscreenSection}>
             <div className={styles.sectionTopbar}>
@@ -754,7 +760,8 @@ function ProfilePage() {
                   <p className={styles.sectionEyebrow}>Статус</p>
                   <h2>Підвищити статус акаунту</h2>
                   <p className={styles.sectionDescription}>
-                    Оберіть підписку, щоб отримати більше можливостей на платформі.
+                    Оберіть підписку, щоб отримати більше можливостей на
+                    платформі.
                   </p>
                 </div>
               </div>
@@ -764,11 +771,15 @@ function ProfilePage() {
                   <div
                     key={status.name}
                     className={`${styles.upgradeCard} ${
-                      user.status === status.name ? styles.currentSubscription : ""
+                      user.status === status.name
+                        ? styles.currentSubscription
+                        : ""
                     }`}
                   >
                     {user.status === status.name && (
-                      <div className={styles.statusRibbon}>АКТИВНА ПІДПИСКА</div>
+                      <div className={styles.statusRibbon}>
+                        АКТИВНА ПІДПИСКА
+                      </div>
                     )}
 
                     <div className={styles.upgradeHeader}>
@@ -791,10 +802,19 @@ function ProfilePage() {
                     <button
                       type="button"
                       className={styles.primaryButton}
-                      onClick={() => showToast("Функція підвищення статусу скоро буде доступна", "success")}
+                      onClick={() =>
+                        showToast(
+                          "Функція підвищення статусу скоро буде доступна",
+                          "success",
+                        )
+                      }
                       disabled={user.status === status.name || saving}
                     >
-                      {user.status === status.name ? "Поточний статус" : saving ? "Оформлюємо..." : "Оформити підписку"}
+                      {user.status === status.name
+                        ? "Поточний статус"
+                        : saving
+                          ? "Оформлюємо..."
+                          : "Оформити підписку"}
                     </button>
                   </div>
                 ))}

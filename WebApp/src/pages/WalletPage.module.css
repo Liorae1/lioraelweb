@@ -1,0 +1,398 @@
+.page {
+  min-height: 100vh;
+  padding: 40px 20px 80px;
+  background:
+    radial-gradient(circle at top left, rgba(212, 153, 74, 0.12), transparent 28%),
+    linear-gradient(180deg, #120f0b 0%, #19140f 42%, #0f0d0b 100%);
+  color: #f6efe7;
+}
+
+.container {
+  max-width: 1280px;
+  margin: 0 auto;
+}
+
+.hero,
+.metricsGrid,
+.workspace,
+.loadingCard {
+  margin-bottom: 24px;
+}
+
+.hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(280px, 0.8fr);
+  gap: 24px;
+}
+
+.heroMain,
+.heroAside,
+.metricCard,
+.workspace,
+.topUpSection,
+.panel,
+.loadingCard,
+.sidebar {
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 28px;
+  background: rgba(21, 17, 12, 0.92);
+  box-shadow: 0 22px 50px rgba(0, 0, 0, 0.22);
+  backdrop-filter: blur(16px);
+}
+
+.heroMain,
+.heroAside,
+.workspace,
+.topUpSection,
+.panel,
+.loadingCard {
+  padding: 24px;
+}
+
+.kicker,
+.cardLabel {
+  display: inline-flex;
+  margin-bottom: 12px;
+  color: #f2c987;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  font-size: 0.74rem;
+  font-weight: 800;
+}
+
+.heroMain h1,
+.panelHeader h2,
+.topUpSection h2 {
+  margin: 0 0 10px;
+}
+
+.heroMain p,
+.panelHeader p,
+.topUpSection p,
+.profileCard b,
+.transactionItem span,
+.lockMeta span,
+.transactionMeta span,
+.emptyState,
+.featureCard b,
+.shortcutCard span {
+  margin: 0;
+  color: rgba(246, 239, 231, 0.68);
+  line-height: 1.65;
+}
+
+.heroAside {
+  display: grid;
+  gap: 16px;
+  align-content: start;
+}
+
+.profileCard {
+  display: grid;
+  gap: 6px;
+  padding: 18px 20px;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.profileCard strong {
+  font-size: 1.2rem;
+}
+
+.refreshButton,
+.primaryButton,
+.quickButton,
+.secondaryLink,
+.navButton,
+.shortcutCard {
+  min-height: 48px;
+  border-radius: 16px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font: inherit;
+  font-weight: 700;
+}
+
+.refreshButton,
+.quickButton,
+.secondaryLink,
+.navButton {
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: transparent;
+  color: #f6efe7;
+}
+
+.primaryButton {
+  border: none;
+  padding: 0 18px;
+  background: linear-gradient(135deg, #d4994a, #f3d29a);
+  color: #1a130d;
+}
+
+.primaryButton:disabled,
+.refreshButton:disabled,
+.quickButton:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.metricsGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.metricCard {
+  padding: 22px;
+}
+
+.metricCard span {
+  display: block;
+  margin-bottom: 10px;
+  color: rgba(246, 239, 231, 0.62);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 0.8rem;
+}
+
+.metricCard strong {
+  font-size: 1.5rem;
+}
+
+.workspace {
+  display: grid;
+  grid-template-columns: 240px minmax(0, 1fr);
+  gap: 24px;
+}
+
+.sidebar {
+  padding: 16px;
+  display: grid;
+  gap: 10px;
+  align-content: start;
+}
+
+.navButton {
+  justify-content: flex-start;
+  padding: 0 16px;
+}
+
+.navButtonActive {
+  background: linear-gradient(135deg, rgba(212, 153, 74, 0.18), rgba(243, 210, 154, 0.08));
+  border-color: rgba(212, 153, 74, 0.28);
+  color: #f2c987;
+}
+
+.stage {
+  min-width: 0;
+}
+
+.overviewGrid {
+  display: grid;
+  gap: 24px;
+}
+
+.featureGrid,
+.shortcutGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.featureCard,
+.shortcutCard {
+  padding: 18px 20px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  background: rgba(255, 255, 255, 0.04);
+  color: inherit;
+}
+
+.featureCard strong,
+.shortcutCard strong {
+  display: block;
+  margin-bottom: 10px;
+  font-size: 1.08rem;
+}
+
+.shortcutCard {
+  text-align: left;
+}
+
+.topUpSection,
+.panel {
+  display: grid;
+  gap: 18px;
+}
+
+.topUpControls {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 12px;
+}
+
+.topUpControls input {
+  width: 100%;
+  height: 50px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  background: rgba(12, 10, 7, 0.84);
+  color: #f6efe7;
+  padding: 0 16px;
+  font: inherit;
+}
+
+.quickButtons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.panelHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.lockList,
+.transactions {
+  display: grid;
+  gap: 12px;
+}
+
+.lockCard,
+.transactionItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 16px 18px;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.lockCard strong,
+.transactionItem strong {
+  display: block;
+}
+
+.lockMeta,
+.transactionMeta {
+  text-align: right;
+}
+
+.inlineLink {
+  display: inline-flex;
+  margin-top: 8px;
+  color: #f2c987;
+  font-size: 0.92rem;
+  font-weight: 600;
+}
+
+.transactionMain {
+  min-width: 0;
+}
+
+.transactionTop {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 8px;
+}
+
+.transactionBadge {
+  display: inline-flex;
+  align-items: center;
+  min-height: 34px;
+  padding: 0 12px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  font-size: 0.8rem;
+  font-weight: 800;
+}
+
+.transactionPositive {
+  background: rgba(92, 167, 123, 0.12);
+  color: #8fe1ad;
+}
+
+.transactionNegative {
+  background: rgba(212, 153, 74, 0.12);
+  color: #f2c987;
+}
+
+.transactionNeutral {
+  background: rgba(255, 255, 255, 0.06);
+  color: #f6efe7;
+}
+
+.transactionAmount {
+  font-size: 1.05rem;
+}
+
+.amountPositive {
+  color: #8fe1ad;
+}
+
+.amountNegative {
+  color: #f2c987;
+}
+
+.amountNeutral {
+  color: #f6efe7;
+}
+
+.emptyState {
+  padding: 24px;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.04);
+}
+
+@media (max-width: 1024px) {
+  .hero,
+  .workspace,
+  .metricsGrid,
+  .featureGrid,
+  .shortcutGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .page {
+    padding: 24px 14px 60px;
+  }
+
+  .topUpControls {
+    grid-template-columns: 1fr;
+  }
+
+  .panelHeader,
+  .lockCard,
+  .transactionItem {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .transactionTop {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .lockMeta,
+  .transactionMeta {
+    text-align: left;
+  }
+
+  .primaryButton,
+  .refreshButton,
+  .secondaryLink {
+    width: 100%;
+  }
+}

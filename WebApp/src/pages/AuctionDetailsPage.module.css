@@ -1,181 +1,353 @@
 .page {
   min-height: 100vh;
-  padding: 40px 20px 80px;
-  color: var(--text-primary, #f5f5f7);
+  padding: 36px 20px 84px;
+  background:
+    radial-gradient(circle at 8% 0%, rgba(212, 153, 74, 0.14), transparent 24%),
+    radial-gradient(circle at 100% 16%, rgba(245, 230, 201, 0.1), transparent 24%),
+    linear-gradient(180deg, #120f0b 0%, #15110d 38%, #0e0c0a 100%);
+  color: #f6efe7;
 }
 
 .container {
-  max-width: 1240px;
+  max-width: 1320px;
   margin: 0 auto;
 }
 
 .breadcrumbs {
   display: flex;
   flex-wrap: wrap;
-  align-items: center;
   gap: 10px;
-  margin-bottom: 24px;
-  color: var(--text-secondary, rgba(255, 255, 255, 0.72));
+  margin-bottom: 18px;
+  color: rgba(246, 239, 231, 0.62);
 }
 
-.breadcrumbs button {
-  border: none;
-  background: transparent;
+.breadcrumbs a {
   color: inherit;
-  cursor: pointer;
-  padding: 0;
-  font: inherit;
 }
 
-.breadcrumbs button:hover {
-  color: var(--accent-color, #d6b36a);
+.hero,
+.infoCard,
+.timelineSection,
+.loadingCard,
+.notFound,
+.alertError,
+.alertSuccess {
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 22px 50px rgba(0, 0, 0, 0.22);
 }
 
-.mainSection {
+.alertError,
+.alertSuccess {
+  margin-bottom: 18px;
+  padding: 14px 16px;
+  border-radius: 18px;
+}
+
+.alertError {
+  background: rgba(168, 67, 67, 0.12);
+  color: #ef9b9b;
+}
+
+.alertSuccess {
+  background: rgba(69, 140, 95, 0.12);
+  color: #8fd8a6;
+}
+
+.hero {
   display: grid;
-  grid-template-columns: 1.1fr 0.9fr;
+  grid-template-columns: minmax(0, 1.1fr) minmax(360px, 0.9fr);
   gap: 24px;
   margin-bottom: 24px;
 }
 
-.galleryCard,
-.infoCard,
-.contentCard,
-.notFound {
-  background: var(--surface-elevated, rgba(255, 255, 255, 0.05));
-  border: 1px solid var(--border-color, rgba(255, 255, 255, 0.08));
-  border-radius: 28px;
-  backdrop-filter: blur(14px);
-  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.12);
+.visualStage,
+.commandPanel {
+  border-radius: 34px;
+  background: rgba(21, 17, 12, 0.92);
+  backdrop-filter: blur(16px);
 }
 
-.galleryCard {
+.visualStage {
   position: relative;
+  overflow: hidden;
   padding: 18px;
 }
 
-.imageBadge {
+.visualTopline {
   position: absolute;
-  top: 30px;
-  left: 30px;
-  z-index: 2;
-  padding: 8px 14px;
+  inset: 24px 24px auto;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.statusBadge,
+.liveBadge,
+.leadingBadge {
+  display: inline-flex;
+  align-items: center;
+  min-height: 40px;
+  padding: 0 14px;
   border-radius: 999px;
-  background: rgba(214, 179, 106, 0.18);
-  color: var(--accent-color, #d6b36a);
-  border: 1px solid rgba(214, 179, 106, 0.24);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(10px);
   font-size: 0.82rem;
-  font-weight: 700;
+  font-weight: 800;
+}
+
+.statusBadge {
+  background: rgba(24, 19, 14, 0.68);
+  color: #f2c987;
+}
+
+.liveBadge {
+  background: rgba(24, 19, 14, 0.68);
+  color: #fff3e2;
+}
+
+.mainImage,
+.mainImagePlaceholder {
+  width: 100%;
+  height: 620px;
+  border-radius: 26px;
 }
 
 .mainImage {
-  width: 100%;
-  height: 560px;
   object-fit: cover;
-  border-radius: 22px;
   display: block;
 }
 
-.thumbnailRow {
+.mainImagePlaceholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.04);
+  color: rgba(246, 239, 231, 0.58);
+}
+
+.thumbnailRail {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(4, 1fr);
   gap: 12px;
   margin-top: 14px;
 }
 
 .thumbnailActive,
 .thumbnailMuted {
-  border-radius: 16px;
   overflow: hidden;
-  border: 1px solid var(--border-soft, rgba(255, 255, 255, 0.08));
+  border-radius: 18px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
+.thumbnailActive {
+  box-shadow: 0 0 0 2px rgba(212, 153, 74, 0.5);
+}
+
+.thumbnailMuted {
+  opacity: 0.58;
 }
 
 .thumbnailActive img,
 .thumbnailMuted img {
   width: 100%;
-  height: 110px;
+  height: 100px;
   object-fit: cover;
   display: block;
 }
 
-.thumbnailMuted {
-  opacity: 0.6;
-}
-
-.infoCard {
+.commandPanel {
   padding: 28px;
-  display: flex;
-  flex-direction: column;
-  gap: 22px;
+  display: grid;
+  gap: 20px;
 }
 
-.headerBlock h1 {
+.headingBlock h1 {
   margin: 6px 0 12px;
-  font-size: clamp(2rem, 4vw, 3.2rem);
-  line-height: 1.05;
-  color: var(--text-primary, inherit);
+  font-size: clamp(2.2rem, 4vw, 3.8rem);
+  line-height: 0.96;
 }
 
 .brand {
   margin: 0;
-  color: var(--accent-color, #d6b36a);
+  color: #f2c987;
   text-transform: uppercase;
   letter-spacing: 0.14em;
-  font-size: 0.84rem;
+  font-size: 0.75rem;
+  font-weight: 800;
+}
+
+.lead {
+  margin: 0;
+  color: rgba(246, 239, 231, 0.76);
+  line-height: 1.72;
+}
+
+.heroCards,
+.summaryTiles {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.heroCard,
+.summaryTile,
+.descriptionCard,
+.userDock,
+.bidPanel,
+.loadingCard,
+.notFound {
+  padding: 18px 20px;
+  border-radius: 24px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.heroCard span,
+.summaryTile span,
+.mutedLabel,
+.userMeta span,
+.field span {
+  display: block;
+  margin-bottom: 8px;
+  color: rgba(246, 239, 231, 0.6);
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.heroCard strong {
+  font-size: 1.28rem;
+}
+
+.userDock {
+  display: grid;
+  gap: 16px;
+}
+
+.userIdentity {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.userAvatar,
+.bidderAvatar {
+  width: 56px;
+  height: 56px;
+  border-radius: 18px;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #d4994a, #f3d29a);
+  color: #1a130d;
+  font-size: 1.15rem;
+  font-weight: 800;
+  flex-shrink: 0;
+}
+
+.userAvatarImage,
+.bidderAvatarImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.userName,
+.bidderName {
+  font-size: 1rem;
   font-weight: 700;
 }
 
-.subtitle {
-  margin: 0;
-  color: var(--text-secondary, rgba(255, 255, 255, 0.72));
-  line-height: 1.7;
+.userNick,
+.bidderUserName,
+.bidDate,
+.timelineCount,
+.sectionHeader p {
+  color: rgba(246, 239, 231, 0.66);
 }
 
-.tags {
+.userNick,
+.bidderUserName {
+  margin-top: 4px;
+  font-size: 0.9rem;
+}
+
+.userMeta {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.userMeta strong {
+  font-size: 1.15rem;
+}
+
+.bidPanel {
+  display: grid;
+  gap: 16px;
+}
+
+.bidPanelTop {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.bidPanelValue {
+  font-size: 1.5rem;
+}
+
+.field {
+  display: grid;
+  gap: 10px;
+}
+
+.field input {
+  width: 100%;
+  height: 56px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  background: rgba(12, 10, 7, 0.84);
+  color: #f6efe7;
+  padding: 0 16px;
+  font: inherit;
+  outline: none;
+}
+
+.field input:focus {
+  border-color: rgba(212, 153, 74, 0.5);
+  box-shadow: 0 0 0 4px rgba(212, 153, 74, 0.14);
+}
+
+.quickBidRow {
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
 }
 
-.tags span {
-  padding: 10px 14px;
+.quickBidButton {
+  min-height: 44px;
+  padding: 0 14px;
   border-radius: 999px;
-  background: var(--surface-soft, rgba(255, 255, 255, 0.055));
-  border: 1px solid var(--border-soft, rgba(255, 255, 255, 0.06));
-  color: var(--text-secondary, rgba(255, 255, 255, 0.8));
-  font-size: 0.92rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.03);
+  color: #f6efe7;
+  cursor: pointer;
+  font: inherit;
+  font-weight: 700;
 }
 
-.bidPanel {
-  padding: 22px;
-  border-radius: 24px;
-  background: var(--surface-soft, rgba(255, 255, 255, 0.045));
-  border: 1px solid var(--border-soft, rgba(255, 255, 255, 0.06));
-  display: grid;
-  gap: 18px;
-}
-
-.panelLabel {
-  display: block;
-  margin-bottom: 6px;
-  font-size: 0.9rem;
-  color: var(--text-secondary, rgba(255, 255, 255, 0.66));
-}
-
-.price {
-  font-size: clamp(2rem, 4vw, 3rem);
-  line-height: 1;
-  color: var(--text-primary, inherit);
-}
-
-.panelMeta {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 16px;
-}
-
-.panelMeta b {
-  color: var(--text-primary, inherit);
+.quickBidButton:hover {
+  border-color: rgba(212, 153, 74, 0.42);
+  color: #f2c987;
 }
 
 .actionButtons {
@@ -186,307 +358,115 @@
 
 .primaryButton,
 .secondaryButton {
-  height: 54px;
+  min-height: 54px;
   border-radius: 16px;
-  font-size: 0.96rem;
-  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   cursor: pointer;
-  transition: transform 0.2s ease, box-shadow 0.25s ease, border-color 0.2s ease;
+  font-size: 0.95rem;
+  font-weight: 800;
 }
 
 .primaryButton {
   border: none;
-  background: linear-gradient(
-    135deg,
-    var(--accent-color, #d6b36a),
-    var(--accent-color-soft, #f1d18b)
-  );
-  color: #111;
-}
-
-.primaryButton:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 12px 30px rgba(214, 179, 106, 0.25);
+  background: linear-gradient(135deg, #d4994a, #f3d29a);
+  color: #1a130d;
 }
 
 .secondaryButton {
-  border: 1px solid var(--border-color, rgba(255, 255, 255, 0.1));
+  border: 1px solid rgba(255, 255, 255, 0.1);
   background: transparent;
-  color: var(--text-primary, inherit);
+  color: #f6efe7;
 }
 
-.secondaryButton:hover {
-  transform: translateY(-2px);
-  border-color: var(--accent-color, #d6b36a);
+.bidHint {
+  margin: 0;
+  color: rgba(246, 239, 231, 0.7);
+  line-height: 1.6;
 }
 
-.quickInfo {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 14px;
-}
-
-.quickInfoItem {
-  padding: 16px 18px;
+.walletFeed {
+  padding: 14px 16px;
   border-radius: 18px;
-  background: var(--surface-soft, rgba(255, 255, 255, 0.045));
-  border: 1px solid var(--border-soft, rgba(255, 255, 255, 0.06));
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.06);
 }
 
-.quickInfoItem span {
+.walletFeed strong {
   display: block;
-  margin-bottom: 6px;
-  color: var(--text-secondary, rgba(255, 255, 255, 0.66));
-  font-size: 0.88rem;
+  font-size: 1rem;
+  line-height: 1.5;
 }
 
-.quickInfoItem strong {
-  color: var(--text-primary, inherit);
-}
-
-.bottomGrid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 24px;
-}
-
-.contentCard {
-  padding: 26px;
-}
-
-.contentCard h2 {
-  margin: 0 0 16px;
-  color: var(--text-primary, inherit);
-}
-
-.contentCard p {
-  margin: 0;
-  color: var(--text-secondary, rgba(255, 255, 255, 0.76));
-  line-height: 1.75;
-}
-
-.detailsList {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  display: grid;
-  gap: 12px;
-}
-
-.detailsList li {
-  display: flex;
+.liveLine {
+  display: inline-flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-  padding-bottom: 12px;
-  border-bottom: 1px solid var(--border-soft, rgba(255, 255, 255, 0.06));
-}
-
-.detailsList li:last-child {
-  border-bottom: none;
-  padding-bottom: 0;
-}
-
-.detailsList span {
-  color: var(--text-secondary, rgba(255, 255, 255, 0.7));
-}
-
-.detailsList strong {
-  color: var(--text-primary, inherit);
-  text-align: right;
-}
-
-.bidHistory {
-  display: grid;
-  gap: 12px;
-}
-
-.bidRow {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-  padding: 14px 0;
-  border-bottom: 1px solid var(--border-soft, rgba(255, 255, 255, 0.06));
-}
-
-.bidRow:last-child {
-  border-bottom: none;
-  padding-bottom: 0;
-}
-
-.bidRow div {
-  display: grid;
-  gap: 4px;
-}
-
-.bidRow span {
-  color: var(--text-secondary, rgba(255, 255, 255, 0.66));
+  gap: 10px;
+  color: rgba(246, 239, 231, 0.66);
   font-size: 0.9rem;
 }
 
-.bidRow b,
-.bidRow strong {
-  color: var(--text-primary, inherit);
+.liveDot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #98e6ae;
+  box-shadow: 0 0 0 6px rgba(152, 230, 174, 0.12);
 }
 
-.notFound {
-  max-width: 720px;
-  margin: 80px auto 0;
-  padding: 40px;
-  text-align: center;
-}
-
-.notFound h1 {
-  margin: 0 0 12px;
-}
-
-.notFound p {
-  margin: 0 0 24px;
-  color: var(--text-secondary, rgba(255, 255, 255, 0.72));
-}
-
-@media (max-width: 1024px) {
-  .mainSection,
-  .bottomGrid {
-    grid-template-columns: 1fr;
-  }
-
-  .mainImage {
-    height: 460px;
-  }
-}
-
-@media (max-width: 640px) {
-  .page {
-    padding: 24px 14px 60px;
-  }
-
-  .galleryCard,
-  .infoCard,
-  .contentCard,
-  .notFound {
-    border-radius: 22px;
-  }
-
-  .infoCard,
-  .contentCard,
-  .notFound {
-    padding: 22px;
-  }
-
-  .mainImage {
-    height: 320px;
-  }
-
-  .thumbnailActive img,
-  .thumbnailMuted img {
-    height: 84px;
-  }
-
-  .panelMeta,
-  .actionButtons,
-  .quickInfo {
-    grid-template-columns: 1fr;
-  }
-
-  .detailsList li,
-  .bidRow {
-    align-items: flex-start;
-    flex-direction: column;
-  }
-}
-
-.auctionFlowCard {
+.infoGrid {
   display: grid;
-  gap: 22px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 24px;
+  margin-bottom: 24px;
 }
 
-.auctionFlowHeader {
+.infoCard,
+.timelineSection {
+  padding: 24px;
+  border-radius: 30px;
+  background: rgba(21, 17, 12, 0.92);
+  backdrop-filter: blur(16px);
+}
+
+.sectionHeader {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
   gap: 16px;
+  margin-bottom: 18px;
 }
 
-.auctionFlowSubtitle {
-  margin: 8px 0 0;
-  color: var(--text-secondary, rgba(255, 255, 255, 0.72));
-  line-height: 1.6;
+.sectionHeader h2 {
+  margin: 0 0 8px;
+  font-size: 1.7rem;
 }
 
-.auctionStatus {
+.sectionHeader p {
+  margin: 0;
+  line-height: 1.62;
+}
+
+.descriptionCard p {
+  margin: 0;
+  color: rgba(246, 239, 231, 0.76);
+  line-height: 1.72;
+}
+
+.progressPercent {
   display: inline-flex;
   align-items: center;
-  gap: 10px;
-  padding: 10px 14px;
+  min-height: 44px;
+  padding: 0 14px;
   border-radius: 999px;
-  background: rgba(107, 208, 152, 0.14);
-  color: #2d8f55;
-  font-size: 0.9rem;
-  font-weight: 600;
-  white-space: nowrap;
-}
-
-.statusDot {
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  background: #2d8f55;
-  box-shadow: 0 0 0 6px rgba(45, 143, 85, 0.12);
-}
-
-.auctionStatsGrid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 14px;
-}
-
-.auctionStatItem {
-  padding: 16px 18px;
-  border-radius: 18px;
-  background: var(--surface-soft, rgba(255, 255, 255, 0.045));
-  border: 1px solid var(--border-soft, rgba(255, 255, 255, 0.06));
-}
-
-.auctionStatItem span {
-  display: block;
-  margin-bottom: 8px;
-  color: var(--text-secondary, rgba(255, 255, 255, 0.66));
-  font-size: 0.88rem;
-}
-
-.auctionStatItem strong {
-  color: var(--text-primary, inherit);
-  font-size: 1.05rem;
-}
-
-.progressBlock {
-  padding: 20px;
-  border-radius: 22px;
-  background: var(--surface-soft, rgba(255, 255, 255, 0.04));
-  border: 1px solid var(--border-soft, rgba(255, 255, 255, 0.06));
-}
-
-.progressTop {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-  margin-bottom: 14px;
-}
-
-.progressTop span {
-  color: var(--text-secondary, rgba(255, 255, 255, 0.7));
-}
-
-.progressTop strong {
-  color: var(--accent-color, #d6b36a);
+  background: rgba(212, 153, 74, 0.14);
+  color: #f2c987;
+  font-weight: 800;
 }
 
 .progressBar {
-  position: relative;
-  height: 12px;
+  height: 14px;
   border-radius: 999px;
   overflow: hidden;
   background: rgba(255, 255, 255, 0.08);
@@ -495,199 +475,163 @@
 .progressFill {
   height: 100%;
   border-radius: 999px;
-  background: linear-gradient(
-    90deg,
-    var(--accent-color, #d6b36a),
-    var(--accent-color-soft, #f1d18b)
-  );
+  background: linear-gradient(90deg, #d4994a, #f3d29a);
 }
 
 .progressLabels {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
   margin-top: 10px;
-  display: flex;
-  justify-content: space-between;
-  gap: 16px;
-  color: var(--text-secondary, rgba(255, 255, 255, 0.68));
+  color: rgba(246, 239, 231, 0.64);
   font-size: 0.9rem;
 }
 
-.nextBidPanel {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 20px;
-  padding: 20px;
-  border-radius: 22px;
-  background: var(--surface-soft, rgba(255, 255, 255, 0.045));
-  border: 1px solid var(--border-soft, rgba(255, 255, 255, 0.06));
-}
-
-.nextBidLabel {
-  display: block;
-  margin-bottom: 8px;
-  color: var(--text-secondary, rgba(255, 255, 255, 0.66));
-  font-size: 0.9rem;
-}
-
-.nextBidPanel strong {
-  font-size: 1.4rem;
-  color: var(--text-primary, inherit);
-}
-
-.quickBidButtons {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-}
-
-.quickBidButtons button {
-  height: 44px;
-  padding: 0 16px;
-  border-radius: 999px;
-  border: 1px solid var(--border-color, rgba(255, 255, 255, 0.1));
-  background: transparent;
-  color: var(--text-primary, inherit);
-  cursor: pointer;
-  font-weight: 600;
-  transition: 0.2s ease;
-}
-
-.quickBidButtons button:hover {
-  border-color: var(--accent-color, #d6b36a);
-  color: var(--accent-color, #d6b36a);
-  transform: translateY(-1px);
-}
-
-.timelineBlock {
+.timelineSection {
   display: grid;
-  gap: 16px;
+  gap: 18px;
 }
 
-.timelineHeader {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-}
-
-.timelineHeader h3 {
-  margin: 0;
-}
-
-.timelineHeader span {
-  color: var(--text-secondary, rgba(255, 255, 255, 0.66));
-  font-size: 0.92rem;
+.emptyTimeline {
+  padding: 24px;
+  border-radius: 24px;
+  background: rgba(255, 255, 255, 0.04);
+  color: rgba(246, 239, 231, 0.68);
 }
 
 .timeline {
-  position: relative;
   display: grid;
   gap: 14px;
 }
 
 .timelineItem {
   display: grid;
-  grid-template-columns: 18px 1fr;
+  grid-template-columns: 6px 1fr;
   gap: 14px;
-  align-items: flex-start;
 }
 
-.timelineMarker {
-  position: relative;
-  width: 14px;
-  height: 14px;
-  margin-top: 8px;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.22);
+.timelineAccent {
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.1);
 }
 
-.timelineMarker::after {
-  content: "";
-  position: absolute;
-  top: 16px;
-  left: 6px;
-  width: 2px;
-  height: calc(100% + 28px);
-  background: var(--border-soft, rgba(255, 255, 255, 0.08));
+.timelineItemActive .timelineAccent {
+  background: linear-gradient(180deg, #d4994a, #f3d29a);
 }
 
-.timelineItem:last-child .timelineMarker::after {
-  display: none;
-}
-
-.timelineItemActive .timelineMarker {
-  background: var(--accent-color, #d6b36a);
-  box-shadow: 0 0 0 6px rgba(214, 179, 106, 0.14);
-}
-
-.timelineContent {
-  padding: 16px 18px;
-  border-radius: 18px;
-  background: var(--surface-soft, rgba(255, 255, 255, 0.04));
-  border: 1px solid var(--border-soft, rgba(255, 255, 255, 0.06));
-}
-
-.timelineMain {
+.timelineBody {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 16px;
+  padding: 18px 20px;
+  border-radius: 24px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.06);
 }
 
-.timelineUser {
-  display: grid;
-  gap: 4px;
+.timelineIdentity {
+  display: flex;
+  align-items: center;
+  gap: 14px;
 }
 
-.timelineUser span {
-  color: var(--text-secondary, rgba(255, 255, 255, 0.66));
-  font-size: 0.9rem;
+.timelineValues {
+  text-align: right;
 }
 
-.timelineMain b,
-.timelineMain strong {
-  color: var(--text-primary, inherit);
+.bidAmount {
+  font-size: 1.18rem;
+  font-weight: 800;
 }
 
-.leadingBidBadge {
-  display: inline-flex;
-  margin-top: 12px;
-  padding: 8px 12px;
-  border-radius: 999px;
-  background: rgba(214, 179, 106, 0.16);
-  color: var(--accent-color, #d6b36a);
-  font-size: 0.82rem;
-  font-weight: 700;
+.leadingBadge {
+  background: rgba(212, 153, 74, 0.14);
+  color: #f2c987;
 }
 
-@media (max-width: 1024px) {
-  .auctionStatsGrid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-
-  .nextBidPanel {
-    flex-direction: column;
-    align-items: flex-start;
-  }
+.loadingCard,
+.notFound {
+  max-width: 720px;
+  margin: 80px auto 0;
+  text-align: center;
 }
 
-@media (max-width: 640px) {
-  .auctionFlowHeader,
-  .timelineHeader,
-  .timelineMain {
-    flex-direction: column;
-    align-items: flex-start;
-  }
+.notFound h1 {
+  margin: 0 0 10px;
+}
 
-  .auctionStatsGrid {
+.notFound p,
+.loadingCard p {
+  margin: 0;
+  color: rgba(246, 239, 231, 0.7);
+  line-height: 1.64;
+}
+
+@media (max-width: 1100px) {
+  .hero,
+  .infoGrid {
     grid-template-columns: 1fr;
   }
 
-  .quickBidButtons {
-    width: 100%;
+  .timelineBody,
+  .sectionHeader,
+  .bidPanelTop {
+    flex-direction: column;
+    align-items: flex-start;
   }
 
-  .quickBidButtons button {
-    width: 100%;
+  .timelineValues {
+    text-align: left;
+  }
+}
+
+@media (max-width: 768px) {
+  .page {
+    padding: 24px 14px 64px;
+  }
+
+  .visualStage,
+  .commandPanel,
+  .infoCard,
+  .timelineSection,
+  .loadingCard,
+  .notFound {
+    border-radius: 24px;
+  }
+
+  .commandPanel,
+  .infoCard,
+  .timelineSection {
+    padding: 20px;
+  }
+
+  .mainImage,
+  .mainImagePlaceholder {
+    height: 340px;
+  }
+
+  .thumbnailRail,
+  .heroCards,
+  .summaryTiles,
+  .userMeta,
+  .actionButtons {
+    grid-template-columns: 1fr;
+  }
+
+  .thumbnailRail {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .thumbnailActive img,
+  .thumbnailMuted img {
+    height: 86px;
+  }
+
+  .visualTopline {
+    position: static;
+    margin-bottom: 14px;
+    flex-direction: column;
+    align-items: flex-start;
   }
 }

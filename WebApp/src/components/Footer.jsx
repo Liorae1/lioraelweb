@@ -6,7 +6,9 @@ function Footer() {
     <footer className={styles.footer}>
       <div className={styles.container}>
         <div className={styles.brandBlock}>
-          <div className={styles.logo}>Liorael</div>
+          <Link to="/" className={styles.brandLink}>
+            <div className={styles.logo}>Liorael</div>
+          </Link>
           <p className={styles.description}>
             Преміум-платформа для аукціонів брендового одягу, де поєднуються
             сучасна естетика, статус і зручний користувацький досвід.
@@ -17,22 +19,22 @@ function Footer() {
           <div className={styles.column}>
             <h4 className={styles.title}>Навігація</h4>
             <Link to="/" className={styles.link}>Головна</Link>
-            <Link to="#" className={styles.link}>Аукціони</Link>
+            <Link to="/auction" className={styles.link}>Аукціони</Link>
             <Link to="/about" className={styles.link}>Про сайт</Link>
           </div>
 
           <div className={styles.column}>
             <h4 className={styles.title}>Інформація</h4>
-            <a href="#" className={styles.link}>FAQ</a>
-            <a href="#" className={styles.link}>Правила</a>
-            <a href="#" className={styles.link}>Контакти</a>
+            <Link to="/about#work" className={styles.link}>Як це працює</Link>
+            <Link to="/about#faq" className={styles.link}>FAQ</Link>
+            <Link to="" className={styles.link}></Link>
           </div>
-
+          
           <div className={styles.column}>
             <h4 className={styles.title}>Соцмережі</h4>
-            <a href="#" className={styles.link}>Instagram</a>
-            <a href="#" className={styles.link}>Telegram</a>
-            <a href="#" className={styles.link}>Pinterest</a>
+            <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" className={styles.link}>Instagram</a>
+            <a href="https://telegram.org" target="_blank" rel="noopener noreferrer" className={styles.link}>Telegram</a>
+            <a href="https://pinterest.com" target="_blank" rel="noopener noreferrer" className={styles.link}>Pinterest</a>
           </div>
         </div>
       </div>

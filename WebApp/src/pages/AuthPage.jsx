@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Header from "../components/Header";
 import styles from "./AuthPage.module.css";
@@ -26,7 +26,19 @@ const [resendMessage, setResendMessage] = useState("");
   const [touched, setTouched] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState("");
+  const [forgotPasswordOpen, setForgotPasswordOpen] = useState(false);
+  const [forgotPasswordEmail, setForgotPasswordEmail] = useState("");
+  const [forgotPasswordLoading, setForgotPasswordLoading] = useState(false);
+  const [forgotPasswordMessage, setForgotPasswordMessage] = useState("");
   const navigate = useNavigate();
+
+  // Load saved email on mount
+  useEffect(() => {
+    const savedEmail = localStorage.getItem("rememberedEmail");
+    if (savedEmail) {
+      setLoginData((prev) => ({ ...prev, email: savedEmail }));
+    }
+  }, []);
 
   const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   const usernamePattern = /^[^\s]{3,}$/;
@@ -138,6 +150,15 @@ const [resendMessage, setResendMessage] = useState("");
     });
 
     localStorage.setItem("token", res.data.token);
+    window.dispatchEvent(new Event("authChanged"));
+    
+    // Handle "Remember Me"
+    if (loginData.rememberMe) {
+      localStorage.setItem("rememberedEmail", loginData.email.trim());
+    } else {
+      localStorage.removeItem("rememberedEmail");
+    }
+    
     navigate("/profile");
   } catch (err) {
     console.error(err);
@@ -253,6 +274,47 @@ const handleResendVerification = async () => {
     );
   } finally {
     setResendLoading(false);
+  }
+};
+
+const handleForgotPassword = async (e) => {
+  e.preventDefault();
+  
+  if (!forgotPasswordEmail.trim()) {
+    setForgotPasswordMessage("Введіть email");
+    return;
+  }
+
+  if (!emailPattern.test(forgotPasswordEmail.trim())) {
+    setForgotPasswordMessage("Введіть коректний email");
+    return;
+  }
+
+  try {
+    setForgotPasswordLoading(true);
+    setForgotPasswordMessage("");
+
+    const res = await api.post("/api/Auth/forgot-password", {
+      email: forgotPasswordEmail.trim(),
+    });
+
+    setForgotPasswordMessage(
+      res?.data?.message || "Лист для скидання пароля відправлено на вашу пошту."
+    );
+    setForgotPasswordEmail("");
+    
+    setTimeout(() => {
+      setForgotPasswordOpen(false);
+      setForgotPasswordMessage("");
+    }, 2500);
+  } catch (err) {
+    console.error(err);
+    setForgotPasswordMessage(
+      err?.response?.data?.message ||
+        "Не вдалося надіслати лист. Перевірте email і спробуйте знову."
+    );
+  } finally {
+    setForgotPasswordLoading(false);
   }
 };
 
@@ -429,7 +491,7 @@ const handleResendVerification = async () => {
                       <span>Запам’ятати мене</span>
                     </label>
 
-                    <button type="button" className={styles.linkButton}>
+                    <button type="button" className={styles.linkButton} onClick={() => setForgotPasswordOpen(true)}>
                       Забули пароль?
                     </button>
                   </div>
@@ -635,6 +697,58 @@ const handleResendVerification = async () => {
           Закрити
         </button>
       </div>
+    </div>
+  </div>
+)}
+
+      {forgotPasswordOpen && (
+  <div className={styles.verifyOverlay}>
+    <div className={styles.verifyModal}>
+      <h3 className={styles.verifyTitle}>Скидання пароля</h3>
+
+      <p className={styles.verifyText}>
+        Введіть вашу електронну пошту, і ми надішлемо вам посилання для скидання пароля.
+      </p>
+
+      <form onSubmit={handleForgotPassword}>
+        <div className={styles.inputGroup}>
+          <input
+            type="email"
+            placeholder="Ваша пошта"
+            value={forgotPasswordEmail}
+            onChange={(e) => setForgotPasswordEmail(e.target.value)}
+            style={{ marginBottom: "16px" }}
+          />
+        </div>
+
+        {forgotPasswordMessage && (
+          <div className={styles.verifyInfo} style={{ marginBottom: "16px" }}>
+            {forgotPasswordMessage}
+          </div>
+        )}
+
+        <div className={styles.verifyActions}>
+          <button
+            type="submit"
+            className={styles.submitButton}
+            disabled={forgotPasswordLoading}
+          >
+            {forgotPasswordLoading ? "Надсилаємо..." : "Надіслати посилання"}
+          </button>
+
+          <button
+            type="button"
+            className={styles.linkButton}
+            onClick={() => {
+              setForgotPasswordOpen(false);
+              setForgotPasswordEmail("");
+              setForgotPasswordMessage("");
+            }}
+          >
+            Скасувати
+          </button>
+        </div>
+      </form>
     </div>
   </div>
 )}

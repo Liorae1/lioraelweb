@@ -1,4 +1,5 @@
-﻿import { useState } from "react";
+﻿import { useState, useEffect } from "react";
+import { useLocation } from "react-router-dom";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import styles from "./AboutPage.module.css";
@@ -51,7 +52,21 @@ const stepItems = [
 ];
 
 function AboutPage() {
+  const location = useLocation();
   const [activeFaq, setActiveFaq] = useState(0);
+
+  useEffect(() => {
+    // Обрабатывает якорные ссылки (#work, #faq, #about)
+    if (location.hash) {
+      const id = location.hash.slice(1);
+      const element = document.getElementById(id);
+      if (element) {
+        setTimeout(() => {
+          element.scrollIntoView({ behavior: "smooth" });
+        }, 0);
+      }
+    }
+  }, [location.hash]);
 
   const toggleFaq = (index) => {
     setActiveFaq((current) => (current === index ? -1 : index));
@@ -98,7 +113,7 @@ function AboutPage() {
           </div>
         </section>
 
-        <section className={styles.aboutSection}>
+        <section id="about" className={styles.aboutSection}>
           <div className={styles.sectionHeader}>
             <div className={`${styles.label} fade-in-up`}>Хто ми</div>
             <h2 className={`${styles.sectionTitle} fade-in-up`}>Liorael — більше ніж маркетплейс</h2>
@@ -130,7 +145,7 @@ function AboutPage() {
           </div>
         </section>
 
-        <section className={styles.stepsSection}>
+        <section id="work" className={styles.stepsSection}>
           <div className={styles.sectionHeader}>
             <div className={styles.label}>Як це працює</div>
             <h2 className={styles.sectionTitle}>Покроковий шлях для новачків</h2>
@@ -151,7 +166,7 @@ function AboutPage() {
           </div>
         </section>
 
-        <section className={styles.faqSection}>
+        <section id="faq" className={styles.faqSection}>
           <div className={styles.faqContainer}>
             <div className={styles.label}>FAQ</div>
             <h2 className={styles.faqTitle}>Часті запитання</h2>

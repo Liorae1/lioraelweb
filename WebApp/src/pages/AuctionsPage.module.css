@@ -1,367 +1,567 @@
 .page {
   min-height: 100vh;
-  padding: 40px 20px 80px;
-  color: var(--text-primary, #f5f5f7);
+  padding: 36px 20px 84px;
+  background:
+    radial-gradient(circle at 0% 0%, rgba(212, 153, 74, 0.14), transparent 28%),
+    radial-gradient(circle at 100% 10%, rgba(243, 228, 197, 0.14), transparent 24%),
+    linear-gradient(180deg, #120f0b 0%, #19140f 42%, #0f0d0b 100%);
+  color: #f6efe7;
+}
+
+.container {
+  max-width: 1320px;
+  margin: 0 auto;
 }
 
 .hero {
-  max-width: 1240px;
-  margin: 0 auto 28px;
   display: grid;
-  grid-template-columns: 1.4fr 0.9fr;
+  grid-template-columns: minmax(0, 1.2fr) minmax(320px, 0.8fr);
   gap: 24px;
-  align-items: stretch;
+  margin-bottom: 24px;
 }
 
-.heroText,
-.heroStats {
-  background: var(--surface-elevated, rgba(255, 255, 255, 0.05));
-  border: 1px solid var(--border-color, rgba(255, 255, 255, 0.08));
-  backdrop-filter: blur(14px);
-  border-radius: 28px;
-  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.12);
+.heroMain,
+.heroAside,
+.filtersPanel,
+.card,
+.empty,
+.error {
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.2);
 }
 
-.heroText {
-  padding: 32px;
+.heroMain {
+  position: relative;
+  overflow: hidden;
+  padding: 36px;
+  border-radius: 36px;
+  background:
+    radial-gradient(circle at 82% 22%, rgba(212, 153, 74, 0.2), transparent 22%),
+    linear-gradient(145deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.02));
+  backdrop-filter: blur(18px);
+}
+
+.heroAside {
+  padding: 24px;
+  border-radius: 32px;
+  background:
+    linear-gradient(180deg, rgba(255, 247, 236, 0.07), rgba(255, 255, 255, 0.03)),
+    rgba(23, 18, 13, 0.95);
+  backdrop-filter: blur(16px);
 }
 
 .kicker {
-  display: inline-block;
-  margin-bottom: 14px;
-  font-size: 0.85rem;
-  letter-spacing: 0.14em;
+  display: inline-flex;
+  align-items: center;
+  margin-bottom: 18px;
+  padding: 8px 14px;
+  border-radius: 999px;
+  background: rgba(212, 153, 74, 0.12);
+  border: 1px solid rgba(212, 153, 74, 0.24);
+  color: #f2c987;
   text-transform: uppercase;
-  color: var(--accent-color, #d6b36a);
+  letter-spacing: 0.18em;
+  font-size: 0.72rem;
+  font-weight: 800;
 }
 
-.heroText h1 {
-  margin: 0 0 14px;
-  font-size: clamp(2.2rem, 4vw, 4rem);
-  line-height: 1;
-  color: var(--text-primary, inherit);
+.title {
+  max-width: 860px;
+  margin: 0 0 16px;
+  font-size: clamp(2.8rem, 6vw, 5.5rem);
+  line-height: 0.92;
+  letter-spacing: -0.06em;
 }
 
-.heroText p {
+.subtitle {
+  max-width: 720px;
   margin: 0;
-  max-width: 700px;
-  color: var(--text-secondary, rgba(255, 255, 255, 0.72));
-  font-size: 1.05rem;
-  line-height: 1.7;
+  color: rgba(246, 239, 231, 0.78);
+  font-size: 1.04rem;
+  line-height: 1.72;
 }
 
 .heroStats {
-  padding: 24px;
   display: grid;
-  gap: 16px;
-}
-
-.statCard {
-  padding: 20px;
-  border-radius: 22px;
-  background: var(--surface-soft, rgba(255, 255, 255, 0.045));
-  border: 1px solid var(--border-soft, rgba(255, 255, 255, 0.06));
-}
-
-.statValue {
-  display: block;
-  font-size: 1.7rem;
-  font-weight: 700;
-  margin-bottom: 6px;
-  color: var(--text-primary, #ffffff);
-}
-
-.statLabel {
-  color: var(--text-secondary, rgba(255, 255, 255, 0.65));
-}
-
-.filtersSection {
-  max-width: 1240px;
-  margin: 0 auto 20px;
-  padding: 22px;
-  border-radius: 28px;
-  background: var(--surface-elevated, rgba(255, 255, 255, 0.045));
-  border: 1px solid var(--border-color, rgba(255, 255, 255, 0.08));
-  backdrop-filter: blur(14px);
-}
-
-.searchBox {
-  margin-bottom: 16px;
-}
-
-.searchBox input,
-.filtersGrid select {
-  width: 100%;
-  height: 54px;
-  border-radius: 16px;
-  border: 1px solid var(--input-border, rgba(255, 255, 255, 0.1));
-  background: var(--input-bg, rgba(17, 20, 28, 0.9));
-  color: var(--text-primary, #fff);
-  padding: 0 16px;
-  font-size: 0.98rem;
-  outline: none;
-  transition: 0.25s ease;
-}
-
-.searchBox input::placeholder {
-  color: var(--text-muted, rgba(255, 255, 255, 0.55));
-}
-
-.searchBox input:focus,
-.filtersGrid select:focus {
-  border-color: var(--accent-color, rgba(214, 179, 106, 0.7));
-  box-shadow: 0 0 0 4px rgba(214, 179, 106, 0.12);
-}
-
-.filtersGrid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 14px;
+  margin-top: 28px;
 }
 
-.resultsHeader {
-  max-width: 1240px;
-  margin: 0 auto 18px;
-  color: var(--text-secondary, rgba(255, 255, 255, 0.76));
+.heroStat {
+  padding: 18px 20px;
+  border-radius: 22px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.06);
 }
 
-.lotsList {
-  max-width: 1240px;
-  margin: 0 auto;
+.heroStat span,
+.userBalanceCard span,
+.heroMiniPanel span,
+.field span,
+.priceTile span,
+.endDate span {
+  display: block;
+  margin-bottom: 8px;
+  color: rgba(246, 239, 231, 0.62);
+  font-size: 0.82rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.heroStat strong {
+  font-size: 1.4rem;
+}
+
+.userCard {
   display: grid;
   gap: 18px;
 }
 
-.lotCard {
-  display: grid;
-  grid-template-columns: 220px 1fr 240px;
-  gap: 20px;
-  padding: 18px;
-  border-radius: 28px;
-  background: var(--surface-elevated, rgba(255, 255, 255, 0.045));
-  border: 1px solid var(--border-color, rgba(255, 255, 255, 0.08));
-  backdrop-filter: blur(14px);
-  transition:
-    transform 0.25s ease,
-    border-color 0.25s ease,
-    box-shadow 0.25s ease;
+.userHeader {
+  display: flex;
+  align-items: center;
+  gap: 14px;
 }
 
-.lotCard:hover {
-  transform: translateY(-4px);
-  border-color: color-mix(in srgb, var(--accent-color, #d6b36a) 50%, transparent);
-  box-shadow: 0 20px 45px rgba(0, 0, 0, 0.14);
-}
-
-.imageWrap {
-  position: relative;
+.userAvatar {
+  width: 58px;
+  height: 58px;
+  border-radius: 18px;
   overflow: hidden;
-  border-radius: 22px;
-  min-height: 220px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #d4994a, #f3d29a);
+  color: #1a130d;
+  font-size: 1.2rem;
+  font-weight: 800;
+  flex-shrink: 0;
 }
 
-.imageWrap img {
+.userAvatarImage {
   width: 100%;
   height: 100%;
   object-fit: cover;
   display: block;
-  transition: transform 0.35s ease;
 }
 
-.lotCard:hover .imageWrap img {
-  transform: scale(1.04);
+.userName {
+  font-size: 1.04rem;
+  font-weight: 700;
 }
 
-.badge {
-  position: absolute;
-  top: 14px;
-  left: 14px;
-  padding: 8px 12px;
-  border-radius: 999px;
-  font-size: 0.8rem;
-  font-weight: 600;
-  backdrop-filter: blur(8px);
-  border: 1px solid rgba(255, 255, 255, 0.14);
+.userNick {
+  margin-top: 4px;
+  color: rgba(246, 239, 231, 0.66);
+  font-size: 0.92rem;
 }
 
-.Hot {
-  background: rgba(255, 115, 115, 0.18);
-  color: #c84e4e;
+.userBalanceCard,
+.heroMiniPanel,
+.filtersPanel {
+  padding: 18px 20px;
+  border-radius: 24px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.06);
 }
 
-.Active {
-  background: rgba(107, 208, 152, 0.18);
-  color: #2d8f55;
+.userBalanceCard strong,
+.heroMiniPanel strong {
+  font-size: 1.4rem;
 }
 
-.EndingSoon {
-  background: rgba(255, 193, 94, 0.2);
-  color: #b07100;
+.heroMiniPanel b {
+  display: block;
+  margin-top: 10px;
+  color: rgba(246, 239, 231, 0.8);
+  font-size: 0.95rem;
 }
 
-.Premium {
-  background: rgba(214, 179, 106, 0.18);
-  color: #8c6a18;
+.loadingPulse {
+  width: 86px;
+  height: 86px;
+  margin: 24px auto;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(212, 153, 74, 0.5), rgba(212, 153, 74, 0.06));
+  animation: pulse 2s ease-in-out infinite;
 }
 
-.lotInfo {
+.filtersPanel {
+  margin-bottom: 24px;
+}
+
+.filtersTop {
   display: flex;
-  flex-direction: column;
-  justify-content: center;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 18px;
 }
 
-.brand {
-  margin: 0 0 8px;
-  font-size: 0.9rem;
-  letter-spacing: 0.12em;
+.sectionTitle {
+  margin: 0 0 6px;
+  font-size: clamp(1.5rem, 3vw, 2.2rem);
+}
+
+.sectionText {
+  margin: 0;
+  color: rgba(246, 239, 231, 0.68);
+  line-height: 1.65;
+}
+
+.resultsPill {
+  display: inline-flex;
+  align-items: center;
+  min-height: 46px;
+  padding: 0 16px;
+  border-radius: 999px;
+  background: rgba(212, 153, 74, 0.14);
+  border: 1px solid rgba(212, 153, 74, 0.22);
+  color: #f2c987;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.filtersGrid {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 1fr;
+  gap: 14px;
+}
+
+.field {
+  display: grid;
+  gap: 10px;
+}
+
+.field input,
+.field select {
+  width: 100%;
+  height: 52px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  background: rgba(14, 11, 8, 0.82);
+  color: #f6efe7;
+  padding: 0 16px;
+  font: inherit;
+  outline: none;
+}
+
+.field input:focus,
+.field select:focus {
+  border-color: rgba(212, 153, 74, 0.5);
+  box-shadow: 0 0 0 4px rgba(212, 153, 74, 0.14);
+}
+
+.error {
+  margin-bottom: 20px;
+  padding: 16px 18px;
+  border-radius: 18px;
+  background: rgba(168, 67, 67, 0.12);
+  color: #ef9797;
+}
+
+.empty {
+  padding: 34px;
+  border-radius: 30px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.03));
+}
+
+.emptyLabel {
+  display: inline-block;
+  margin-bottom: 14px;
+  color: #f2c987;
   text-transform: uppercase;
-  color: var(--accent-color, #d6b36a);
+  letter-spacing: 0.18em;
+  font-size: 0.74rem;
+  font-weight: 800;
 }
 
-.lotInfo h2 {
-  margin: 0 0 16px;
-  font-size: 1.45rem;
-  line-height: 1.25;
-  color: var(--text-primary, inherit);
+.empty h3 {
+  margin: 0 0 10px;
+  font-size: 2rem;
 }
 
-.meta {
+.empty p {
+  margin: 0;
+  color: rgba(246, 239, 231, 0.68);
+  line-height: 1.65;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: 22px;
+}
+
+.card {
+  overflow: hidden;
+  border-radius: 30px;
+  background: rgba(22, 17, 13, 0.95);
+  transition: transform 0.24s ease, border-color 0.24s ease, box-shadow 0.24s ease;
+}
+
+.card:hover {
+  transform: translateY(-6px);
+  border-color: rgba(212, 153, 74, 0.28);
+  box-shadow: 0 28px 60px rgba(0, 0, 0, 0.26);
+}
+
+.cardMedia {
+  position: relative;
+  height: 330px;
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0.02), rgba(0, 0, 0, 0.28));
+}
+
+.cardOverlay {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(180deg, rgba(0, 0, 0, 0.02), rgba(0, 0, 0, 0.38)),
+    radial-gradient(circle at top right, rgba(212, 153, 74, 0.2), transparent 28%);
+  z-index: 1;
+}
+
+.cardTopline {
+  position: absolute;
+  inset: 16px 16px auto;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.statusBadge,
+.timerBadge {
+  display: inline-flex;
+  align-items: center;
+  min-height: 38px;
+  padding: 0 14px;
+  border-radius: 999px;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(17, 12, 8, 0.6);
+  color: #fff8f0;
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+.statusActive {
+  color: #9be1ae;
+}
+
+.statusDraft {
+  color: #f2c987;
+}
+
+.statusClosed {
+  color: #ffb4b4;
+}
+
+.statusDefault {
+  color: #fff8f0;
+}
+
+.timerDanger {
+  color: #ff9b8a;
+}
+
+.cardImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.noImage {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(246, 239, 231, 0.58);
+}
+
+.cardBody {
+  padding: 22px;
+}
+
+.cardHeading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.brandLine {
+  margin-bottom: 8px;
+  color: #f2c987;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  font-size: 0.74rem;
+  font-weight: 800;
+}
+
+.cardTitle {
+  margin: 0;
+  font-size: 1.6rem;
+  line-height: 1.06;
+}
+
+.endDate {
+  min-width: 120px;
+  text-align: right;
+}
+
+.endDate strong {
+  font-size: 0.95rem;
+  line-height: 1.4;
+}
+
+.cardDescription {
+  margin: 16px 0;
+  color: rgba(246, 239, 231, 0.74);
+  line-height: 1.62;
+}
+
+.cardTags {
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
+  margin-bottom: 18px;
 }
 
-.meta span {
-  padding: 10px 14px;
+.cardTags span {
+  padding: 8px 12px;
   border-radius: 999px;
-  background: var(--surface-soft, rgba(255, 255, 255, 0.055));
-  color: var(--text-secondary, rgba(255, 255, 255, 0.78));
-  font-size: 0.92rem;
-  border: 1px solid var(--border-soft, rgba(255, 255, 255, 0.05));
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  color: rgba(246, 239, 231, 0.76);
+  font-size: 0.84rem;
 }
 
-.lotSide {
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  gap: 18px;
-  padding: 8px 0 8px 8px;
-}
-
-.priceBlock {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.priceLabel {
-  color: var(--text-secondary, rgba(255, 255, 255, 0.62));
-  font-size: 0.92rem;
-}
-
-.priceBlock strong {
-  font-size: 1.8rem;
-  line-height: 1.1;
-  color: var(--text-primary, inherit);
-}
-
-.sideMeta {
+.cardStats {
   display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin-bottom: 18px;
+}
+
+.priceTile {
+  padding: 16px;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.priceTile strong {
+  font-size: 1.04rem;
+}
+
+.cardFooter {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.liveLine {
+  display: inline-flex;
+  align-items: center;
   gap: 10px;
-  color: var(--text-secondary, rgba(255, 255, 255, 0.78));
+  color: rgba(246, 239, 231, 0.64);
+  font-size: 0.9rem;
 }
 
-.detailsBtn {
-  height: 52px;
-  border: none;
-  border-radius: 16px;
-  cursor: pointer;
-  font-weight: 700;
-  font-size: 0.96rem;
-  background: linear-gradient(
-    135deg,
-    var(--accent-color, #d6b36a),
-    var(--accent-color-soft, #f1d18b)
-  );
-  color: #111;
-  transition: transform 0.2s ease, box-shadow 0.25s ease;
+.liveDot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #8ff3b0;
+  box-shadow: 0 0 0 6px rgba(143, 243, 176, 0.12);
 }
 
-.detailsBtn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 12px 30px rgba(214, 179, 106, 0.25);
+.openLink {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 46px;
+  padding: 0 16px;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #d4994a, #f3d29a);
+  color: #1a130d;
+  font-size: 0.92rem;
+  font-weight: 800;
 }
 
-.emptyState {
-  text-align: center;
-  padding: 56px 24px;
-  border-radius: 28px;
-  background: var(--surface-elevated, rgba(255, 255, 255, 0.045));
-  border: 1px solid var(--border-color, rgba(255, 255, 255, 0.08));
-}
-
-.emptyState h3 {
-  margin-bottom: 10px;
-  color: var(--text-primary, inherit);
-}
-
-.emptyState p {
-  margin: 0;
-  color: var(--text-secondary, rgba(255, 255, 255, 0.7));
-}
-
-@media (max-width: 1024px) {
-  .hero {
-    grid-template-columns: 1fr;
+@keyframes pulse {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 0.7;
   }
+  50% {
+    transform: scale(1.08);
+    opacity: 1;
+  }
+}
 
+@media (max-width: 1100px) {
+  .hero,
   .filtersGrid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-
-  .lotCard {
     grid-template-columns: 1fr;
   }
 
-  .imageWrap {
-    min-height: 280px;
+  .filtersTop,
+  .cardHeading,
+  .cardFooter {
+    flex-direction: column;
+    align-items: flex-start;
   }
 
-  .lotSide {
-    padding: 0;
+  .endDate {
+    min-width: 0;
+    text-align: left;
   }
 }
 
-@media (max-width: 640px) {
+@media (max-width: 768px) {
   .page {
-    padding: 24px 14px 60px;
+    padding: 24px 14px 64px;
   }
 
-  .heroText,
+  .heroMain,
+  .heroAside,
+  .filtersPanel,
+  .card,
+  .empty {
+    border-radius: 24px;
+  }
+
+  .heroMain,
+  .heroAside,
+  .filtersPanel,
+  .cardBody,
+  .empty {
+    padding: 20px;
+  }
+
   .heroStats,
-  .filtersSection,
-  .lotCard,
-  .emptyState {
-    border-radius: 22px;
-  }
-
-  .heroText {
-    padding: 24px;
-  }
-
-  .filtersGrid {
+  .cardStats {
     grid-template-columns: 1fr;
   }
 
-  .imageWrap {
-    min-height: 220px;
+  .cardMedia {
+    height: 260px;
   }
 
-  .lotInfo h2 {
-    font-size: 1.2rem;
+  .cardTopline {
+    flex-direction: column;
+    align-items: flex-start;
   }
 
-  .priceBlock strong {
-    font-size: 1.45rem;
+  .openLink {
+    width: 100%;
   }
 }
