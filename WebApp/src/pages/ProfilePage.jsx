@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { Navigate } from "react-router-dom";
+import { Navigate, useNavigate } from "react-router-dom";
 import api from "../api/axios";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
@@ -28,6 +28,7 @@ const mapUserToProfileForm = (userData) => ({
 });
 
 function ProfilePage() {
+  const navigate = useNavigate();
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [auth, setAuth] = useState(true);
@@ -452,9 +453,7 @@ function ProfilePage() {
                   <button
                     type="button"
                     className={styles.quickActionButton}
-                    onClick={() =>
-                      showToast("Функція буде доступна пізніше", "success")
-                    }
+                    onClick={() => navigate("/wallet#transactions")}
                   >
                     Історія транзакцій
                   </button>
@@ -462,9 +461,7 @@ function ProfilePage() {
                   <button
                     type="button"
                     className={styles.quickActionButton}
-                    onClick={() =>
-                      showToast("Поповнення балансу скоро з'явиться", "success")
-                    }
+                    onClick={() => navigate("/wallet#topup")}
                   >
                     Поповнення балансу
                   </button>
@@ -472,9 +469,7 @@ function ProfilePage() {
                   <button
                     type="button"
                     className={styles.quickActionButton}
-                    onClick={() =>
-                      showToast("Функція буде доступна пізніше", "success")
-                    }
+                    onClick={() => navigate("/wallet#bids")}
                   >
                     Мої ставки
                   </button>

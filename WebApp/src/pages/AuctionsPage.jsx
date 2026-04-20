@@ -1,7 +1,6 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import api from "../api/axios";
-
 import styles from "./AuctionsPage.module.css";
 
 const AUCTIONS_RESPONSE_KEYS = ["items", "data", "results", "content", "auctions"];
@@ -24,28 +23,175 @@ function normalizeAuctionsResponse(payload) {
   return [];
 }
 
+function formatPrice(value) {
+  return new Intl.NumberFormat("uk-UA", {
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 2,
+  }).format(Number(value || 0));
+}
+
+function formatDate(value) {
+  if (!value) return "—";
+
+  return new Date(value).toLocaleString("uk-UA", {
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+}
+
+function getTimeLeftParts(value, now) {
+  if (!value) {
+    return { label: "Дата уточнюється", tone: "muted" };
+  }
+
+  const target = new Date(value).getTime();
+
+  if (Number.isNaN(target)) {
+    return { label: "Дата уточнюється", tone: "muted" };
+  }
+
+  const diff = target - now;
+
+  if (diff <= 0) {
+    return { label: "Завершено", tone: "finished" };
+  }
+
+  const totalSeconds = Math.floor(diff / 1000);
+  const days = Math.floor(totalSeconds / 86400);
+  const hours = Math.floor((totalSeconds % 86400) / 3600);
+  const minutes = Math.floor((totalSeconds % 3600) / 60);
+  const seconds = totalSeconds % 60;
+
+  if (days > 0) {
+    return { label: `${days} д ${hours} год`, tone: "normal" };
+  }
+
+  if (hours > 0) {
+    return { label: `${hours} год ${minutes} хв`, tone: "normal" };
+  }
+
+  return {
+    label: `${Math.max(minutes, 0)}:${String(Math.max(seconds, 0)).padStart(2, "0")}`,
+    tone: totalSeconds < 900 ? "danger" : "normal",
+  };
+}
+
+function getStatusLabel(status) {
+  const normalizedStatus = String(status || "").toLowerCase();
+
+  if (normalizedStatus === "active") return "Активний";
+  if (normalizedStatus === "draft") return "Чернетка";
+  if (normalizedStatus === "finished" || normalizedStatus === "closed") {
+    return "Завершено";
+  }
+
+  return status || "Лот";
+}
+
+function isAuctionActive(auction, now) {
+  const normalizedStatus = String(auction?.status || "").toLowerCase();
+  const endTime = auction?.endTime ? new Date(auction.endTime).getTime() : null;
+  const startTime = auction?.startTime ? new Date(auction.startTime).getTime() : null;
+
+  if (["finished", "closed"].includes(normalizedStatus)) {
+    return false;
+  }
+
+  if (normalizedStatus === "draft") {
+    return false;
+  }
+
+  if (startTime && !Number.isNaN(startTime) && startTime > now) {
+    return false;
+  }
+
+  if (endTime && !Number.isNaN(endTime) && endTime <= now) {
+    return false;
+  }
+
+  if (!normalizedStatus) {
+    return Boolean(endTime ? endTime > now : true);
+  }
+
+  return true;
+}
+
+function getStatusTone(auction, now) {
+  const normalizedStatus = String(auction?.status || "").toLowerCase();
+
+  if (isAuctionActive(auction, now)) return "active";
+  if (normalizedStatus === "draft") return "draft";
+  if (normalizedStatus === "finished" || normalizedStatus === "closed") {
+    return "closed";
+  }
+
+  return "default";
+}
+
+function getMainImage(auction) {
+  if (!auction?.images?.length) return "";
+  return auction.images[0].imageUrl;
+}
+
+function getShortDescription(auction) {
+  const description = auction?.description?.trim();
+
+  if (!description) {
+    return "Коротка презентація лота для клієнта: фото, бренд, ставка та дедлайн без перевантаження деталями.";
+  }
+
+  return description.length > 140 ? `${description.slice(0, 140)}...` : description;
+}
+
+async function requestCurrentUser() {
+  const token = localStorage.getItem("token");
+
+  if (!token) {
+    return null;
+  }
+
+  const response = await api.get("/api/profile/me");
+  return response.data;
+}
+
 function AuctionsPage() {
   const [auctions, setAuctions] = useState([]);
+  const [currentUser, setCurrentUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [search, setSearch] = useState("");
+  const [categoryFilter, setCategoryFilter] = useState("all");
+  const [statusFilter, setStatusFilter] = useState("active");
+  const [sortMode, setSortMode] = useState("ending");
+  const [now, setNow] = useState(Date.now());
 
   useEffect(() => {
-    const loadAuctions = async () => {
+    const timer = window.setInterval(() => {
+      setNow(Date.now());
+    }, 1000);
+
+    return () => window.clearInterval(timer);
+  }, []);
+
+  useEffect(() => {
+    const loadPage = async () => {
       try {
         setLoading(true);
         setError("");
 
-        const response = await api.get("/api/auctions");
-        const nextAuctions = normalizeAuctionsResponse(response.data)
-          .filter((auction) => auction?.id)
-          .sort((first, second) => {
-            const firstEndTime = first?.endTime ? new Date(first.endTime).getTime() : Number.MAX_SAFE_INTEGER;
-            const secondEndTime = second?.endTime ? new Date(second.endTime).getTime() : Number.MAX_SAFE_INTEGER;
+        const [auctionsResponse, currentUserData] = await Promise.all([
+          api.get("/api/auctions"),
+          requestCurrentUser().catch(() => null),
+        ]);
 
-            return firstEndTime - secondEndTime;
-          });
+        const nextAuctions = normalizeAuctionsResponse(auctionsResponse.data)
+          .filter((auction) => auction?.id);
 
         setAuctions(nextAuctions);
+        setCurrentUser(currentUserData);
       } catch (err) {
         console.error(err);
         setError(
@@ -56,91 +202,135 @@ function AuctionsPage() {
       }
     };
 
-    loadAuctions();
+    loadPage();
   }, []);
 
-  const formatPrice = (value) => {
-    return new Intl.NumberFormat("uk-UA", {
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
-    }).format(Number(value || 0));
-  };
+  useEffect(() => {
+    const syncCurrentUser = async () => {
+      try {
+        const currentUserData = await requestCurrentUser();
+        setCurrentUser(currentUserData);
+      } catch {
+        setCurrentUser(null);
+      }
+    };
 
-  const formatDate = (value) => {
-    if (!value) return "—";
+    const handleAuthChange = () => {
+      syncCurrentUser();
+    };
 
-    return new Date(value).toLocaleString("uk-UA", {
-      year: "numeric",
-      month: "2-digit",
-      day: "2-digit",
-      hour: "2-digit",
-      minute: "2-digit",
+    window.addEventListener("authChanged", handleAuthChange);
+    window.addEventListener("storage", handleAuthChange);
+
+    return () => {
+      window.removeEventListener("authChanged", handleAuthChange);
+      window.removeEventListener("storage", handleAuthChange);
+    };
+  }, []);
+
+  const categories = useMemo(() => {
+    return [...new Set(auctions.map((auction) => auction.category).filter(Boolean))];
+  }, [auctions]);
+
+  const filteredAuctions = useMemo(() => {
+    const normalizedSearch = search.trim().toLowerCase();
+
+    const nextAuctions = auctions.filter((auction) => {
+      const matchesSearch =
+        !normalizedSearch ||
+        [
+          auction.title,
+          auction.brand,
+          auction.category,
+          auction.condition,
+          auction.size,
+          auction.description,
+        ]
+          .filter(Boolean)
+          .some((value) => String(value).toLowerCase().includes(normalizedSearch));
+
+      const normalizedStatus = String(auction.status || "").toLowerCase();
+      const matchesStatus =
+        statusFilter === "all" ||
+        (statusFilter === "active" && isAuctionActive(auction, now)) ||
+        (statusFilter === "closed" &&
+          !isAuctionActive(auction, now) &&
+          ["finished", "closed"].includes(normalizedStatus)) ||
+        (statusFilter === "draft" && normalizedStatus === "draft");
+
+      const matchesCategory =
+        categoryFilter === "all" || auction.category === categoryFilter;
+
+      return matchesSearch && matchesStatus && matchesCategory;
     });
-  };
 
-  const getMainImage = (auction) => {
-    if (!auction?.images?.length) return "";
-    return auction.images[0].imageUrl;
-  };
+    nextAuctions.sort((first, second) => {
+      if (sortMode === "priceDesc") {
+        return Number(second.currentPrice || 0) - Number(first.currentPrice || 0);
+      }
 
-  const formatTimeLeft = (value) => {
-    if (!value) return "Дата уточнюється";
+      if (sortMode === "priceAsc") {
+        return Number(first.currentPrice || 0) - Number(second.currentPrice || 0);
+      }
 
-    const target = new Date(value).getTime();
+      if (sortMode === "newest") {
+        return new Date(second.startTime || 0).getTime() - new Date(first.startTime || 0).getTime();
+      }
 
-    if (Number.isNaN(target)) return "Дата уточнюється";
+      const firstEndTime = first?.endTime
+        ? new Date(first.endTime).getTime()
+        : Number.MAX_SAFE_INTEGER;
+      const secondEndTime = second?.endTime
+        ? new Date(second.endTime).getTime()
+        : Number.MAX_SAFE_INTEGER;
 
-    const diff = target - Date.now();
+      return firstEndTime - secondEndTime;
+    });
 
-    if (diff <= 0) return "Аукціон завершено";
-
-    const minutes = Math.floor(diff / (1000 * 60));
-    const days = Math.floor(minutes / (60 * 24));
-    const hours = Math.floor((minutes % (60 * 24)) / 60);
-    const mins = minutes % 60;
-
-    if (days > 0) return `${days} д ${hours} год`;
-    if (hours > 0) return `${hours} год ${mins} хв`;
-
-    return `${Math.max(mins, 1)} хв`;
-  };
-
-  const getStatusLabel = (status) => {
-    const normalizedStatus = String(status || "").toLowerCase();
-
-    if (normalizedStatus === "active") return "Активний";
-    if (normalizedStatus === "draft") return "Чернетка";
-    if (normalizedStatus === "finished" || normalizedStatus === "closed") return "Завершено";
-
-    return status || "Лот";
-  };
+    return nextAuctions;
+  }, [auctions, categoryFilter, now, search, sortMode, statusFilter]);
 
   const activeAuctionsCount = auctions.filter(
-    (auction) => String(auction.status || "").toLowerCase() === "active"
+    (auction) => isAuctionActive(auction, now)
   ).length;
-  const categoriesCount = new Set(
-    auctions.map((auction) => auction.category).filter(Boolean)
-  ).size;
-  const highestCurrentPrice = auctions.reduce((highest, auction) => {
-    return Math.max(highest, Number(auction.currentPrice || 0));
-  }, 0);
-  const endingSoonAuction = auctions.find((auction) => auction.endTime);
+
+  const endingSoonAuction = useMemo(() => {
+    return [...auctions]
+      .filter((auction) => {
+        const endTime = auction?.endTime ? new Date(auction.endTime).getTime() : 0;
+        return endTime > now;
+      })
+      .sort((first, second) => {
+        return new Date(first.endTime).getTime() - new Date(second.endTime).getTime();
+      })[0] || null;
+  }, [auctions, now]);
+
+  const topPriceAuction = useMemo(() => {
+    return [...auctions].sort(
+      (first, second) => Number(second.currentPrice || 0) - Number(first.currentPrice || 0)
+    )[0] || null;
+  }, [auctions]);
+
+  const userDisplayName =
+    [currentUser?.firstName, currentUser?.lastName].filter(Boolean).join(" ") ||
+    currentUser?.userName ||
+    "Гість";
+  const userAvatarLetter = userDisplayName.charAt(0).toUpperCase();
 
   if (loading) {
     return (
       <div className={styles.page}>
         <div className={styles.container}>
           <section className={styles.hero}>
-            <div className={styles.heroContent}>
-              <span className={styles.kicker}>Curated Drop</span>
-              <h1 className={styles.title}>Аукціони</h1>
+            <div className={styles.heroMain}>
+              <span className={styles.kicker}>Live showroom</span>
+              <h1 className={styles.title}>Готуємо аукціони до показу</h1>
               <p className={styles.subtitle}>
-                Підтягуємо актуальні лоти та готуємо вітрину до показу.
+                Завантажуємо лоти, поточні ставки та таймери в реальному часі.
               </p>
             </div>
-            <div className={styles.heroPanel}>
+            <div className={styles.heroAside}>
               <div className={styles.loadingPulse} />
-              <p className={styles.muted}>Завантаження...</p>
             </div>
           </section>
         </div>
@@ -152,138 +342,234 @@ function AuctionsPage() {
     <div className={styles.page}>
       <div className={styles.container}>
         <section className={styles.hero}>
-          <div className={styles.heroContent}>
-            <span className={styles.kicker}>Curated Drop</span>
-            <h1 className={styles.title}>Аукціони</h1>
+          <div className={styles.heroMain}>
+            <span className={styles.kicker}>Live showroom</span>
+            <h1 className={styles.title}>Аукціони у форматі швидкої вітрини</h1>
             <p className={styles.subtitle}>
-              Вітрина преміальних лотів з актуальними ставками, дедлайнами та
-              швидким переходом до деталей.
+              Клієнт одразу бачить лот, картинку, поточну ціну та час до завершення.
+              Далі вже відкриває красивий екран торгів.
             </p>
-          </div>
 
-          <div className={styles.heroPanel}>
-            <div className={styles.heroPanelTop}>
-              <div>
-                <span className={styles.panelLabel}>Завершується найближче</span>
-                <strong className={styles.panelValue}>
-                  {endingSoonAuction ? formatTimeLeft(endingSoonAuction.endTime) : "Немає активних лотів"}
-                </strong>
-              </div>
-              <div className={styles.statusPill}>
-                {activeAuctionsCount} active
-              </div>
-            </div>
-
-            <div className={styles.statsGrid}>
-              <div className={styles.statCard}>
-                <span>Активні лоти</span>
+            <div className={styles.heroStats}>
+              <div className={styles.heroStat}>
+                <span>Активні</span>
                 <strong>{activeAuctionsCount}</strong>
               </div>
-              <div className={styles.statCard}>
+              <div className={styles.heroStat}>
                 <span>Категорії</span>
-                <strong>{categoriesCount}</strong>
+                <strong>{categories.length}</strong>
               </div>
-              <div className={styles.statCard}>
-                <span>Макс. ставка</span>
-                <strong>{formatPrice(highestCurrentPrice)} ₴</strong>
+              <div className={styles.heroStat}>
+                <span>Топ ставка</span>
+                <strong>
+                  {topPriceAuction ? `${formatPrice(topPriceAuction.currentPrice)} ₴` : "—"}
+                </strong>
               </div>
             </div>
+          </div>
+
+          <aside className={styles.heroAside}>
+            <div className={styles.userCard}>
+              <div className={styles.userHeader}>
+                <div className={styles.userAvatar}>
+                  {currentUser?.avatarUrl ? (
+                    <img
+                      src={currentUser.avatarUrl}
+                      alt={userDisplayName}
+                      className={styles.userAvatarImage}
+                    />
+                  ) : (
+                    userAvatarLetter
+                  )}
+                </div>
+                <div>
+                  <div className={styles.userName}>{userDisplayName}</div>
+                  <div className={styles.userNick}>
+                    {currentUser?.userName ? `@${currentUser.userName}` : "Не авторизований"}
+                  </div>
+                </div>
+              </div>
+
+              <div className={styles.userBalanceCard}>
+                <span>Баланс</span>
+                <strong>
+                  {currentUser ? `${formatPrice(currentUser.balance)} ₴` : "Увійди в акаунт"}
+                </strong>
+              </div>
+
+              <div className={styles.heroMiniPanel}>
+                <span>Завершується першим</span>
+                <strong>
+                  {endingSoonAuction
+                    ? getTimeLeftParts(endingSoonAuction.endTime, now).label
+                    : "Немає активних лотів"}
+                </strong>
+                <b>{endingSoonAuction?.title || "Очікуємо нові лоти"}</b>
+              </div>
+            </div>
+          </aside>
+        </section>
+
+        <section className={styles.filtersPanel}>
+          <div className={styles.filtersTop}>
+            <div>
+              <h2 className={styles.sectionTitle}>Знайти потрібний лот</h2>
+              <p className={styles.sectionText}>
+                Фільтри без переходів по вкладках: швидкий пошук, категорії та сортування.
+              </p>
+            </div>
+            <div className={styles.resultsPill}>
+              {filteredAuctions.length} {filteredAuctions.length === 1 ? "лот" : "лотів"}
+            </div>
+          </div>
+
+          <div className={styles.filtersGrid}>
+            <label className={styles.field}>
+              <span>Пошук</span>
+              <input
+                type="text"
+                value={search}
+                onChange={(event) => setSearch(event.target.value)}
+                placeholder="Наприклад, Prada, сумка, S, black"
+              />
+            </label>
+
+            <label className={styles.field}>
+              <span>Категорія</span>
+              <select
+                value={categoryFilter}
+                onChange={(event) => setCategoryFilter(event.target.value)}
+              >
+                <option value="all">Усі категорії</option>
+                {categories.map((category) => (
+                  <option key={category} value={category}>
+                    {category}
+                  </option>
+                ))}
+              </select>
+            </label>
+
+            <label className={styles.field}>
+              <span>Статус</span>
+              <select
+                value={statusFilter}
+                onChange={(event) => setStatusFilter(event.target.value)}
+              >
+                <option value="active">Активні</option>
+                <option value="all">Усі</option>
+                <option value="closed">Завершені</option>
+                <option value="draft">Чернетки</option>
+              </select>
+            </label>
+
+            <label className={styles.field}>
+              <span>Сортування</span>
+              <select
+                value={sortMode}
+                onChange={(event) => setSortMode(event.target.value)}
+              >
+                <option value="ending">Швидко завершуються</option>
+                <option value="priceDesc">Дорожчі першими</option>
+                <option value="priceAsc">Дешевші першими</option>
+                <option value="newest">Найновіші</option>
+              </select>
+            </label>
           </div>
         </section>
 
-        <div className={styles.header}>
-          <h2 className={styles.sectionTitle}>Доступні лоти</h2>
-          <p className={styles.subtitle}>
-            Актуальні лоти брендового одягу, взуття та аксесуарів
-          </p>
-        </div>
-
         {error && <div className={styles.error}>{error}</div>}
 
-        {!auctions.length ? (
+        {!filteredAuctions.length ? (
           <div className={styles.empty}>
-            <span className={styles.emptyLabel}>Пауза між дропами</span>
-            <h3>Зараз немає активних аукціонів</h3>
-            <p>
-              Сам запит до API спрацьовує коректно, але сервер зараз повертає
-              порожній список лотів.
-            </p>
+            <span className={styles.emptyLabel}>Нічого не знайдено</span>
+            <h3>Під фільтри зараз немає лотів</h3>
+            <p>Спробуй змінити пошук, статус або категорію, щоб побачити більше результатів.</p>
           </div>
         ) : (
           <div className={styles.grid}>
-            {auctions.map((auction) => (
-              <Link
-                key={auction.id}
-                to={`/auction/${auction.id}`}
-                className={styles.card}
-              >
-                <div className={styles.imageWrap}>
-                  <div className={styles.imageOverlay} />
-                  <div className={styles.imageMeta}>
-                    <span>{getStatusLabel(auction.status)}</span>
-                    <strong>{formatTimeLeft(auction.endTime)}</strong>
+            {filteredAuctions.map((auction) => {
+              const timeLeft = getTimeLeftParts(auction.endTime, now);
+
+              return (
+                <Link
+                  key={auction.id}
+                  to={`/auction/${auction.id}`}
+                  className={styles.card}
+                >
+                  <div className={styles.cardMedia}>
+                    <div className={styles.cardOverlay} />
+                    <div className={styles.cardTopline}>
+                      <span
+                        className={`${styles.statusBadge} ${styles[`status${getStatusTone(auction, now)[0].toUpperCase()}${getStatusTone(auction, now).slice(1)}`]}`}
+                      >
+                        {getStatusLabel(auction.status)}
+                      </span>
+                      <span
+                        className={`${styles.timerBadge} ${
+                          timeLeft.tone === "danger" ? styles.timerDanger : ""
+                        }`}
+                      >
+                        {timeLeft.label}
+                      </span>
+                    </div>
+
+                    {getMainImage(auction) ? (
+                      <img
+                        src={getMainImage(auction)}
+                        alt={auction.title}
+                        className={styles.cardImage}
+                      />
+                    ) : (
+                      <div className={styles.noImage}>Немає фото</div>
+                    )}
                   </div>
 
-                  {getMainImage(auction) ? (
-                    <img
-                      src={getMainImage(auction)}
-                      alt={auction.title}
-                      className={styles.image}
-                    />
-                  ) : (
-                    <div className={styles.noImage}>Немає фото</div>
-                  )}
-                </div>
-
-                <div className={styles.cardBody}>
-                  <div className={styles.badges}>
-                    <span className={styles.badge}>{getStatusLabel(auction.status)}</span>
-                    <span className={styles.badge}>{auction.category || "Категорія"}</span>
-                  </div>
-
-                  <h2 className={styles.cardTitle}>{auction.title}</h2>
-
-                  {auction.description && (
-                    <p className={styles.description}>
-                      {auction.description}
-                    </p>
-                  )}
-
-                  <div className={styles.meta}>
-                    <div>
-                      <span className={styles.label}>Бренд:</span> {auction.brand || "—"}
-                    </div>
-                    <div>
-                      <span className={styles.label}>Стан:</span> {auction.condition || "—"}
-                    </div>
-                    <div>
-                      <span className={styles.label}>Розмір:</span> {auction.size || "—"}
-                    </div>
-                  </div>
-
-                  <div className={styles.prices}>
-                    <div className={styles.priceBlock}>
-                      <span className={styles.priceLabel}>Стартова ціна</span>
-                      <strong>{formatPrice(auction.startPrice)} ₴</strong>
+                  <div className={styles.cardBody}>
+                    <div className={styles.cardHeading}>
+                      <div>
+                        <div className={styles.brandLine}>{auction.brand || "Curated lot"}</div>
+                        <h3 className={styles.cardTitle}>{auction.title}</h3>
+                      </div>
+                      <div className={styles.endDate}>
+                        <span>До</span>
+                        <strong>{formatDate(auction.endTime)}</strong>
+                      </div>
                     </div>
 
-                    <div className={styles.priceBlock}>
-                      <span className={styles.priceLabel}>Поточна ціна</span>
-                      <strong>{formatPrice(auction.currentPrice)} ₴</strong>
+                    <p className={styles.cardDescription}>{getShortDescription(auction)}</p>
+
+                    <div className={styles.cardTags}>
+                      <span>{auction.category || "Категорія"}</span>
+                      <span>{auction.condition || "Стан не вказано"}</span>
+                      <span>{auction.size || "Розмір —"}</span>
+                    </div>
+
+                    <div className={styles.cardStats}>
+                      <div className={styles.priceTile}>
+                        <span>Поточна ставка</span>
+                        <strong>{formatPrice(auction.currentPrice)} ₴</strong>
+                      </div>
+                      <div className={styles.priceTile}>
+                        <span>Старт</span>
+                        <strong>{formatPrice(auction.startPrice)} ₴</strong>
+                      </div>
+                      <div className={styles.priceTile}>
+                        <span>Крок</span>
+                        <strong>{formatPrice(auction.minBidStep)} ₴</strong>
+                      </div>
+                    </div>
+
+                    <div className={styles.cardFooter}>
+                      <div className={styles.liveLine}>
+                        <span className={styles.liveDot} />
+                        Таймер оновлюється автоматично
+                      </div>
+                      <div className={styles.openLink}>Відкрити аукціон</div>
                     </div>
                   </div>
-
-                  <div className={styles.footer}>
-                    <div>
-                      <span className={styles.label}>Кінець:</span>
-                      <div className={styles.footerValue}>{formatDate(auction.endTime)}</div>
-                    </div>
-
-                    <div className={styles.openLink}>Переглянути лот</div>
-                  </div>
-                </div>
-              </Link>
-            ))}
+                </Link>
+              );
+            })}
           </div>
         )}
       </div>

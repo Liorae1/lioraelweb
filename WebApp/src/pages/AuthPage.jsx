@@ -150,6 +150,7 @@ const [resendMessage, setResendMessage] = useState("");
     });
 
     localStorage.setItem("token", res.data.token);
+    window.dispatchEvent(new Event("authChanged"));
     
     // Handle "Remember Me"
     if (loginData.rememberMe) {

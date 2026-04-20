@@ -3,6 +3,7 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import ThemeToggle from "./ThemeToggle";
 import styles from "./Header.module.css";
 import api from "../api/axios";
+import { getMyWallet } from "../api/wallet";
 
 const mockNotifications = [];
 
@@ -11,6 +12,7 @@ function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [notificationsOpen, setNotificationsOpen] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [wallet, setWallet] = useState(null);
   const [avatarVersion, setAvatarVersion] = useState(Date.now());
 
   const location = useLocation();
@@ -38,14 +40,19 @@ function Header() {
         return;
       }
 
-      const res = await api.get("/api/profile/me", getAuthConfig());
-      const me = res.data;
+      const [profileResponse, walletData] = await Promise.all([
+        api.get("/api/profile/me", getAuthConfig()),
+        getMyWallet().catch(() => null),
+      ]);
+      const me = profileResponse.data;
 
       setUser(me);
+      setWallet(walletData);
       setAvatarVersion(Date.now());
     } catch (error) {
       console.error("Failed to load header user:", error);
       setUser(null);
+      setWallet(null);
     } finally {
       setLoading(false);
     }
@@ -88,6 +95,7 @@ function Header() {
     setMenuOpen(false);
     setNotificationsOpen(false);
     setUser(null);
+    setWallet(null);
     window.dispatchEvent(new Event("authChanged"));
     navigate("/");
   };
@@ -109,7 +117,7 @@ function Header() {
     "Користувач";
 
   const nickname = user?.userName ? `${user.userName}` : displayName;
-  const balanceLabel = `${(user?.balance ?? 0).toLocaleString("uk-UA")} ₴`;
+  const balanceLabel = `${(wallet?.availableBalance ?? wallet?.balance ?? user?.balance ?? 0).toLocaleString("uk-UA")} ₴`;
   const firstLetter = displayName.charAt(0).toUpperCase();
   const isAuth = !!user;
 
@@ -275,6 +283,14 @@ function Header() {
                       onClick={() => setMenuOpen(false)}
                     >
                       Профіль
+                    </Link>
+
+                    <Link
+                      to="/wallet"
+                      className={styles.dropdownItem}
+                      onClick={() => setMenuOpen(false)}
+                    >
+                      Гаманець
                     </Link>
 
                     <button

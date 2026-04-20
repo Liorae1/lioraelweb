@@ -6,6 +6,7 @@ import HomePage from "./pages/HomePage";
 import AboutPage from "./pages/AboutPage";
 import AuthPage from "./pages/AuthPage";
 import ProfilePage from "./pages/ProfilePage";
+import WalletPage from "./pages/WalletPage";
 import AuctionsPage from "./pages/AuctionsPage";
 import AuctionDetailsPage from "./pages/AuctionDetailsPage";
 import VerifyEmailPage from "./pages/VerifyEmailPage";
@@ -37,6 +38,7 @@ function App() {
         <Route path="/about" element={<AboutPage />} />
         <Route path="/auth" element={<AuthPage />} />
         <Route path="/profile" element={<ProfilePage />} />
+        <Route path="/wallet" element={<WalletPage />} />
         <Route path="/auction" element={<AuctionsPage />} />
         <Route path="/auction/:id" element={<AuctionDetailsPage />} />
         <Route path="/verify-email" element={<VerifyEmailPage />} />
