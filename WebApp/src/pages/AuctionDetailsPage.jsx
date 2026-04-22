@@ -1,89 +1,24 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import api from "../api/axios";
+import Toast from "../components/Toast";
+import { getAuctionBids, getAuctionById } from "../api/auctions";
+import {
+  addAuctionToFavorites,
+  progressWinningDelivery,
+  removeAuctionFromFavorites,
+  requestWinningDelivery,
+} from "../api/profile";
 import { getMyWallet, getMyWalletTransactions } from "../api/wallet";
+import {
+  formatMoneyWithCurrency,
+  getAuctionAccessLevelMeta,
+  getAuctionLeaderProfile,
+  getDeliveryStatusLabel,
+  getWalletAmounts,
+  normalizeMediaUrl,
+} from "../utils/domain";
 import styles from "./AuctionDetailsPage.module.css";
-
-function normalizeAuctionResponse(payload) {
-  if (payload && typeof payload === "object" && !Array.isArray(payload)) {
-    return payload;
-  }
-
-  return null;
-}
-
-function normalizeBidsResponse(payload) {
-  if (Array.isArray(payload)) {
-    return payload;
-  }
-
-  if (!payload || typeof payload !== "object") {
-    return [];
-  }
-
-  if (Array.isArray(payload.items)) return payload.items;
-  if (Array.isArray(payload.data)) return payload.data;
-  if (Array.isArray(payload.results)) return payload.results;
-
-  return [];
-}
-
-function getBidUserProfile(bid) {
-  const nestedUser =
-    bid?.user ||
-    bid?.bidder ||
-    bid?.participant ||
-    bid?.profile ||
-    bid?.author ||
-    null;
-
-  const firstName =
-    nestedUser?.firstName ||
-    bid?.firstName ||
-    bid?.bidderFirstName ||
-    bid?.userFirstName ||
-    "";
-  const lastName =
-    nestedUser?.lastName ||
-    bid?.lastName ||
-    bid?.bidderLastName ||
-    bid?.userLastName ||
-    "";
-  const fullName = [firstName, lastName].filter(Boolean).join(" ").trim();
-  const userName =
-    nestedUser?.userName ||
-    nestedUser?.username ||
-    bid?.userName ||
-    bid?.username ||
-    bid?.bidderUserName ||
-    bid?.bidderUsername ||
-    "";
-  const avatarUrl =
-    nestedUser?.avatarUrl ||
-    bid?.avatarUrl ||
-    bid?.bidderAvatarUrl ||
-    bid?.userAvatarUrl ||
-    "";
-
-  return {
-    displayName: fullName || userName || "Користувач",
-    userName: userName || "",
-    avatarUrl: avatarUrl || "",
-  };
-}
-
-function normalizeMediaUrl(rawUrl) {
-  const value = rawUrl?.trim();
-
-  if (!value) return "";
-  if (value.startsWith("http://") || value.startsWith("https://")) return value;
-  if (value.startsWith("data:") || value.startsWith("blob:")) return value;
-
-  const baseUrl = String(api.defaults.baseURL || "").replace(/\/$/, "");
-  const path = value.startsWith("/") ? value : `/${value}`;
-
-  return `${baseUrl}${path}`;
-}
 
 function buildUserMatchKeys(user) {
   return new Set(
@@ -161,13 +96,6 @@ function enrichBidderWithCurrentUser(bid, currentUser) {
   };
 }
 
-function formatPrice(value) {
-  return new Intl.NumberFormat("uk-UA", {
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 2,
-  }).format(Number(value || 0));
-}
-
 function formatDate(value) {
   if (!value) return "—";
 
@@ -191,7 +119,7 @@ function formatTimeLeft(value, now) {
 
   const diff = target - now;
 
-  if (diff <= 0) return "Аукціон завершено";
+  if (diff <= 0) return "Аукціон розпочато";
 
   const totalSeconds = Math.floor(diff / 1000);
   const days = Math.floor(totalSeconds / 86400);
@@ -249,24 +177,47 @@ function getShortDescription(description) {
   return description.length > 180 ? `${description.slice(0, 180)}...` : description;
 }
 
+function getAccessMessage(auction) {
+  const levelMeta = getAuctionAccessLevelMeta(auction?.minimumRequiredStatus);
+
+  return (
+    auction?.accessDeniedMessage ||
+    (levelMeta.tone === "private"
+      ? "Цей аукціон доступний лише для користувачів рівня Private."
+      : levelMeta.tone === "elite"
+        ? "Ця функція доступна для статусу Elite або Private."
+        : "")
+  );
+}
+
+function getDeliveryDisplayLabel(status, canRequestDelivery) {
+  if (canRequestDelivery) {
+    return "Очікує на оформлення";
+  }
+
+  switch (String(status || "")) {
+    case "Requested":
+    case "InTransit":
+      return "Ваш товар буде доставлено";
+    case "Delivered":
+      return "Товар доставлено";
+    default:
+      return getDeliveryStatusLabel(status);
+  }
+}
+
 async function requestAuction(auctionId) {
-  const response = await api.get(`/api/auctions/${auctionId}`);
-  return normalizeAuctionResponse(response.data);
+  const auction = await getAuctionById(auctionId);
+
+  if (!auction) {
+    return null;
+  }
+
+  return auction;
 }
 
 async function requestBids(auctionId) {
-  const response = await api.get(`/api/auctions/${auctionId}/bids`);
-  return normalizeBidsResponse(response.data)
-    .map((bid) => ({
-      ...bid,
-      bidder: getBidUserProfile(bid),
-    }))
-    .sort((first, second) => {
-      const firstTime = first?.createdAt ? new Date(first.createdAt).getTime() : 0;
-      const secondTime = second?.createdAt ? new Date(second.createdAt).getTime() : 0;
-
-      return secondTime - firstTime;
-    });
+  return getAuctionBids(auctionId);
 }
 
 async function requestCurrentUser() {
@@ -292,6 +243,8 @@ function AuctionDetailsPage() {
   const [bidAmount, setBidAmount] = useState("");
   const [loading, setLoading] = useState(true);
   const [bidLoading, setBidLoading] = useState(false);
+  const [favoriteLoading, setFavoriteLoading] = useState(false);
+  const [deliveryLoading, setDeliveryLoading] = useState(false);
   const [error, setError] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
   const [now, setNow] = useState(Date.now());
@@ -319,6 +272,17 @@ function AuctionDetailsPage() {
 
     return () => window.clearInterval(timer);
   }, []);
+
+  useEffect(() => {
+    if (!error && !successMessage) return;
+
+    const timer = window.setTimeout(() => {
+      setError("");
+      setSuccessMessage("");
+    }, 3200);
+
+    return () => window.clearTimeout(timer);
+  }, [error, successMessage]);
 
   useEffect(() => {
     const loadPage = async () => {
@@ -408,17 +372,17 @@ function AuctionDetailsPage() {
     return ((now - startTime) / (endTime - startTime)) * 100;
   }, [auction, now]);
 
-  const availableBalance = Number(
-    wallet?.availableBalance ?? wallet?.balance ?? currentUser?.balance ?? 0
+  const { availableBalance, lockedBalance, balance, currency } = getWalletAmounts(
+    wallet,
+    currentUser
   );
-  const lockedBalance = Number(wallet?.lockedBalance ?? 0);
   const isAuthenticated = !!currentUser;
   const parsedBidAmount = Number(bidAmount);
   const enteredBidAmount = Number.isFinite(parsedBidAmount) ? parsedBidAmount : 0;
   const requestedBidAmount = enteredBidAmount > 0 ? enteredBidAmount : minimumBid;
   const hasEnoughBalance = availableBalance >= requestedBidAmount;
 
-  const countdown = formatTimeLeft(auction?.endTime, now);
+  const countdown = formatTimeLeft(auction?.startTime, now);
   const enrichedBids = useMemo(() => {
     return bids.map((bid) => enrichBidderWithCurrentUser(bid, currentUser));
   }, [bids, currentUser]);
@@ -428,6 +392,9 @@ function AuctionDetailsPage() {
     "Гість";
   const userAvatarLetter = userDisplayName.charAt(0).toUpperCase();
   const currentUserAvatarUrl = normalizeMediaUrl(currentUser?.avatarUrl);
+  const leader = getAuctionLeaderProfile(auction);
+  const accessMeta = getAuctionAccessLevelMeta(auction?.minimumRequiredStatus);
+  const accessMessage = getAccessMessage(auction);
 
   const quickBidValues = useMemo(() => {
     if (!minimumBid) return [];
@@ -457,28 +424,114 @@ function AuctionDetailsPage() {
       return "Щоб зробити ставку, потрібно увійти в акаунт.";
     }
 
+    if (auction?.canCurrentUserBid === false) {
+      return accessMessage;
+    }
+
     if (!isAuctionActive) {
       return "Ставки для цього аукціону зараз недоступні.";
     }
 
     if (availableBalance < minimumBid) {
-      return `На балансі недостатньо коштів для мінімальної ставки ${formatPrice(minimumBid)} ₴.`;
+      return `На балансі недостатньо коштів для мінімальної ставки ${formatMoneyWithCurrency(minimumBid, auction?.currency || currency)}.`;
     }
 
     if (bidAmount && !hasEnoughBalance) {
-      return `Недостатньо коштів для ставки ${formatPrice(requestedBidAmount)} ₴.`;
+      return `Недостатньо коштів для ставки ${formatMoneyWithCurrency(requestedBidAmount, auction?.currency || currency)}.`;
     }
 
     return "";
   }, [
     availableBalance,
+    auction?.currency,
     bidAmount,
+    currency,
+    accessMessage,
     hasEnoughBalance,
     isAuctionActive,
     isAuthenticated,
     minimumBid,
     requestedBidAmount,
+    auction?.canCurrentUserBid,
   ]);
+
+  const refreshAuctionState = async () => {
+    const [
+      auctionData,
+      bidsData,
+      currentUserData,
+      walletData,
+      walletTransactionsData,
+    ] = await Promise.all([
+      requestAuction(id),
+      requestBids(id),
+      requestCurrentUser().catch(() => currentUser),
+      getMyWallet().catch(() => wallet),
+      getMyWalletTransactions().catch(() => walletTransactions),
+    ]);
+
+    applyAuctionData(auctionData);
+    setBids(bidsData);
+    setCurrentUser(currentUserData);
+    setWallet(walletData);
+    setWalletTransactions(walletTransactionsData);
+  };
+
+  const handleFavoriteToggle = async () => {
+    if (!isAuthenticated || !auction) {
+      setError("Щоб додати лот в обране, потрібно увійти в акаунт.");
+      return;
+    }
+
+    try {
+      setFavoriteLoading(true);
+      setError("");
+      setSuccessMessage("");
+
+      if (auction.isFavorite) {
+        await removeAuctionFromFavorites(auction.id);
+      } else {
+        await addAuctionToFavorites(auction.id);
+      }
+
+      setAuction((currentAuction) =>
+        currentAuction
+          ? { ...currentAuction, isFavorite: !currentAuction.isFavorite }
+          : currentAuction
+      );
+      setSuccessMessage(
+        auction.isFavorite ? "Лот прибрано з обраного." : "Лот додано в обране."
+      );
+    } catch (err) {
+      console.error(err);
+      setError(err?.response?.data?.message || "Не вдалося оновити обране.");
+    } finally {
+      setFavoriteLoading(false);
+    }
+  };
+
+  const handleDeliveryAction = async () => {
+    if (!auction?.id) {
+      return;
+    }
+
+    try {
+      setDeliveryLoading(true);
+      setError("");
+      setSuccessMessage("");
+
+      await requestWinningDelivery(auction.id);
+
+      await refreshAuctionState();
+      window.dispatchEvent(new Event("authChanged"));
+      setSuccessMessage("Доставку оформлено. Ваш товар буде доставлено найближчим часом.");
+    } catch (err) {
+      console.error(err);
+      setError(err?.response?.data?.message || "Не вдалося оновити доставку.");
+    } finally {
+      setDeliveryLoading(false);
+    }
+  };
 
   const handleBidSubmit = async (event) => {
     event.preventDefault();
@@ -492,9 +545,15 @@ function AuctionDetailsPage() {
       return;
     }
 
+    if (auction?.canCurrentUserBid === false) {
+      setSuccessMessage("");
+      setError(accessMessage);
+      return;
+    }
+
     if (!Number.isFinite(nextAmount) || nextAmount < minimumBid) {
       setSuccessMessage("");
-      setError(`Мінімальна ставка зараз ${formatPrice(minimumBid)} ₴.`);
+      setError(`Мінімальна ставка зараз ${formatMoneyWithCurrency(minimumBid, auction?.currency || currency)}.`);
       return;
     }
 
@@ -507,7 +566,7 @@ function AuctionDetailsPage() {
     if (availableBalance < nextAmount) {
       setSuccessMessage("");
       setError(
-        `Недостатньо коштів на балансі. Доступно ${formatPrice(availableBalance)} ₴.`
+        `Недостатньо коштів на балансі. Доступно ${formatMoneyWithCurrency(availableBalance, currency)}.`
       );
       return;
     }
@@ -524,25 +583,7 @@ function AuctionDetailsPage() {
       setSuccessMessage("Ставку успішно зроблено.");
       setBidAmount("");
 
-      const [
-        auctionData,
-        bidsData,
-        currentUserData,
-        walletData,
-        walletTransactionsData,
-      ] = await Promise.all([
-        requestAuction(id),
-        requestBids(id),
-        requestCurrentUser().catch(() => currentUser),
-        getMyWallet().catch(() => wallet),
-        getMyWalletTransactions().catch(() => walletTransactions),
-      ]);
-
-      applyAuctionData(auctionData);
-      setBids(bidsData);
-      setCurrentUser(currentUserData);
-      setWallet(walletData);
-      setWalletTransactions(walletTransactionsData);
+      await refreshAuctionState();
       window.dispatchEvent(new Event("authChanged"));
     } catch (err) {
       console.error(err);
@@ -572,11 +613,13 @@ function AuctionDetailsPage() {
   if (!auction) {
     return (
       <div className={styles.page}>
+        {error ? (
+          <Toast message={error} type="error" onClose={() => setError("")} />
+        ) : null}
         <div className={styles.container}>
           <div className={styles.notFound}>
             <h1>Аукціон не знайдено</h1>
             <p>Можливо, лот уже завершився або посилання стало неактуальним.</p>
-            {error && <div className={styles.alertError}>{error}</div>}
             <Link to="/auction" className={styles.primaryButton}>
               Повернутися до аукціонів
             </Link>
@@ -588,6 +631,16 @@ function AuctionDetailsPage() {
 
   return (
     <div className={styles.page}>
+      {error ? (
+        <Toast message={error} type="error" onClose={() => setError("")} />
+      ) : null}
+      {successMessage ? (
+        <Toast
+          message={successMessage}
+          type="success"
+          onClose={() => setSuccessMessage("")}
+        />
+      ) : null}
       <div className={styles.container}>
         <div className={styles.breadcrumbs}>
           <Link to="/">Головна</Link>
@@ -597,14 +650,15 @@ function AuctionDetailsPage() {
           <span>{auction.title}</span>
         </div>
 
-        {error && <div className={styles.alertError}>{error}</div>}
-        {successMessage && <div className={styles.alertSuccess}>{successMessage}</div>}
-
         <section className={styles.hero}>
           <div className={styles.visualStage}>
             <div className={styles.visualTopline}>
               <span className={styles.statusBadge}>{getStatusLabel(auction.status)}</span>
-              <span className={styles.liveBadge}>Live timer: {countdown}</span>
+              <span className={styles.statusBadge}>{accessMeta.shortLabel}</span>
+              {auction?.earlyAccessStartTime ? (
+                <span className={styles.statusBadge}>Ранній доступ</span>
+              ) : null}
+              <span className={styles.liveBadge}>До старту: {countdown}</span>
             </div>
 
             {selectedImage ? (
@@ -639,23 +693,43 @@ function AuctionDetailsPage() {
 
           <div className={styles.commandPanel}>
             <div className={styles.headingBlock}>
-              <p className={styles.brand}>{auction.brand || "Curated lot"}</p>
+              <p className={styles.brand}>{auction.brand || "Добірний лот"}</p>
               <h1>{auction.title}</h1>
               <p className={styles.lead}>{getShortDescription(auction.description)}</p>
+              <div className={styles.headingActions}>
+                <button
+                  type="button"
+                  className={`${styles.secondaryButton} ${
+                    auction.isFavorite ? styles.favoriteActionActive : ""
+                  }`}
+                  onClick={handleFavoriteToggle}
+                  disabled={favoriteLoading}
+                >
+                  {favoriteLoading
+                    ? "Оновлення..."
+                    : auction.isFavorite
+                      ? "Прибрати з обраного"
+                      : "Додати в обране"}
+                </button>
+              </div>
             </div>
 
             <div className={styles.heroCards}>
               <div className={styles.heroCard}>
                 <span>Поточна ставка</span>
-                <strong>{formatPrice(auction.currentPrice)} ₴</strong>
+                <strong>{formatMoneyWithCurrency(auction.currentPrice, auction.currency || "UAH")}</strong>
               </div>
               <div className={styles.heroCard}>
-                <span>Наступна ставка</span>
-                <strong>{formatPrice(minimumBid)} ₴</strong>
+                <span>Лідер</span>
+                <strong>{leader.userName ? `@${leader.userName}` : leader.displayName}</strong>
               </div>
               <div className={styles.heroCard}>
-                <span>До завершення</span>
-                <strong>{countdown}</strong>
+                <span>Ставок</span>
+                <strong>{auction.bidCount ?? enrichedBids.length}</strong>
+              </div>
+              <div className={styles.heroCard}>
+                <span>Рівень доступу</span>
+                <strong>{accessMeta.label}</strong>
               </div>
             </div>
 
@@ -683,30 +757,53 @@ function AuctionDetailsPage() {
               <div className={styles.userMeta}>
                 <div>
                   <span>Доступно</span>
-                  <strong>
-                    {isAuthenticated ? `${formatPrice(availableBalance)} ₴` : "—"}
-                  </strong>
+                  <strong>{isAuthenticated ? formatMoneyWithCurrency(availableBalance, currency) : "—"}</strong>
                 </div>
                 <div>
                   <span>В резерві</span>
-                  <strong>{isAuthenticated ? `${formatPrice(lockedBalance)} ₴` : "—"}</strong>
+                  <strong>{isAuthenticated ? formatMoneyWithCurrency(lockedBalance, currency) : "—"}</strong>
                 </div>
                 <div>
-                  <span>Можеш ставити</span>
-                  <strong>{!isAuthenticated || bidGuardMessage ? "Ні" : "Так"}</strong>
+                  <span>Всього</span>
+                  <strong>{isAuthenticated ? formatMoneyWithCurrency(balance, currency) : "—"}</strong>
                 </div>
               </div>
             </div>
+
+            {auction.isWonByCurrentUser && (
+              <div className={styles.deliveryPanel}>
+                <div className={styles.deliveryHeader}>
+                  <div>
+                    <span className={styles.mutedLabel}>Доставка переможця</span>
+                    <strong>{getDeliveryDisplayLabel(auction.deliveryStatus, auction.canRequestDelivery)}</strong>
+                  </div>
+                  <div className={styles.deliveryActions}>
+                    {auction.canRequestDelivery && (
+                      <button
+                        type="button"
+                        className={styles.primaryButton}
+                        onClick={handleDeliveryAction}
+                        disabled={deliveryLoading}
+                      >
+                        {deliveryLoading ? "Оновлення..." : "Оформити доставку"}
+                      </button>
+                    )}
+                  </div>
+                </div>
+              </div>
+            )}
 
             <form className={styles.bidPanel} onSubmit={handleBidSubmit}>
               <div className={styles.bidPanelTop}>
                 <div>
                   <span className={styles.mutedLabel}>Твоя ставка</span>
-                  <strong className={styles.bidPanelValue}>{formatPrice(requestedBidAmount)} ₴</strong>
+                  <strong className={styles.bidPanelValue}>
+                    {formatMoneyWithCurrency(requestedBidAmount, auction.currency || currency)}
+                  </strong>
                 </div>
                 <div className={styles.liveLine}>
                   <span className={styles.liveDot} />
-                  Час оновлюється автоматично
+                  До старту: {countdown}
                 </div>
               </div>
 
@@ -719,7 +816,7 @@ function AuctionDetailsPage() {
                   min={minimumBid || 0}
                   value={bidAmount}
                   onChange={(event) => setBidAmount(event.target.value)}
-                  placeholder={`Мінімум ${formatPrice(minimumBid)} ₴`}
+                  placeholder={`Мінімум ${formatMoneyWithCurrency(minimumBid, auction.currency || currency)}`}
                 />
               </label>
 
@@ -728,19 +825,19 @@ function AuctionDetailsPage() {
                   <button
                     key={value}
                     type="button"
-                    className={styles.quickBidButton}
-                    onClick={() => setBidAmount(String(value))}
-                  >
-                    {formatPrice(value)} ₴
-                  </button>
-                ))}
+                  className={styles.quickBidButton}
+                  onClick={() => setBidAmount(String(value))}
+                >
+                    {formatMoneyWithCurrency(value, auction.currency || currency)}
+                </button>
+              ))}
               </div>
 
               <div className={styles.actionButtons}>
                 <button
                   type="submit"
                   className={styles.primaryButton}
-                  disabled={bidLoading}
+                  disabled={bidLoading || auction?.canCurrentUserBid === false}
                 >
                   {bidLoading ? "Відправка..." : "Поставити ставку"}
                 </button>
@@ -760,7 +857,7 @@ function AuctionDetailsPage() {
                   <span className={styles.mutedLabel}>Останній рух по гаманцю</span>
                   <strong>
                     {walletTransactions[0].type || "Транзакція"}:{" "}
-                    {formatPrice(walletTransactions[0].amount)} ₴
+                    {formatMoneyWithCurrency(walletTransactions[0].amount, walletTransactions[0].currency || currency)}
                   </strong>
                 </div>
               )}
@@ -792,7 +889,7 @@ function AuctionDetailsPage() {
               </div>
               <div className={styles.summaryTile}>
                 <span>Крок ставки</span>
-                <strong>{formatPrice(auction.minBidStep)} ₴</strong>
+                <strong>{formatMoneyWithCurrency(auction.minBidStep, auction.currency || "UAH")}</strong>
               </div>
             </div>
 
@@ -829,19 +926,19 @@ function AuctionDetailsPage() {
             <div className={styles.summaryTiles}>
               <div className={styles.summaryTile}>
                 <span>Старт</span>
-                <strong>{formatPrice(auction.startPrice)} ₴</strong>
+                <strong>{formatMoneyWithCurrency(auction.startPrice, auction.currency || "UAH")}</strong>
               </div>
               <div className={styles.summaryTile}>
-                <span>Ставок</span>
-                <strong>{enrichedBids.length}</strong>
+                <span>Поточний лідер</span>
+                <strong>{leader.userName ? `@${leader.userName}` : leader.displayName}</strong>
               </div>
               <div className={styles.summaryTile}>
-                <span>Початок</span>
-                <strong>{formatDate(auction.startTime)}</strong>
+                <span>До старту</span>
+                <strong>{countdown}</strong>
               </div>
               <div className={styles.summaryTile}>
-                <span>Фініш</span>
-                <strong>{formatDate(auction.endTime)}</strong>
+                <span>Статус доставки</span>
+                <strong>{getDeliveryDisplayLabel(auction.deliveryStatus, auction.canRequestDelivery)}</strong>
               </div>
             </div>
           </div>
@@ -851,7 +948,7 @@ function AuctionDetailsPage() {
           <div className={styles.sectionHeader}>
             <div>
               <h2>Жива стрічка ставок</h2>
-              <p>Кожна нова ставка показує нік і аватарку учасника, як ти й хотів.</p>
+              <p>Останні ставки учасників аукціону.</p>
             </div>
             <div className={styles.timelineCount}>
               {enrichedBids.length ? `${enrichedBids.length} записів` : "Поки без ставок"}
@@ -873,7 +970,15 @@ function AuctionDetailsPage() {
                 >
                   <div className={styles.timelineAccent} />
                   <div className={styles.timelineBody}>
-                    <div className={styles.timelineIdentity}>
+                    <Link
+                      to={bid.bidder.userId ? `/profile/${bid.bidder.userId}` : "#"}
+                      className={styles.timelineIdentity}
+                      onClick={(event) => {
+                        if (!bid.bidder.userId) {
+                          event.preventDefault();
+                        }
+                      }}
+                    >
                       <div className={styles.bidderAvatar}>
                         {bid.bidder.avatarUrl ? (
                           <img
@@ -893,10 +998,12 @@ function AuctionDetailsPage() {
                             : "Учасник аукціону"}
                         </div>
                       </div>
-                    </div>
+                    </Link>
 
                     <div className={styles.timelineValues}>
-                      <div className={styles.bidAmount}>{formatPrice(bid.amount)} ₴</div>
+                      <div className={styles.bidAmount}>
+                        {formatMoneyWithCurrency(bid.amount, bid.currency || auction.currency || "UAH")}
+                      </div>
                       <div className={styles.bidDate}>{formatDate(bid.createdAt)}</div>
                     </div>
 

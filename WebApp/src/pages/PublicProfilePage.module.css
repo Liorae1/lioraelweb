@@ -1,0 +1,253 @@
+.page {
+  min-height: 100vh;
+  background:
+    radial-gradient(circle at top left, color-mix(in srgb, var(--accent) 14%, transparent), transparent 28%),
+    linear-gradient(180deg, var(--hero-gradient-start) 0%, color-mix(in srgb, var(--hero-gradient-middle) 88%, var(--surface) 12%) 100%);
+}
+
+.main {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 36px 20px 56px;
+  display: grid;
+  gap: 24px;
+}
+
+.hero,
+.card {
+  border-radius: 28px;
+  background: color-mix(in srgb, var(--surface-strong) 92%, transparent);
+  border: 1px solid var(--border-color);
+  box-shadow: var(--shadow-soft);
+}
+
+.hero {
+  padding: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+}
+
+.identity {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+
+.avatar {
+  position: relative;
+  isolation: isolate;
+  width: 112px;
+  height: 112px;
+  border-radius: 50%;
+  overflow: visible;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, var(--accent), color-mix(in srgb, var(--accent-soft) 72%, #fff 28%));
+  color: white;
+  font-size: 2rem;
+  font-weight: 700;
+}
+
+.avatar::before {
+  content: "";
+  position: absolute;
+  inset: -6px;
+  border-radius: 50%;
+  z-index: -1;
+  opacity: 0;
+}
+
+.avatarPremium::before {
+  opacity: 1;
+  background: linear-gradient(135deg, #caa461 0%, #faefb8 45%, #8a6737 100%);
+  box-shadow:
+    0 0 0 1px rgba(250, 239, 184, 0.5),
+    0 0 26px rgba(202, 164, 97, 0.18);
+}
+
+.avatarVip::before {
+  inset: -8px;
+  opacity: 1;
+  background: conic-gradient(
+    from 200deg,
+    #6d44ff 0deg,
+    #c48fff 65deg,
+    #ffd467 145deg,
+    #fff5b8 220deg,
+    #c48fff 300deg,
+    #6d44ff 360deg
+  );
+  box-shadow:
+    0 0 0 1px rgba(255, 240, 185, 0.65),
+    0 0 34px rgba(196, 143, 255, 0.24);
+}
+
+.avatarImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  border-radius: 50%;
+}
+
+.crownBadge {
+  position: absolute;
+  top: -20px;
+  right: -6px;
+  width: 38px;
+  height: 38px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #fff7c6 0%, #ebc660 55%, #996818 100%);
+  color: #5a3900;
+  box-shadow:
+    0 10px 22px rgba(138, 103, 55, 0.24),
+    0 0 0 3px rgba(255, 255, 255, 0.8);
+}
+
+.crownIcon {
+  width: 20px;
+  height: 20px;
+  fill: currentColor;
+  stroke: currentColor;
+  stroke-width: 1.4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.identity h1,
+.body h3,
+.sectionHeader h2 {
+  margin: 0;
+  color: var(--text-primary);
+}
+
+.identity p,
+.identity b,
+.body p,
+.sectionHeader p,
+.walletCard p,
+.empty {
+  color: var(--text-secondary);
+}
+
+.identity p,
+.body p,
+.sectionHeader p,
+.walletCard p {
+  margin: 8px 0 0;
+  line-height: 1.6;
+}
+
+.walletCard {
+  min-width: 280px;
+  padding: 20px 22px;
+  border-radius: 24px;
+  background: color-mix(in srgb, var(--surface) 94%, transparent);
+  border: 1px solid var(--border-color);
+}
+
+.walletCard span {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--text-secondary);
+}
+
+.walletCard strong {
+  display: block;
+  font-size: 1.8rem;
+  color: var(--text-primary);
+}
+
+.card {
+  padding: 28px;
+}
+
+.sectionHeader {
+  margin-bottom: 18px;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 18px;
+}
+
+.auctionCard {
+  overflow: hidden;
+  border-radius: 22px;
+  background: color-mix(in srgb, var(--surface) 94%, transparent);
+  border: 1px solid var(--border-color);
+}
+
+.media {
+  height: 220px;
+  background: color-mix(in srgb, var(--surface-strong) 84%, transparent);
+}
+
+.mediaImage,
+.mediaPlaceholder {
+  width: 100%;
+  height: 100%;
+}
+
+.mediaImage {
+  object-fit: cover;
+  display: block;
+}
+
+.mediaPlaceholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-secondary);
+}
+
+.body {
+  display: grid;
+  gap: 10px;
+  padding: 18px;
+}
+
+.body strong {
+  color: var(--text-primary);
+}
+
+.linkButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 46px;
+  padding: 0 16px;
+  border-radius: 999px;
+  background: linear-gradient(135deg, var(--accent), var(--accent-soft));
+  color: white;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.empty {
+  padding: 18px;
+  border-radius: 20px;
+  background: color-mix(in srgb, var(--surface) 92%, transparent);
+}
+
+@media (max-width: 900px) {
+  .hero {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .walletCard {
+    width: 100%;
+    min-width: 0;
+  }
+}

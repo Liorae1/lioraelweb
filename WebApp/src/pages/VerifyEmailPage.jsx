@@ -13,13 +13,13 @@ function VerifyEmailPage() {
     const userId = searchParams.get("userId");
     const token = searchParams.get("token");
 
-    if (!userId || !token) {
-      setStatus("error");
-      setMessage("Некоректне посилання для підтвердження.");
-      return;
-    }
-
     const verify = async () => {
+      if (!userId || !token) {
+        setStatus("error");
+        setMessage("Некоректне посилання для підтвердження.");
+        return;
+      }
+
       try {
         const res = await api.post("/api/Auth/verify-email", {
           userId,

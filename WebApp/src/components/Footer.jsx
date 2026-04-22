@@ -10,7 +10,7 @@ function Footer() {
             <div className={styles.logo}>Liorael</div>
           </Link>
           <p className={styles.description}>
-            Преміум-платформа для аукціонів брендового одягу, де поєднуються
+            Платформа для аукціонів брендового одягу з рівнями доступу Member, Elite та Private, де поєднуються
             сучасна естетика, статус і зручний користувацький досвід.
           </p>
         </div>
@@ -26,8 +26,8 @@ function Footer() {
           <div className={styles.column}>
             <h4 className={styles.title}>Інформація</h4>
             <Link to="/about#work" className={styles.link}>Як це працює</Link>
-            <Link to="/about#faq" className={styles.link}>FAQ</Link>
-            <Link to="" className={styles.link}></Link>
+            <Link to="/about#faq" className={styles.link}>Часті запитання</Link>
+            <Link to="/auth" className={styles.link}>Вхід та реєстрація</Link>
           </div>
           
           <div className={styles.column}>
@@ -42,7 +42,7 @@ function Footer() {
       <div className={styles.bottom}>
         <div className={styles.bottomContainer}>
           <span>© 2026 Liorael. Усі права захищені.</span>
-          <span>Luxury Fashion Auctions</span>
+          <span>Аукціони брендового одягу</span>
         </div>
       </div>
     </footer>

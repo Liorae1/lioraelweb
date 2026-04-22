@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Header from "../components/Header";
+import Toast from "../components/Toast";
 import styles from "./AuthPage.module.css";
 import api from "../api/axios";
 
@@ -25,7 +26,7 @@ const [resendMessage, setResendMessage] = useState("");
   const [errors, setErrors] = useState({});
   const [touched, setTouched] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [submitError, setSubmitError] = useState("");
+  const [toast, setToast] = useState(null);
   const [forgotPasswordOpen, setForgotPasswordOpen] = useState(false);
   const [forgotPasswordEmail, setForgotPasswordEmail] = useState("");
   const [forgotPasswordLoading, setForgotPasswordLoading] = useState(false);
@@ -39,6 +40,12 @@ const [resendMessage, setResendMessage] = useState("");
       setLoginData((prev) => ({ ...prev, email: savedEmail }));
     }
   }, []);
+
+  useEffect(() => {
+    if (!toast) return;
+    const timer = window.setTimeout(() => setToast(null), 3200);
+    return () => window.clearTimeout(timer);
+  }, [toast]);
 
   const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   const usernamePattern = /^[^\s]{3,}$/;
@@ -68,7 +75,7 @@ const [resendMessage, setResendMessage] = useState("");
     }
 
     setErrors((prev) => ({ ...prev, [getFieldKey(section, field)]: undefined }));
-    if (submitError) setSubmitError("");
+    if (toast) setToast(null);
   };
 
   const handleFieldBlur = (section, field) => {
@@ -78,15 +85,13 @@ const [resendMessage, setResendMessage] = useState("");
   const validateLogin = () => {
     const nextErrors = {};
     if (!loginData.email.trim()) {
-      nextErrors.loginEmail = "Введите email";
+      nextErrors.loginEmail = "Введіть email";
     } else if (!emailPattern.test(loginData.email.trim())) {
-      nextErrors.loginEmail = "Введите корректный email";
+      nextErrors.loginEmail = "Введіть коректний email";
     }
 
     if (!loginData.password) {
-      nextErrors.loginPassword = "Введите пароль";
-    } else if (!passwordPattern.test(loginData.password)) {
-      nextErrors.loginPassword = "Пароль должен содержать 8+ символов, заглавную букву и цифру";
+      nextErrors.loginPassword = "Введіть пароль";
     }
 
     return nextErrors;
@@ -95,31 +100,31 @@ const [resendMessage, setResendMessage] = useState("");
   const validateRegister = () => {
     const nextErrors = {};
     if (!registerData.username.trim()) {
-      nextErrors.registerUsername = "Введите имя пользователя";
+      nextErrors.registerUsername = "Введіть ім'я користувача";
     } else if (!usernamePattern.test(registerData.username.trim())) {
-      nextErrors.registerUsername = "Имя пользователя должно быть не менее 3 символов и без пробелов";
+      nextErrors.registerUsername = "Ім'я користувача має містити щонайменше 3 символи й не містити пробілів";
     }
 
     if (!registerData.email.trim()) {
-      nextErrors.registerEmail = "Введите email";
+      nextErrors.registerEmail = "Введіть email";
     } else if (!emailPattern.test(registerData.email.trim())) {
-      nextErrors.registerEmail = "Введите корректный email";
+      nextErrors.registerEmail = "Введіть коректний email";
     }
 
     if (!registerData.password) {
-      nextErrors.registerPassword = "Введите пароль";
+      nextErrors.registerPassword = "Введіть пароль";
     } else if (!passwordPattern.test(registerData.password)) {
-      nextErrors.registerPassword = "Пароль должен быть 8+ символов, с заглавной буквой и цифрой";
+      nextErrors.registerPassword = "Пароль має містити 8+ символів, велику літеру та цифру";
     }
 
     if (!registerData.passwordRepeat) {
-      nextErrors.registerPasswordRepeat = "Повторите пароль";
+      nextErrors.registerPasswordRepeat = "Повторіть пароль";
     } else if (registerData.passwordRepeat !== registerData.password) {
-      nextErrors.registerPasswordRepeat = "Пароли не совпадают";
+      nextErrors.registerPasswordRepeat = "Паролі не збігаються";
     }
 
     if (!registerData.agreeTerms) {
-      nextErrors.registerAgreeTerms = "Требуется согласие с условиями";
+      nextErrors.registerAgreeTerms = "Потрібна згода з умовами";
     }
 
     return nextErrors;
@@ -128,7 +133,7 @@ const [resendMessage, setResendMessage] = useState("");
  const handleLogin = async (e) => {
   e.preventDefault();
   setIsSubmitting(true);
-  setSubmitError("");
+  setToast(null);
 
   const validation = validateLogin();
   setErrors(validation);
@@ -149,7 +154,13 @@ const [resendMessage, setResendMessage] = useState("");
       Password: loginData.password,
     });
 
-    localStorage.setItem("token", res.data.token);
+    const authToken = res?.data?.token || res?.data?.accessToken || res?.data?.jwt;
+
+    if (!authToken) {
+      throw new Error("Сервер не повернув токен авторизації.");
+    }
+
+    localStorage.setItem("token", authToken);
     window.dispatchEvent(new Event("authChanged"));
     
     // Handle "Remember Me"
@@ -166,7 +177,7 @@ const [resendMessage, setResendMessage] = useState("");
     const serverMessage =
       err?.response?.data?.message ||
       err?.response?.data ||
-      "Ошибка входа. Проверьте данные и попробуйте снова.";
+      "Помилка входу. Перевірте дані та спробуйте ще раз.";
 
     if (serverMessage.toString().toLowerCase().includes("confirm your email")) {
       setVerificationNotice({
@@ -176,7 +187,7 @@ const [resendMessage, setResendMessage] = useState("");
       });
     }
 
-    setSubmitError(serverMessage);
+    setToast({ message: serverMessage, type: "error" });
   } finally {
     setIsSubmitting(false);
   }
@@ -185,7 +196,7 @@ const [resendMessage, setResendMessage] = useState("");
   const handleRegister = async (e) => {
   e.preventDefault();
   setIsSubmitting(true);
-  setSubmitError("");
+  setToast(null);
   setResendMessage("");
 
   const validation = validateRegister();
@@ -232,7 +243,7 @@ const [resendMessage, setResendMessage] = useState("");
     const serverMessage =
       err?.response?.data?.message ||
       err?.response?.data ||
-      "Ошибка регистрации. Проверьте данные и попробуйте снова.";
+      "Помилка реєстрації. Перевірте дані та спробуйте ще раз.";
 
     const conflictEmail =
       err?.response?.status === 409 ||
@@ -241,12 +252,12 @@ const [resendMessage, setResendMessage] = useState("");
     if (conflictEmail) {
       setErrors((prev) => ({
         ...prev,
-        registerEmail: "Этот email уже используется",
+        registerEmail: "Цей email уже використовується",
       }));
       setTouched((prev) => ({ ...prev, registerEmail: true }));
     }
 
-    setSubmitError(serverMessage);
+    setToast({ message: serverMessage, type: "error" });
   } finally {
     setIsSubmitting(false);
   }
@@ -301,6 +312,10 @@ const handleForgotPassword = async (e) => {
     setForgotPasswordMessage(
       res?.data?.message || "Лист для скидання пароля відправлено на вашу пошту."
     );
+    setToast({
+      message: res?.data?.message || "Лист для скидання пароля відправлено на вашу пошту.",
+      type: "success",
+    });
     setForgotPasswordEmail("");
     
     setTimeout(() => {
@@ -313,6 +328,12 @@ const handleForgotPassword = async (e) => {
       err?.response?.data?.message ||
         "Не вдалося надіслати лист. Перевірте email і спробуйте знову."
     );
+    setToast({
+      message:
+        err?.response?.data?.message ||
+        "Не вдалося надіслати лист. Перевірте email і спробуйте знову.",
+      type: "error",
+    });
   } finally {
     setForgotPasswordLoading(false);
   }
@@ -342,6 +363,13 @@ const handleForgotPassword = async (e) => {
   return (
     <div className={styles.page}>
       <Header />
+      {toast ? (
+        <Toast
+          message={toast.message}
+          type={toast.type}
+          onClose={() => setToast(null)}
+        />
+      ) : null}
 
       <section className={styles.authSection}>
         <div className={styles.backgroundGlowOne}></div>
@@ -425,10 +453,6 @@ const handleForgotPassword = async (e) => {
             </div>
 
             <div className={styles.formViewport}>
-              {submitError && (
-                <div className={styles.submitError}>{submitError}</div>
-              )}
-
               <div
                 className={`${styles.formsTrack} ${
                   isLogin ? styles.showLogin : styles.showRegister
@@ -519,11 +543,11 @@ const handleForgotPassword = async (e) => {
                       shouldShowError("register", "username") ? styles.inputInvalid : ""
                     }`}
                   >
-                    <label htmlFor="registerUsername">Username</label>
+                    <label htmlFor="registerUsername">Ім'я користувача</label>
                     <input
                       id="registerUsername"
                       type="text"
-                      placeholder="Введіть ваш username"
+                      placeholder="Введіть ім'я користувача"
                       value={registerData.username}
                       onChange={(e) => handleFieldChange("register", "username", e.target.value)}
                       onBlur={() => handleFieldBlur("register", "username")}

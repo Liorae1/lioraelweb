@@ -56,7 +56,7 @@ function AboutPage() {
   const [activeFaq, setActiveFaq] = useState(0);
 
   useEffect(() => {
-    // Обрабатывает якорные ссылки (#work, #faq, #about)
+    // Обробляє якірні посилання (#work, #faq, #about)
     if (location.hash) {
       const id = location.hash.slice(1);
       const element = document.getElementById(id);
@@ -81,7 +81,7 @@ function AboutPage() {
           <div className={styles.heroContainer}>
             <div className={`${styles.content} fade-in-up`}>
               <div className={styles.label}>Про платформу</div>
-              <h1 className={styles.title}>Liorael — простір сучасних luxury-аукціонів</h1>
+              <h1 className={styles.title}>Liorael — простір сучасних люксових аукціонів</h1>
               <p className={styles.text}>
                 Ми будуємо платформу для тих, хто цінує стиль, ексклюзивність і
                 якісну подачу. Liorael робить покупку брендового одягу простішою,
@@ -106,7 +106,7 @@ function AboutPage() {
             <div className={`${styles.imageBlock} fade-in`}>
               <img 
                 src={img} 
-                alt="Liorael luxury fashion" 
+                alt="Преміальний одяг Liorael" 
                 className={styles.heroImage}
               />
             </div>
@@ -130,7 +130,7 @@ function AboutPage() {
             <article className={`${styles.aboutCard} fade-in-up`} style={{ animationDelay: '0.2s' }}>
               <h3>Історія</h3>
               <p>
-                Liorael стартувала з ідеї зробити luxury-аукціони доступними для
+                Liorael стартувала з ідеї зробити люксові аукціони доступними для
                 українського ринку. Ми поєднали класичну аукціонну драму з
                 сучасним інтерфейсом.
               </p>
@@ -168,7 +168,7 @@ function AboutPage() {
 
         <section id="faq" className={styles.faqSection}>
           <div className={styles.faqContainer}>
-            <div className={styles.label}>FAQ</div>
+            <div className={styles.label}>Часті запитання</div>
             <h2 className={styles.faqTitle}>Часті запитання</h2>
             <p className={styles.faqIntro}>
               Якщо не знайшли потрібну відповідь, ви завжди можете написати нам

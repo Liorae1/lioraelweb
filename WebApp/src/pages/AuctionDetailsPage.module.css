@@ -187,6 +187,10 @@
   line-height: 1.72;
 }
 
+.headingActions {
+  margin-top: 16px;
+}
+
 .heroCards,
 .summaryTiles {
   display: grid;
@@ -380,10 +384,40 @@
   color: #f6efe7;
 }
 
+.favoriteActionActive {
+  border-color: rgba(255, 180, 180, 0.32);
+  color: #ffb4b4;
+}
+
 .bidHint {
   margin: 0;
   color: rgba(246, 239, 231, 0.7);
   line-height: 1.6;
+}
+
+.deliveryPanel {
+  padding: 18px 20px;
+  border-radius: 24px;
+  background: rgba(255, 180, 180, 0.06);
+  border: 1px solid rgba(255, 180, 180, 0.12);
+}
+
+.deliveryHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.deliveryHeader strong {
+  display: block;
+  font-size: 1.12rem;
+}
+
+.deliveryActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
 }
 
 .walletFeed {
@@ -534,6 +568,8 @@
   display: flex;
   align-items: center;
   gap: 14px;
+  color: inherit;
+  text-decoration: none;
 }
 
 .timelineValues {
@@ -576,7 +612,8 @@
 
   .timelineBody,
   .sectionHeader,
-  .bidPanelTop {
+  .bidPanelTop,
+  .deliveryHeader {
     flex-direction: column;
     align-items: flex-start;
   }
