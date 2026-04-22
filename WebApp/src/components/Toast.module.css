@@ -1,6 +1,6 @@
 .toast {
   position: fixed;
-  top: 80px;
+  top: max(20px, env(safe-area-inset-top));
   right: 22px;
   left: auto;
   transform: none;
@@ -19,6 +19,7 @@
   justify-content: space-between;
   gap: 16px;
   backdrop-filter: blur(10px);
+  pointer-events: auto;
 }
 
 .success {
@@ -52,10 +53,20 @@
 @keyframes fadeInToast {
   from {
     opacity: 0;
-    transform: translateX(20px);
+    transform: translate3d(20px, 0, 0);
   }
   to {
     opacity: 1;
-    transform: translateX(0);
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@media (max-width: 640px) {
+  .toast {
+    top: max(14px, env(safe-area-inset-top));
+    right: 14px;
+    left: 14px;
+    width: auto;
+    max-width: none;
   }
 }

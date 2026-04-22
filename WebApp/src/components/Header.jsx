@@ -4,8 +4,18 @@ import ThemeToggle from "./ThemeToggle";
 import styles from "./Header.module.css";
 import api from "../api/axios";
 import { getMyWallet } from "../api/wallet";
-
-const mockNotifications = [];
+import {
+  getMyNotifications,
+  getMyUnreadNotificationsCount,
+  markAllNotificationsAsRead,
+  markNotificationAsRead,
+} from "../api/notifications";
+import {
+  formatMoneyWithCurrency,
+  getAccountStatusMeta,
+  getWalletAmounts,
+  normalizeAccountStatus,
+} from "../utils/domain";
 
 function Header() {
   const [user, setUser] = useState(null);
@@ -14,6 +24,9 @@ function Header() {
   const [loading, setLoading] = useState(true);
   const [wallet, setWallet] = useState(null);
   const [avatarVersion, setAvatarVersion] = useState(Date.now());
+  const [notifications, setNotifications] = useState([]);
+  const [notificationsLoading, setNotificationsLoading] = useState(false);
+  const [unreadCount, setUnreadCount] = useState(0);
 
   const location = useLocation();
   const navigate = useNavigate();
@@ -58,9 +71,38 @@ function Header() {
     }
   };
 
+  const loadNotifications = async ({ silent = false } = {}) => {
+    if (!localStorage.getItem("token")) {
+      setNotifications([]);
+      setUnreadCount(0);
+      return;
+    }
+
+    try {
+      if (!silent) {
+        setNotificationsLoading(true);
+      }
+
+      const [items, count] = await Promise.all([
+        getMyNotifications(),
+        getMyUnreadNotificationsCount().catch(() => 0),
+      ]);
+
+      setNotifications(items);
+      setUnreadCount(count);
+    } catch (error) {
+      console.error("Failed to load notifications:", error);
+      setNotifications([]);
+      setUnreadCount(0);
+    } finally {
+      setNotificationsLoading(false);
+    }
+  };
+
   useEffect(() => {
     const handleAuthChange = () => {
       loadUser();
+      loadNotifications({ silent: true });
     };
 
     const handleClickOutside = (event) => {
@@ -77,6 +119,7 @@ function Header() {
     };
 
     loadUser();
+    loadNotifications({ silent: true });
 
     window.addEventListener("authChanged", handleAuthChange);
     window.addEventListener("storage", handleAuthChange);
@@ -90,12 +133,20 @@ function Header() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  useEffect(() => {
+    if (notificationsOpen) {
+      loadNotifications();
+    }
+  }, [notificationsOpen]);
+
   const handleLogout = () => {
     localStorage.removeItem("token");
     setMenuOpen(false);
     setNotificationsOpen(false);
     setUser(null);
     setWallet(null);
+    setNotifications([]);
+    setUnreadCount(0);
     window.dispatchEvent(new Event("authChanged"));
     navigate("/");
   };
@@ -117,9 +168,14 @@ function Header() {
     "Користувач";
 
   const nickname = user?.userName ? `${user.userName}` : displayName;
-  const balanceLabel = `${(wallet?.availableBalance ?? wallet?.balance ?? user?.balance ?? 0).toLocaleString("uk-UA")} ₴`;
+  const { availableBalance, currency } = getWalletAmounts(wallet, user);
+  const balanceLabel = formatMoneyWithCurrency(availableBalance, currency);
   const firstLetter = displayName.charAt(0).toUpperCase();
   const isAuth = !!user;
+  const normalizedStatus = normalizeAccountStatus(user?.status);
+  const statusMeta = getAccountStatusMeta(user?.status);
+  const isPremium = normalizedStatus === "Elite";
+  const isVip = normalizedStatus === "Private";
 
   const avatarSrc = (() => {
     const rawUrl = user?.avatarUrl?.trim();
@@ -134,6 +190,87 @@ function Header() {
 
     return `${rawUrl}${rawUrl.includes("?") ? "&" : "?"}v=${avatarVersion}`;
   })();
+
+  const formatNotificationTime = (value) => {
+    if (!value) return "";
+
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) return "";
+
+    return new Intl.DateTimeFormat("uk-UA", {
+      day: "2-digit",
+      month: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit",
+    }).format(date);
+  };
+
+  const resolveNotificationTarget = (notification) => {
+    if (notification?.targetUrl) {
+      return notification.targetUrl;
+    }
+
+    if (notification?.auctionId) {
+      return `/auction/${notification.auctionId}`;
+    }
+
+    return "/profile";
+  };
+
+  const openNotificationTarget = (target) => {
+    if (!target) {
+      navigate("/profile");
+      return;
+    }
+
+    const isExternalTarget = /^https?:\/\//i.test(target);
+
+    if (isExternalTarget) {
+      window.location.assign(target);
+      return;
+    }
+
+    navigate(target);
+  };
+
+  const handleNotificationClick = async (notification) => {
+    const target = resolveNotificationTarget(notification);
+
+    try {
+      if (!notification?.isRead && notification?.id) {
+        await markNotificationAsRead(notification.id);
+      }
+    } catch (error) {
+      console.error("Failed to mark notification as read:", error);
+    } finally {
+      setNotifications((current) =>
+        current.map((item) =>
+          item.id === notification.id
+            ? { ...item, isRead: true, readAt: item.readAt || new Date().toISOString() }
+            : item
+        )
+      );
+      setUnreadCount((current) => Math.max(0, current - (notification?.isRead ? 0 : 1)));
+      setNotificationsOpen(false);
+      openNotificationTarget(target);
+    }
+  };
+
+  const handleReadAllNotifications = async () => {
+    try {
+      await markAllNotificationsAsRead();
+      setNotifications((current) =>
+        current.map((item) => ({
+          ...item,
+          isRead: true,
+          readAt: item.readAt || new Date().toISOString(),
+        }))
+      );
+      setUnreadCount(0);
+    } catch (error) {
+      console.error("Failed to mark all notifications as read:", error);
+    }
+  };
 
   return (
     <header className={styles.header}>
@@ -162,7 +299,7 @@ function Header() {
             to="/about"
             className={`${styles.link} ${isActive("/about") ? styles.active : ""}`}
           >
-            Про нас
+            Про платформу
           </Link>
         </nav>
 
@@ -202,6 +339,11 @@ function Header() {
                     strokeLinecap="round"
                   />
                 </svg>
+                {unreadCount > 0 && (
+                  <span className={styles.notificationBadge}>
+                    {unreadCount > 99 ? "99+" : unreadCount}
+                  </span>
+                )}
               </button>
 
               {notificationsOpen && (
@@ -211,24 +353,45 @@ function Header() {
                       Сповіщення
                     </span>
                     <span className={styles.notificationsCount}>
-                      {mockNotifications.length}
+                      {unreadCount}
                     </span>
                   </div>
 
-                  {mockNotifications.length > 0 ? (
+                  {!!notifications.length && (
+                    <button
+                      type="button"
+                      className={styles.readAllButton}
+                      onClick={handleReadAllNotifications}
+                    >
+                      Позначити все як прочитане
+                    </button>
+                  )}
+
+                  {notificationsLoading ? (
+                    <div className={styles.notificationsEmpty}>
+                      Завантаження сповіщень...
+                    </div>
+                  ) : notifications.length > 0 ? (
                     <ul className={styles.notificationsList}>
-                      {mockNotifications.map((notification) => (
-                        <li
+                      {notifications.map((notification) => (
+                        <button
                           key={notification.id}
-                          className={styles.notificationItem}
+                          type="button"
+                          className={`${styles.notificationItem} ${
+                            notification.isRead ? "" : styles.notificationItemUnread
+                          }`}
+                          onClick={() => handleNotificationClick(notification)}
                         >
+                          <span className={styles.notificationTitle}>
+                            {notification.title || "Сповіщення"}
+                          </span>
                           <span className={styles.notificationText}>
-                            {notification.text}
+                            {notification.message || "Нове оновлення для вашого акаунта."}
                           </span>
                           <span className={styles.notificationTime}>
-                            {notification.time}
+                            {formatNotificationTime(notification.createdAt)}
                           </span>
-                        </li>
+                        </button>
                       ))}
                     </ul>
                   ) : (
@@ -248,7 +411,19 @@ function Header() {
                     setNotificationsOpen(false);
                   }}
                 >
-                  <div className={styles.avatar}>
+                  <div
+                    className={`${styles.avatar} ${
+                      isVip ? styles.avatarVip : isPremium ? styles.avatarPremium : ""
+                    }`}
+                  >
+                    {isVip && (
+                      <span className={styles.crownBadge} aria-hidden="true">
+                        <svg viewBox="0 0 24 24" className={styles.crownIcon}>
+                          <path d="M4 18 2.5 7.5l5.2 3.7L12 4l4.3 7.2 5.2-3.7L20 18H4Z" />
+                          <path d="M5 20h14" />
+                        </svg>
+                      </span>
+                    )}
                     {avatarSrc ? (
                       <img
                         key={avatarSrc}
@@ -263,7 +438,7 @@ function Header() {
 
                   <div className={styles.profileInfo}>
                     <span className={styles.profileName}>{nickname}</span>
-                    <span className={styles.profileBalance}>{balanceLabel}</span>
+                    <span className={styles.profileBalance}>{statusMeta.label} • {balanceLabel}</span>
                   </div>
 
                   <span

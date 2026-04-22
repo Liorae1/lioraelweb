@@ -214,7 +214,7 @@ function AvatarUpload({
 
           <div className={styles.cropToolbar}>
             <div className={styles.sliderBlock}>
-              <label htmlFor="zoomRange">Размер</label>
+              <label htmlFor="zoomRange">Розмір</label>
               <input
                 id="zoomRange"
                 type="range"

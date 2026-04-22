@@ -662,7 +662,7 @@
   filter: brightness(1.03);
 }
 
-/* === Новый переключатель === */
+/* === Новий перемикач === */
 
 .accountSwitch {
   margin-bottom: 32px;
@@ -710,17 +710,17 @@
     transform 0.2s ease;
 }
 
-/* hover subtle */
+/* м'який hover-ефект */
 .segmentButton:hover {
   transform: translateY(-1px);
 }
 
-/* активный текст */
+/* активний текст */
 .segmentActive {
   color: var(--button-primary-text);
 }
 
-/* слайдер */
+/* повзунок */
 .segmentSlider {
   position: absolute;
   top: 4px;

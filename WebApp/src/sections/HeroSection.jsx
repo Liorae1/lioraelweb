@@ -1,9 +1,16 @@
 import { Link } from "react-router-dom";
 import styles from "./HeroSection.module.css";
 import { useParallax } from "../hooks/useParallax";
+import brandImage from "../app/images/heroImg.jpg";
 
-function HeroSection() {
+function HeroSection({ auction, stats, loading, error }) {
   const slowOffset = useParallax(0.12);
+  const totalLots = stats?.totalLots ?? 0;
+  const totalBids = stats?.totalBids ?? 0;
+  const activeAuctions = stats?.activeAuctions ?? 0;
+  const plannedTitle = auction?.title?.trim();
+  const plannedBrand = auction?.brand?.trim();
+  const plannedInfo = [plannedBrand, plannedTitle].filter(Boolean).join(" • ");
 
   return (
     <section className={styles.section}>
@@ -19,17 +26,17 @@ function HeroSection() {
 
       <div className={styles.container}>
         <div className={`${styles.content} fade-in-up`}>
-          <div className={styles.badge}>Ексклюзивні лоти та преміальна естетика</div>
+          <div className={styles.badge}>Живі аукціони брендового одягу</div>
 
           <h1 className={styles.title}>
-            Сучасна розкіш
-            <span className={styles.gradientText}> для поціновувачів стилю</span>
+            Брендові аукціони
+            <span className={styles.gradientText}> у впізнаваному стилі</span>
           </h1>
 
           <p className={styles.description}>
-            Liorael — це простір аукціонів брендового одягу, де поєднуються
-            статус, елегантність і сучасний інтерфейс. Платформа створена для
-            тих, хто цінує унікальні речі та преміальний досвід.
+            Liorael об'єднує заплановані та активні аукціони брендового одягу в
+            одному каталозі, щоб покупець одразу бачив важливе і міг спокійно
+            підготуватися до торгів.
           </p>
 
           <div className={styles.actions}>
@@ -43,28 +50,23 @@ function HeroSection() {
 
           <div className={styles.stats}>
             <div className={styles.statCard}>
-              <span className={styles.statValue}>120+</span>
-              <span className={styles.statLabel}>Актуальних лотів</span>
+              <span className={styles.statValue}>{totalLots}</span>
+              <span className={styles.statLabel}>Лотів уже в каталозі</span>
             </div>
             <div className={styles.statCard}>
-              <span className={styles.statValue}>35</span>
-              <span className={styles.statLabel}>Преміум брендів</span>
+              <span className={styles.statValue}>{totalBids}</span>
+              <span className={styles.statLabel}>Ставок у всіх лотах</span>
             </div>
             <div className={styles.statCard}>
-              <span className={styles.statValue}>24/7</span>
-              <span className={styles.statLabel}>Оновлення аукціонів</span>
+              <span className={styles.statValue}>{activeAuctions}</span>
+              <span className={styles.statLabel}>Активних або запланованих торгів</span>
             </div>
           </div>
         </div>
 
         <div className={`${styles.visual} fade-in-up`}>
-          <div className={styles.visualCard}>
-            <div className={styles.visualImage}>
-              <img
-                src="https://i.pinimg.com/736x/fc/c0/86/fcc086d622ffd9ede8c6e40a1dda0220.jpg"
-                alt="Fashion preview"
-              />
-            </div>
+          <div className={styles.visualImageWrap}>
+            <img src={brandImage} alt="Liorael" className={styles.visualImage} />
           </div>
         </div>
       </div>

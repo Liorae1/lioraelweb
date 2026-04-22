@@ -10,6 +10,10 @@ import {
   getMyWalletTransactions,
 } from "../api/wallet";
 import styles from "./WalletPage.module.css";
+import {
+  getAccountStatusMeta,
+  normalizeAccountStatus,
+} from "../utils/domain";
 
 function formatPrice(value, currency = "UAH") {
   const symbol = currency === "UAH" ? "₴" : currency;
@@ -198,6 +202,11 @@ function WalletPage() {
     profile?.userName ||
     profile?.email ||
     "Користувач";
+  const userAvatarLetter = userDisplayName.charAt(0).toUpperCase();
+  const normalizedStatus = normalizeAccountStatus(profile?.status);
+  const statusMeta = getAccountStatusMeta(profile?.status);
+  const isPremium = normalizedStatus === "Elite";
+  const isVip = normalizedStatus === "Private";
 
   const openSection = (section) => {
     navigate(`/wallet#${section}`);
@@ -242,7 +251,7 @@ function WalletPage() {
         <div className={styles.container}>
           <section className={styles.hero}>
             <div className={styles.heroMain}>
-              <span className={styles.kicker}>Wallet</span>
+              <span className={styles.kicker}>Гаманець</span>
               <h1>Гаманець у розділеному форматі</h1>
               <p>
                 Кожна задача в окремій секції: огляд, поповнення, резерви та транзакції.
@@ -252,19 +261,68 @@ function WalletPage() {
 
             <aside className={styles.heroAside}>
               <div className={styles.profileCard}>
-                <span className={styles.cardLabel}>Користувач</span>
-                <strong>{userDisplayName}</strong>
-                <b>{profile?.userName ? `@${profile.userName}` : "Профіль"}</b>
-              </div>
+                <div className={styles.profileTop}>
+                  <div
+                    className={`${styles.profileAvatar} ${
+                      isVip ? styles.profileAvatarVip : isPremium ? styles.profileAvatarPremium : ""
+                    }`}
+                  >
+                    {isVip && (
+                      <span className={styles.profileAvatarCrown} aria-hidden="true">
+                        <svg viewBox="0 0 24 24" className={styles.profileAvatarCrownIcon}>
+                          <path d="M4 18 2.5 7.5l5.2 3.7L12 4l4.3 7.2 5.2-3.7L20 18H4Z" />
+                          <path d="M5 20h14" />
+                        </svg>
+                      </span>
+                    )}
+                    {profile?.avatarUrl ? (
+                      <img
+                        src={profile.avatarUrl}
+                        alt={userDisplayName}
+                        className={styles.profileAvatarImage}
+                      />
+                    ) : (
+                      userAvatarLetter
+                    )}
+                  </div>
+                  <div className={styles.profileMeta}>
+                    <span className={styles.cardLabel}>Користувач</span>
+                    <strong>{userDisplayName}</strong>
+                    <b>
+                      {profile?.userName ? `@${profile.userName}` : "Профіль"} • {statusMeta.label}
+                    </b>
+                  </div>
+                </div>
 
-              <button
-                type="button"
-                className={styles.refreshButton}
-                onClick={() => loadWalletData({ silent: true })}
-                disabled={refreshing}
-              >
-                {refreshing ? "Оновлення..." : "Оновити дані"}
-              </button>
+                <div className={styles.profileSummary}>
+                  <div className={styles.profileStat}>
+                    <span>Доступно</span>
+                    <strong>{formatPrice(wallet?.availableBalance, wallet?.currency)}</strong>
+                  </div>
+                  <div className={styles.profileStat}>
+                    <span>У резерві</span>
+                    <strong>{formatPrice(wallet?.lockedBalance, wallet?.currency)}</strong>
+                  </div>
+                </div>
+
+                <div className={styles.heroActions}>
+                  <button
+                    type="button"
+                    className={styles.refreshButton}
+                    onClick={() => loadWalletData({ silent: true })}
+                    disabled={refreshing}
+                  >
+                    {refreshing ? "Оновлення..." : "Оновити дані"}
+                  </button>
+                  <button
+                    type="button"
+                    className={styles.quickButton}
+                    onClick={() => navigate("/profile")}
+                  >
+                    До профілю
+                  </button>
+                </div>
+              </div>
             </aside>
           </section>
 
@@ -273,17 +331,17 @@ function WalletPage() {
           ) : (
             <>
               <section className={styles.metricsGrid}>
+                <article className={`${styles.metricCard} ${styles.metricCardPrimary}`}>
+                  <span>Доступно зараз</span>
+                  <strong>{formatPrice(wallet?.availableBalance, wallet?.currency)}</strong>
+                </article>
                 <article className={styles.metricCard}>
-                  <span>Balance</span>
+                  <span>Загальний баланс</span>
                   <strong>{formatPrice(wallet?.balance, wallet?.currency)}</strong>
                 </article>
                 <article className={styles.metricCard}>
-                  <span>Locked</span>
+                  <span>У резерві</span>
                   <strong>{formatPrice(wallet?.lockedBalance, wallet?.currency)}</strong>
-                </article>
-                <article className={styles.metricCard}>
-                  <span>Available</span>
-                  <strong>{formatPrice(wallet?.availableBalance, wallet?.currency)}</strong>
                 </article>
               </section>
 
@@ -342,8 +400,8 @@ function WalletPage() {
                       <article className={styles.panel}>
                         <div className={styles.panelHeader}>
                           <div>
-                            <h2>Швидкий стан гаманця</h2>
-                            <p>Головні цифри та поточна ситуація без зайвих переходів.</p>
+                            <h2>Огляд гаманця</h2>
+                            <p>Основні суми та останні рухи без перевантаження екрана.</p>
                           </div>
                         </div>
 
@@ -351,12 +409,17 @@ function WalletPage() {
                           <div className={styles.featureCard}>
                             <span className={styles.cardLabel}>Доступно</span>
                             <strong>{formatPrice(wallet?.availableBalance, wallet?.currency)}</strong>
-                            <b>Це сума, яку можна використовувати для нових ставок.</b>
+                            <b>Гроші для нових ставок і покупок.</b>
                           </div>
                           <div className={styles.featureCard}>
                             <span className={styles.cardLabel}>У резерві</span>
                             <strong>{formatPrice(wallet?.lockedBalance, wallet?.currency)}</strong>
-                            <b>Гроші тимчасово заблоковані лідерськими ставками.</b>
+                            <b>Заблоковано вашими активними лідерськими ставками.</b>
+                          </div>
+                          <div className={styles.featureCard}>
+                            <span className={styles.cardLabel}>Всього</span>
+                            <strong>{formatPrice(wallet?.balance, wallet?.currency)}</strong>
+                            <b>Повний баланс акаунта разом із резервами.</b>
                           </div>
                           <div className={styles.featureCard}>
                             <span className={styles.cardLabel}>Остання операція</span>
@@ -382,7 +445,7 @@ function WalletPage() {
                         <div className={styles.panelHeader}>
                           <div>
                             <h2>Швидкі дії</h2>
-                            <p>Кожна велика дія окремо, без переповненого екрану.</p>
+                            <p>Кожен сценарій винесений окремо, щоб блоки не наїжджали один на одного.</p>
                           </div>
                         </div>
 
@@ -409,7 +472,7 @@ function WalletPage() {
                             onClick={() => openSection("transactions")}
                           >
                             <strong>Відкрити історію</strong>
-                            <span>Усі операції гаманця в окремому розділі.</span>
+                            <span>Усі операції гаманця в одному чистому списку.</span>
                           </button>
                           <button
                             type="button"
@@ -417,7 +480,7 @@ function WalletPage() {
                             onClick={() => openSection("bids")}
                           >
                             <strong>Операції по ставках</strong>
-                            <span>Тільки резерви, повернення резерву та покупки.</span>
+                            <span>Резерви, повернення і покупки без зайвого шуму.</span>
                           </button>
                         </div>
                       </article>
@@ -490,7 +553,7 @@ function WalletPage() {
                           {activeLocks.map((lock, index) => (
                             <article key={lock.id || `${lock.auctionId || "lock"}-${index}`} className={styles.lockCard}>
                               <div>
-                                <span className={styles.cardLabel}>Auction</span>
+                                <span className={styles.cardLabel}>Аукціон</span>
                                 <strong>{lock.auctionTitle || `Аукціон #${lock.auctionId || "—"}`}</strong>
                                 {lock.auctionId ? (
                                   <Link to={`/auction/${lock.auctionId}`} className={styles.inlineLink}>

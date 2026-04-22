@@ -183,6 +183,7 @@
 }
 
 .viewScreen {
+  margin-top: 24px;
   animation: screenFade 0.35s ease;
 }
 
@@ -208,6 +209,8 @@
 }
 
 .bigAvatar {
+  position: relative;
+  isolation: isolate;
   width: 120px;
   height: 120px;
   border-radius: 50%;
@@ -224,19 +227,82 @@
   font-weight: 700;
   flex-shrink: 0;
   box-shadow: var(--shadow-soft);
-  overflow: hidden;
+  overflow: visible;
+}
+
+.bigAvatar::before {
+  content: "";
+  position: absolute;
+  inset: -6px;
+  border-radius: 50%;
+  z-index: -1;
+  opacity: 0;
+}
+
+.bigAvatarPremium::before {
+  opacity: 1;
+  background: linear-gradient(135deg, #caa461 0%, #faefb8 45%, #8a6737 100%);
+  box-shadow:
+    0 0 0 1px rgba(250, 239, 184, 0.5),
+    0 0 26px rgba(202, 164, 97, 0.18);
+}
+
+.bigAvatarVip::before {
+  inset: -8px;
+  opacity: 1;
+  background: conic-gradient(
+    from 200deg,
+    #6d44ff 0deg,
+    #c48fff 65deg,
+    #ffd467 145deg,
+    #fff5b8 220deg,
+    #c48fff 300deg,
+    #6d44ff 360deg
+  );
+  box-shadow:
+    0 0 0 1px rgba(255, 240, 185, 0.65),
+    0 0 34px rgba(196, 143, 255, 0.24);
 }
 
 .bigAvatarImage {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  border-radius: 50%;
+}
+
+.avatarCrown {
+  position: absolute;
+  top: -20px;
+  right: -6px;
+  width: 38px;
+  height: 38px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #fff7c6 0%, #ebc660 55%, #996818 100%);
+  color: #5a3900;
+  box-shadow:
+    0 10px 22px rgba(138, 103, 55, 0.24),
+    0 0 0 3px var(--surface);
+}
+
+.avatarCrownIcon {
+  width: 20px;
+  height: 20px;
+  fill: currentColor;
+  stroke: currentColor;
+  stroke-width: 1.4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
 }
 
 .userMeta {
   display: flex;
   flex-direction: column;
   min-width: 0;
+  gap: 10px;
 }
 
 .userBadge {
@@ -248,12 +314,12 @@
   letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--accent);
-  background: rgba(184, 138, 103, 0.12);
-  border: 1px solid rgba(184, 138, 103, 0.18);
+  background: color-mix(in srgb, var(--surface-strong) 92%, transparent);
+  border: 1px solid var(--border-color);
 }
 
 .userName {
-  margin: 0 0 8px;
+  margin: 0;
   font-size: 36px;
   color: var(--text-primary);
   letter-spacing: -0.03em;
@@ -266,6 +332,54 @@
   color: var(--accent);
   font-weight: 600;
   word-break: break-word;
+}
+
+.userSummary {
+  margin: 8px 0 0;
+  max-width: 560px;
+  font-size: 15px;
+  line-height: 1.7;
+  color: var(--text-secondary);
+}
+
+.statusRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+}
+
+.accountStatusChip {
+  display: inline-flex;
+  align-items: center;
+  min-height: 34px;
+  padding: 0 14px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--surface-strong) 88%, transparent);
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.accountStatusChipPremium {
+  background: linear-gradient(135deg, rgba(244, 213, 136, 0.28), rgba(191, 140, 68, 0.18));
+  border-color: rgba(191, 140, 68, 0.3);
+  color: #9c6512;
+}
+
+.accountStatusChipVip {
+  background: linear-gradient(135deg, rgba(119, 77, 255, 0.14), rgba(255, 212, 103, 0.24));
+  border-color: rgba(145, 103, 255, 0.28);
+  color: #6c42ff;
+}
+
+.statusHint {
+  color: var(--text-secondary);
+  font-size: 14px;
+  line-height: 1.5;
 }
 
 .userEmail {
@@ -282,11 +396,103 @@
   gap: 18px;
 }
 
+.heroActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  justify-content: flex-end;
+}
+
+.heroMetaBar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: flex-end;
+}
+
+.heroMetaBar span {
+  padding: 10px 14px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--surface-strong) 90%, transparent);
+  border: 1px solid var(--border-color);
+  color: var(--text-secondary);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.heroMetaAction {
+  min-height: 44px;
+  padding: 0 18px;
+  border: 1px solid var(--border-color);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--surface-strong) 90%, transparent);
+  color: var(--text-primary);
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition:
+    transform 0.25s ease,
+    border-color 0.25s ease,
+    background 0.25s ease;
+}
+
+.heroMetaAction:hover {
+  transform: translateY(-1px);
+  border-color: var(--accent);
+  background: var(--surface-strong);
+}
+
 .heroButtons {
   display: flex;
   gap: 12px;
   flex-wrap: wrap;
   justify-content: flex-end;
+}
+
+.sectionTabs {
+  position: sticky;
+  top: 88px;
+  z-index: 12;
+  margin-top: 18px;
+  padding: 10px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  border-radius: 24px;
+  background: color-mix(in srgb, var(--surface) 84%, transparent);
+  border: 1px solid var(--border-color);
+  box-shadow: var(--shadow-soft);
+  backdrop-filter: blur(16px);
+}
+
+.sectionTab {
+  min-height: 44px;
+  padding: 0 18px;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--text-secondary);
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition:
+    background 0.25s ease,
+    color 0.25s ease,
+    border-color 0.25s ease,
+    transform 0.25s ease;
+}
+
+.sectionTab:hover {
+  transform: translateY(-1px);
+  background: var(--surface-strong);
+  color: var(--text-primary);
+}
+
+.sectionTabActive {
+  background: linear-gradient(135deg, var(--accent) 0%, var(--accent-soft) 100%);
+  color: white;
+  border-color: rgba(255, 255, 255, 0.16);
+  box-shadow: 0 12px 24px rgba(184, 138, 103, 0.2);
 }
 
 .balanceCard {
@@ -353,11 +559,16 @@
 .secondaryButton,
 .quickActionButton,
 .backArrowButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   min-height: 48px;
   padding: 0 18px;
   border-radius: 999px;
   font-size: 14px;
   font-weight: 600;
+  text-align: center;
+  text-decoration: none;
   cursor: pointer;
   transition:
     transform 0.25s ease,
@@ -408,8 +619,8 @@
   margin-top: 24px;
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  grid-template-rows: repeat(2, 1fr);
   gap: 18px;
+  align-items: stretch;
 }
 
 .statCard {
@@ -420,7 +631,10 @@
   box-shadow: var(--shadow-soft);
   animation: cardSlide 0.45s ease;
   transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
-  cursor: pointer;
+  min-height: 220px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
 }
 
 .statCard:hover {
@@ -447,22 +661,14 @@
   font-weight: 700;
 }
 
-.statCard button {
-  margin-top: 12px;
-  background: linear-gradient(135deg, var(--accent) 0%, var(--accent-soft) 100%);
-  color: white;
-  border: none;
-  font-weight: 600;
-}
-
-.statCard button:hover {
-  background: linear-gradient(135deg, var(--accent-soft) 0%, var(--accent) 100%);
-  transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(184, 138, 103, 0.3);
+.statText {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: 14px;
+  line-height: 1.6;
 }
 
 .profileOverviewGrid {
-  margin-top: 24px;
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   grid-auto-rows: auto;
@@ -476,6 +682,7 @@
   border: 1px solid var(--border-color);
   box-shadow: var(--shadow-soft);
   animation: cardSlide 0.45s ease;
+  height: 100%;
 }
 
 .panelWide {
@@ -537,6 +744,202 @@
   margin: 0;
   font-size: 22px;
   color: var(--text-primary);
+}
+
+.accountSnapshot {
+  display: grid;
+  gap: 14px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.snapshotItem {
+  padding: 18px 20px;
+  border-radius: 20px;
+  background: color-mix(in srgb, var(--surface-strong) 90%, transparent);
+  border: 1px solid var(--border-color);
+  min-height: 112px;
+}
+
+.snapshotItemWide {
+  grid-column: 1 / -1;
+}
+
+.snapshotItem span {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+}
+
+.snapshotItem strong {
+  display: block;
+  color: var(--text-primary);
+  line-height: 1.6;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.privilegeCard {
+  min-height: 172px;
+  padding: 22px;
+  border-radius: 24px;
+  border: 1px solid var(--border-color);
+  background:
+    radial-gradient(circle at top right, color-mix(in srgb, var(--accent) 14%, transparent), transparent 34%),
+    color-mix(in srgb, var(--surface-strong) 92%, transparent);
+  display: grid;
+  grid-template-columns: 54px minmax(0, 1fr);
+  gap: 16px;
+  align-items: start;
+  box-shadow: var(--shadow-soft);
+  transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+}
+
+.privilegeCard:hover {
+  transform: translateY(-3px);
+  border-color: color-mix(in srgb, var(--accent) 42%, transparent);
+  box-shadow: 0 16px 30px rgba(0, 0, 0, 0.1);
+}
+
+.privilegeIcon {
+  width: 54px;
+  height: 54px;
+  border-radius: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, var(--accent) 0%, var(--accent-soft) 100%);
+  color: #fff;
+  font-size: 1.15rem;
+  font-weight: 800;
+  box-shadow: 0 10px 22px color-mix(in srgb, var(--accent) 18%, transparent);
+}
+
+.privilegeContent {
+  display: grid;
+  gap: 8px;
+  align-content: start;
+}
+
+.privilegeLabel {
+  display: block;
+  color: var(--text-secondary);
+  font-size: 0.76rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.privilegeValue {
+  display: block;
+  color: var(--text-primary);
+  font-size: clamp(1.3rem, 2vw, 1.8rem);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+}
+
+.privilegeValuePositive {
+  color: #2f8f68;
+}
+
+.privilegeValueMuted {
+  color: var(--text-secondary);
+}
+
+.privilegeValueNumeric {
+  color: var(--accent);
+}
+
+.privilegeHint {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: 14px;
+  line-height: 1.65;
+}
+
+.quickAccessGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.quickAccessCard {
+  min-height: 180px;
+  padding: 22px;
+  display: grid;
+  align-content: start;
+  gap: 12px;
+  text-align: left;
+  border: 1px solid var(--border-color);
+  border-radius: 24px;
+  background:
+    radial-gradient(circle at top right, color-mix(in srgb, var(--accent) 18%, transparent), transparent 34%),
+    color-mix(in srgb, var(--surface-strong) 90%, transparent);
+  cursor: pointer;
+  font: inherit;
+  transition:
+    transform 0.25s ease,
+    border-color 0.25s ease,
+    box-shadow 0.25s ease;
+}
+
+.quickAccessCard:hover {
+  transform: translateY(-3px);
+  border-color: color-mix(in srgb, var(--accent) 52%, transparent);
+  box-shadow: 0 18px 32px rgba(0, 0, 0, 0.1);
+}
+
+.quickAccessCard span {
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+.quickAccessCard strong {
+  font-size: 22px;
+  line-height: 1.25;
+  color: var(--text-primary);
+}
+
+.quickAccessCard p {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: 14px;
+  line-height: 1.65;
+}
+
+.compactLinks {
+  margin-top: 18px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.inlineAction {
+  min-height: 44px;
+  padding: 0 16px;
+  border: 1px solid var(--border-color);
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--text-primary);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    transform 0.25s ease,
+    border-color 0.25s ease,
+    background 0.25s ease;
+}
+
+.inlineAction:hover {
+  transform: translateY(-1px);
+  border-color: var(--accent);
+  background: var(--surface-strong);
 }
 
 .infoCardWrap {
@@ -618,6 +1021,91 @@
   color: var(--text-secondary);
 }
 
+.emptyStateCard {
+  padding: 24px;
+  border-radius: 24px;
+  background: var(--surface-strong);
+  border: 1px solid var(--border-color);
+  color: var(--text-secondary);
+}
+
+.auctionCollection {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 18px;
+}
+
+.auctionCard {
+  overflow: hidden;
+  border-radius: 24px;
+  background: var(--surface-strong);
+  border: 1px solid var(--border-color);
+  box-shadow: var(--shadow-soft);
+}
+
+.auctionCardMedia {
+  height: 220px;
+  background: color-mix(in srgb, var(--surface) 88%, transparent);
+}
+
+.auctionCardImage,
+.auctionCardPlaceholder {
+  width: 100%;
+  height: 100%;
+}
+
+.auctionCardImage {
+  object-fit: cover;
+  display: block;
+}
+
+.auctionCardPlaceholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-secondary);
+}
+
+.auctionCardBody {
+  display: grid;
+  gap: 10px;
+  padding: 18px;
+}
+
+.auctionCardBody h3 {
+  margin: 0;
+  color: var(--text-primary);
+}
+
+.auctionCardBody p {
+  margin: 0;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+.cardActionsRow {
+  display: flex;
+  align-items: stretch;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.cardActionsRow > .secondaryButton,
+.cardActionsRow > .primaryButton {
+  flex: 1 1 180px;
+}
+
+.deliveryStatusChip {
+  width: fit-content;
+  padding: 8px 12px;
+  border-radius: 999px;
+  background: rgba(184, 138, 103, 0.12);
+  border: 1px solid rgba(184, 138, 103, 0.18);
+  color: var(--accent);
+  font-size: 13px;
+  font-weight: 600;
+}
+
 .actionStack {
   display: grid;
   gap: 18px;
@@ -632,6 +1120,7 @@
 }
 
 .fullscreenSection {
+  margin-top: 24px;
   animation: screenFade 0.35s ease;
 }
 
@@ -715,6 +1204,18 @@
   grid-template-columns: minmax(280px, 360px) minmax(0, 1fr);
   gap: 24px;
   align-items: start;
+}
+
+.settingsLayout {
+  display: grid;
+  grid-template-columns: minmax(300px, 360px) minmax(0, 1fr);
+  gap: 24px;
+  align-items: start;
+}
+
+.settingsStack {
+  display: grid;
+  gap: 18px;
 }
 
 .leftColumn,
@@ -976,79 +1477,264 @@
 }
 
 .upgradeGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  align-items: stretch;
+  gap: 22px;
+}
+
+.upgradeFlow {
+  display: grid;
+  gap: 26px;
+  margin-top: 12px;
+}
+
+.upgradeContainer {
+  display: grid;
+  gap: 28px;
+}
+
+.statusPromoCard {
   display: flex;
-  justify-content: center;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 28px 30px;
+  border-radius: 30px;
+  background:
+    radial-gradient(circle at top right, color-mix(in srgb, var(--accent) 24%, transparent), transparent 28%),
+    linear-gradient(
+      135deg,
+      color-mix(in srgb, var(--surface-strong) 94%, transparent),
+      color-mix(in srgb, var(--surface) 90%, transparent)
+    );
+  border: 1px solid color-mix(in srgb, var(--accent) 18%, var(--border-color));
+  box-shadow: var(--shadow-soft);
+}
+
+.statusPromoContent {
+  display: grid;
+  gap: 4px;
+  max-width: 780px;
+}
+
+.statusPromoKicker,
+.planKicker {
+  display: inline-flex;
   align-items: center;
-  gap: 30px;
+  width: fit-content;
+  padding: 8px 12px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--surface-strong) 88%, transparent);
+  border: 1px solid color-mix(in srgb, var(--accent) 24%, var(--border-color));
+  color: var(--accent);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.statusPromoCard strong {
+  display: block;
+  margin-top: 14px;
+  font-size: clamp(1.8rem, 4vw, 2.8rem);
+  letter-spacing: -0.04em;
+  color: var(--text-primary);
+}
+
+.statusPromoCard p {
+  max-width: 720px;
+  margin: 12px 0 0;
+  color: var(--text-secondary);
+  font-size: 15px;
+  line-height: 1.75;
+}
+
+.subscriptionSummaryCard,
+.checkoutCard {
+  padding: 28px 30px;
+  border-radius: 30px;
+  background:
+    linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--surface-strong) 92%, transparent),
+      color-mix(in srgb, var(--surface) 96%, transparent)
+    );
+  border: 1px solid var(--border-color);
+  box-shadow: var(--shadow-soft);
+}
+
+.modalOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background:
+    radial-gradient(circle at top, rgba(255, 255, 255, 0.08), transparent 30%),
+    rgba(12, 10, 9, 0.56);
+  backdrop-filter: blur(18px);
+  animation: overlayFade 0.25s ease;
+}
+
+.modalDialog {
+  width: min(100%, 880px);
+  max-height: calc(100vh - 48px);
+  overflow: auto;
+}
+
+.checkoutCard {
+  margin-top: 0;
+  animation: panelReveal 0.3s ease;
+}
+
+.subscriptionSummaryHeader,
+.checkoutHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 18px;
+}
+
+.subscriptionSummaryHeader strong,
+.checkoutHeader h3 {
+  margin: 14px 0 0;
+  font-size: clamp(1.5rem, 3vw, 2.2rem);
+  color: var(--text-primary);
+  letter-spacing: -0.03em;
+}
+
+.subscriptionSummaryHeader > div {
+  display: grid;
+  gap: 6px;
+}
+
+.modalCloseButton {
+  width: 46px;
+  height: 46px;
+  border: 1px solid var(--border-color);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--surface-strong) 92%, transparent);
+  color: var(--text-primary);
+  font-size: 1.6rem;
+  line-height: 1;
+  cursor: pointer;
+  transition: transform 0.25s ease, border-color 0.25s ease, background 0.25s ease;
+}
+
+.modalCloseButton:hover {
+  transform: translateY(-2px);
+  border-color: color-mix(in srgb, var(--accent) 52%, transparent);
+  background: var(--surface);
+}
+
+.subscriptionSummaryGrid,
+.checkoutSummary {
+  margin-top: 20px;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.checkoutForm {
   margin-top: 24px;
-  perspective: 1200px;
-  min-height: 60vh;
+  display: grid;
+  gap: 20px;
+}
+
+.checkoutFooter {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 18px;
+}
+
+.checkoutHint {
+  margin: 0;
+  max-width: 420px;
+  color: var(--text-secondary);
+  font-size: 14px;
+  line-height: 1.7;
+}
+
+.checkoutActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  justify-content: flex-end;
 }
 
 .upgradeCard {
-  padding: 44px 32px 32px;
+  padding: 28px;
   border-radius: 32px;
-  background: var(--surface);
+  background:
+    radial-gradient(circle at top right, color-mix(in srgb, var(--accent) 10%, transparent), transparent 26%),
+    var(--surface);
   border: 1px solid var(--border-color);
   box-shadow: var(--shadow-soft);
   animation: cardSlide 0.45s ease;
   transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
-  flex: 1;
-  max-width: 350px;
-  min-height: 560px;
+  min-height: 100%;
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  gap: 20px;
   justify-content: flex-start;
   position: relative;
   overflow: hidden;
 }
 
 .currentSubscription {
-  border-color: var(--accent);
-  box-shadow: 0 0 30px rgba(184, 138, 103, 0.5), 0 8px 32px rgba(0, 0, 0, 0.15);
+  border-color: color-mix(in srgb, var(--accent) 54%, transparent);
+  box-shadow:
+    0 18px 38px rgba(184, 138, 103, 0.16),
+    0 0 0 1px color-mix(in srgb, var(--accent) 26%, transparent);
 }
 
 .statusRibbon {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  background: linear-gradient(135deg, var(--accent) 0%, var(--accent-soft) 100%);
-  color: white;
-  text-align: center;
-  padding: 8px 16px;
-  font-size: 12px;
+  position: static;
+  width: fit-content;
+  border-radius: 999px;
+  background: rgba(184, 138, 103, 0.12);
+  color: var(--accent);
+  padding: 8px 12px;
+  font-size: 11px;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.08em;
-  box-shadow: 0 2px 8px rgba(184, 138, 103, 0.4);
-  z-index: 1;
+  border: 1px solid rgba(184, 138, 103, 0.18);
 }
 
-.upgradeCard:nth-child(1) {
-  transform: rotateY(10deg) translateZ(30px);
+.upgradeCardPremium {
+  background:
+    radial-gradient(circle at top right, rgba(223, 183, 105, 0.24), transparent 34%),
+    linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--surface) 96%, #fff0c4 4%),
+      color-mix(in srgb, var(--surface-strong) 96%, transparent)
+    );
 }
 
-.upgradeCard:nth-child(2) {
-  transform: translateZ(-30px);
-}
-
-.upgradeCard:nth-child(3) {
-  transform: rotateY(-10deg) translateZ(30px);
+.upgradeCardVip {
+  background:
+    radial-gradient(circle at top right, rgba(117, 78, 255, 0.18), transparent 32%),
+    radial-gradient(circle at bottom left, rgba(255, 212, 103, 0.16), transparent 30%),
+    linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--surface) 96%, #f3edff 4%),
+      color-mix(in srgb, var(--surface-strong) 96%, transparent)
+    );
 }
 
 .upgradeCard:hover {
-  transform: translateY(-4px) translateZ(50px);
+  transform: translateY(-4px);
   box-shadow: 0 12px 32px rgba(0, 0, 0, 0.15);
   border-color: var(--accent-soft);
 }
 
 .upgradeHeader {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 22px;
+  display: block;
 }
 
 .upgradeHeader h3 {
@@ -1057,17 +1743,41 @@
   color: var(--text-primary);
 }
 
+.upgradePriceBlock {
+  display: grid;
+  gap: 4px;
+  padding: 18px 20px;
+  border-radius: 22px;
+  background: color-mix(in srgb, var(--surface-strong) 92%, transparent);
+  border: 1px solid var(--border-color);
+}
+
 .upgradePrice {
-  font-size: 20px;
-  font-weight: 700;
+  font-size: clamp(1.5rem, 3vw, 2rem);
+  font-weight: 800;
   color: var(--accent);
 }
 
+.upgradePeriod {
+  color: var(--text-secondary);
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
 .upgradeDescription {
-  margin: 0 0 18px;
-  font-size: 17px;
+  margin: 10px 0 0;
+  font-size: 15px;
   line-height: 1.75;
   color: var(--text-secondary);
+}
+
+.upgradeBenefitsBlock {
+  padding: 18px 20px;
+  border-radius: 24px;
+  background: color-mix(in srgb, var(--surface-strong) 86%, transparent);
+  border: 1px solid var(--border-color);
 }
 
 .advantagesList {
@@ -1076,12 +1786,12 @@
   margin: 0;
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 14px;
   flex: 1;
 }
 
 .advantagesList li {
-  font-size: 16px;
+  font-size: 15px;
   color: var(--text-primary);
   position: relative;
   padding-left: 20px;
@@ -1094,6 +1804,16 @@
   left: 0;
   color: var(--accent);
   font-weight: 700;
+}
+
+.upgradeCardFooter {
+  margin-top: auto;
+  padding-top: 4px;
+}
+
+.upgradeCardFooter .primaryButton {
+  width: 100%;
+  min-height: 52px;
 }
 
 .input:disabled,
@@ -1131,11 +1851,27 @@
     align-items: flex-start;
   }
 
+  .heroMetaBar {
+    justify-content: flex-start;
+  }
+
   .heroButtons {
     justify-content: flex-start;
   }
 
+  .heroActions {
+    justify-content: flex-start;
+  }
+
   .profileOverviewGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .accountSnapshot {
+    grid-template-columns: 1fr;
+  }
+
+  .quickAccessGrid {
     grid-template-columns: 1fr;
   }
 
@@ -1151,9 +1887,28 @@
     grid-template-columns: 1fr;
   }
 
-  .upgradeGrid {
+  .settingsLayout {
+    grid-template-columns: 1fr;
+  }
+
+  .statusPromoCard {
     flex-direction: column;
-    perspective: none;
+    align-items: flex-start;
+  }
+
+  .subscriptionSummaryHeader,
+  .checkoutHeader {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .subscriptionSummaryGrid,
+  .checkoutSummary {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .upgradeGrid {
+    grid-template-columns: 1fr;
   }
 
   .upgradeCard {
@@ -1169,6 +1924,10 @@
     padding: 20px;
     border-radius: 24px;
   }
+
+  .sectionTabs {
+    top: 78px;
+  }
 }
 
 @media (max-width: 768px) {
@@ -1182,6 +1941,7 @@
   .loadingHero,
   .loadingPanel,
   .fullscreenCard,
+  .upgradeContainer,
   .settingsSection,
   .avatarEditorCard,
   .formColumn,
@@ -1193,6 +1953,15 @@
   .heroLeft {
     flex-direction: column;
     align-items: flex-start;
+  }
+
+  .sectionTabs {
+    top: 72px;
+    border-radius: 20px;
+  }
+
+  .sectionTab {
+    flex: 1 1 calc(50% - 10px);
   }
 
   .loadingHeroMain {
@@ -1226,6 +1995,11 @@
     font-size: 28px;
   }
 
+  .balanceCard {
+    width: 100%;
+    text-align: left;
+  }
+
   .statsGrid {
     grid-template-columns: 1fr;
   }
@@ -1257,7 +2031,34 @@
     width: 100%;
   }
 
+  .subscriptionSummaryGrid,
+  .checkoutSummary {
+    grid-template-columns: 1fr;
+  }
+
+  .privilegeCard {
+    grid-template-columns: 1fr;
+  }
+
   .infoCardWrap {
     min-height: 420px;
+  }
+
+  .compactLinks {
+    flex-direction: column;
+  }
+
+  .inlineAction {
+    width: 100%;
+  }
+
+  .heroActions,
+  .statusPromoCard .secondaryButton {
+    width: 100%;
+  }
+
+  .heroActions > * {
+    width: 100%;
+    justify-content: center;
   }
 }
