@@ -15,6 +15,7 @@ function ResetPasswordPage() {
   const [submitting, setSubmitting] = useState(false);
   const [status, setStatus] = useState("idle");
   const [message, setMessage] = useState("");
+  const [fieldError, setFieldError] = useState("");
 
   const userId = useMemo(() => searchParams.get("userId") || "", [searchParams]);
   const token = useMemo(() => searchParams.get("token") || "", [searchParams]);
@@ -36,14 +37,12 @@ function ResetPasswordPage() {
     }
 
     if (!newPassword || !confirmPassword) {
-      setStatus("error");
-      setMessage("Заповніть обидва поля пароля.");
+      setFieldError("Заповніть обидва поля пароля.");
       return;
     }
 
     if (newPassword !== confirmPassword) {
-      setStatus("error");
-      setMessage("Паролі не збігаються.");
+      setFieldError("Паролі не збігаються. Перевірте введення ще раз.");
       return;
     }
 
@@ -51,6 +50,7 @@ function ResetPasswordPage() {
       setSubmitting(true);
       setStatus("idle");
       setMessage("");
+      setFieldError("");
 
       const response = await api.post("/api/Auth/reset-password", {
         userId,
@@ -82,11 +82,21 @@ function ResetPasswordPage() {
 
       <div className={styles.container}>
         <div className={styles.card}>
-          <span className={styles.badge}>Reset Password</span>
-          <h1 className={styles.title}>Створіть новий пароль</h1>
+          <span className={styles.badge}>Відновлення доступу</span>
+          <h1 className={styles.title}>Оновіть пароль до акаунта</h1>
           <p className={styles.message}>
-            Введіть новий пароль для акаунта. Після успішної зміни ми повернемо вас на сторінку входу.
+            Створіть новий пароль для входу в Liorael. Після успішної зміни ви зможете одразу повернутися до сторінки авторизації.
           </p>
+
+          <div className={styles.infoCard}>
+            <strong>Що важливо</strong>
+            <p>Використайте пароль, який легко запам'ятати вам і складно підібрати іншим.</p>
+            <div className={styles.tipList}>
+              <span>Мінімум 8 символів</span>
+              <span>Бажано велика літера та цифра</span>
+              <span>Не використовуйте старі прості комбінації</span>
+            </div>
+          </div>
 
           <form className={styles.form} onSubmit={handleSubmit}>
             <label className={styles.field}>
@@ -109,10 +119,11 @@ function ResetPasswordPage() {
                   {showNewPassword ? "🙈" : "👁"}
                 </button>
               </div>
+              <small className={styles.fieldHint}>Придумайте новий пароль для входу в акаунт.</small>
             </label>
 
             <label className={styles.field}>
-              <span>Повторіть пароль</span>
+              <span>Підтвердження пароля</span>
               <div className={styles.passwordField}>
                 <input
                   type={showConfirmPassword ? "text" : "password"}
@@ -131,7 +142,10 @@ function ResetPasswordPage() {
                   {showConfirmPassword ? "🙈" : "👁"}
                 </button>
               </div>
+              <small className={styles.fieldHint}>Введіть той самий пароль ще раз для перевірки.</small>
             </label>
+
+            {fieldError ? <div className={`${styles.notice} ${styles.noticeError}`}>{fieldError}</div> : null}
 
             {message ? (
               <div
@@ -148,7 +162,7 @@ function ResetPasswordPage() {
               className={styles.button}
               disabled={submitting || status === "success" || !userId || !token}
             >
-              {submitting ? "Оновлюємо..." : "Змінити пароль"}
+              {submitting ? "Оновлюємо пароль..." : "Зберегти новий пароль"}
             </button>
           </form>
 
