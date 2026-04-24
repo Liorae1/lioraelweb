@@ -1,7 +1,8 @@
 import api from "./axios";
+import { getAuthToken } from "../utils/authStorage";
 
 export async function getMyWallet() {
-  const token = localStorage.getItem("token");
+  const token = getAuthToken();
 
   if (!token) {
     return null;
@@ -12,7 +13,7 @@ export async function getMyWallet() {
 }
 
 export async function getMyWalletTransactions() {
-  const token = localStorage.getItem("token");
+  const token = getAuthToken();
 
   if (!token) {
     return [];

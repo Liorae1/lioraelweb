@@ -49,6 +49,116 @@
   padding: 24px;
 }
 
+.loadingShell,
+.loadingMetric,
+.loadingNav,
+.loadingPanelTitle,
+.loadingFeature {
+  position: relative;
+  overflow: hidden;
+}
+
+.loadingShell::after,
+.loadingMetric::after,
+.loadingNav::after,
+.loadingPanelTitle::after,
+.loadingFeature::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    color-mix(in srgb, #fff 54%, transparent) 50%,
+    transparent 100%
+  );
+  transform: translateX(-100%);
+  animation: walletShimmer 1.4s ease-in-out infinite;
+}
+
+.loadingShell {
+  display: grid;
+  gap: 24px;
+  background:
+    radial-gradient(circle at top right, color-mix(in srgb, var(--accent) 18%, transparent), transparent 34%),
+    color-mix(in srgb, var(--surface-strong) 94%, transparent);
+}
+
+.loadingMetricRow,
+.loadingFeatureGrid {
+  display: grid;
+  gap: 16px;
+}
+
+.loadingMetricRow {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.loadingMetric,
+.loadingNav,
+.loadingPanelTitle,
+.loadingFeature {
+  display: block;
+  border-radius: 24px;
+  background: color-mix(in srgb, var(--accent) 12%, var(--surface) 88%);
+}
+
+.loadingMetric {
+  min-height: 104px;
+}
+
+.loadingPrimary {
+  border-color: color-mix(in srgb, var(--accent) 26%, transparent);
+}
+
+.loadingWorkspace {
+  display: grid;
+  grid-template-columns: 240px minmax(0, 1fr);
+  gap: 24px;
+}
+
+.loadingSidebar {
+  display: grid;
+  gap: 12px;
+  padding: 16px;
+  border-radius: 24px;
+  background: color-mix(in srgb, var(--surface) 90%, transparent);
+  border: 1px solid var(--border-color);
+}
+
+.loadingNav {
+  min-height: 48px;
+  border-radius: 16px;
+}
+
+.loadingStage {
+  display: grid;
+  gap: 18px;
+}
+
+.loadingPanelTitle {
+  height: 28px;
+  width: min(280px, 42%);
+}
+
+.loadingFeatureGrid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.loadingFeature {
+  min-height: 140px;
+  border-radius: 22px;
+}
+
+@keyframes walletShimmer {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(100%);
+  }
+}
+
 .kicker,
 .cardLabel {
   display: inline-flex;
@@ -490,7 +600,10 @@
   .workspace,
   .metricsGrid,
   .featureGrid,
-  .shortcutGrid {
+  .shortcutGrid,
+  .loadingMetricRow,
+  .loadingWorkspace,
+  .loadingFeatureGrid {
     grid-template-columns: 1fr;
   }
 

@@ -72,6 +72,10 @@
   transform: translateY(-8px);
 }
 
+.cardLoading:hover {
+  transform: none;
+}
+
 .imageFrame {
   height: 280px;
   min-height: 280px;
@@ -202,4 +206,105 @@
 .bidButton:hover {
   transform: translateY(-2px);
   box-shadow: var(--shadow-soft);
+}
+
+.loadingBlock,
+.loadingLine,
+.loadingChip,
+.loadingPill,
+.loadingButton {
+  position: relative;
+  overflow: hidden;
+  background: color-mix(in srgb, var(--accent) 12%, var(--surface) 88%);
+}
+
+.loadingBlock::after,
+.loadingLine::after,
+.loadingChip::after,
+.loadingPill::after,
+.loadingButton::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    color-mix(in srgb, #fff 54%, transparent) 50%,
+    transparent 100%
+  );
+  transform: translateX(-100%);
+  animation: featuredShimmer 1.4s ease-in-out infinite;
+}
+
+.loadingLine {
+  border-radius: 999px;
+}
+
+.loadingLineShort {
+  width: 110px;
+  height: 14px;
+}
+
+.loadingChip {
+  width: 84px;
+  height: 30px;
+  border-radius: 999px;
+  border: none;
+}
+
+.loadingLineTitle {
+  width: 88%;
+  height: 22px;
+  margin-top: 16px;
+}
+
+.loadingLineTitleSmall {
+  width: 62%;
+  height: 22px;
+  margin-top: 10px;
+}
+
+.loadingLineMeta {
+  width: 76%;
+  height: 14px;
+  margin-top: 16px;
+}
+
+.loadingInfoBlock {
+  min-width: 0;
+  flex: 1;
+}
+
+.loadingLineLabel {
+  width: 72%;
+  height: 12px;
+}
+
+.loadingLineValue {
+  width: 90%;
+  height: 18px;
+  margin-top: 10px;
+}
+
+.loadingPill {
+  width: 92px;
+  height: 34px;
+  border: none;
+}
+
+.loadingButton {
+  min-height: 48px;
+  margin-top: 24px;
+  width: 168px;
+  align-self: flex-start;
+  border-radius: 999px;
+}
+
+@keyframes featuredShimmer {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(100%);
+  }
 }

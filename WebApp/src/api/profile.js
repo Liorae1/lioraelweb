@@ -1,5 +1,6 @@
 import api from "./axios";
 import { normalizeAuctionEntity, normalizeMediaUrl } from "../utils/domain";
+import { clearAuthToken, hasAuthToken } from "../utils/authStorage";
 
 function normalizeProfile(profile) {
   if (!profile || typeof profile !== "object") {
@@ -19,7 +20,7 @@ function normalizeProfile(profile) {
 }
 
 export async function getMe() {
-  if (!localStorage.getItem("token")) {
+  if (!hasAuthToken()) {
     return null;
   }
 
@@ -34,7 +35,7 @@ export async function getProfileByUserId(userId) {
 }
 
 export async function getMyFavorites() {
-  if (!localStorage.getItem("token")) {
+  if (!hasAuthToken()) {
     return [];
   }
 
@@ -69,6 +70,6 @@ export async function purchaseSubscription(payload) {
 }
 
 export function logout() {
-  localStorage.removeItem("token");
+  clearAuthToken();
   window.dispatchEvent(new Event("authChanged"));
 }

@@ -268,6 +268,155 @@
   gap: 8px;
 }
 
+.notificationsPanel {
+  display: grid;
+  gap: 12px;
+  padding: 16px;
+  border-radius: 22px;
+  background: var(--auction-surface-soft);
+  border: 1px solid var(--auction-border);
+}
+
+.notificationsPanelTop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.notificationsToggle {
+  width: 100%;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+
+.notificationsToggleMeta {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.notificationsTitle {
+  color: var(--auction-text);
+  font-size: 0.96rem;
+  font-weight: 800;
+}
+
+.notificationsCount {
+  min-width: 28px;
+  height: 28px;
+  padding: 0 9px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--accent) 16%, transparent);
+  color: var(--accent);
+  font-size: 0.82rem;
+  font-weight: 800;
+}
+
+.notificationsChevron {
+  width: 28px;
+  height: 28px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--auction-surface-strong) 92%, transparent);
+  color: var(--auction-text-soft);
+  transition: transform 0.2s ease, color 0.2s ease, background 0.2s ease;
+}
+
+.notificationsChevron svg {
+  width: 16px;
+  height: 16px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.notificationsToggle:hover .notificationsChevron {
+  color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 12%, transparent);
+}
+
+.notificationsChevronOpen {
+  transform: rotate(180deg);
+}
+
+.notificationsList {
+  display: grid;
+  gap: 8px;
+}
+
+.notificationItem {
+  width: 100%;
+  padding: 12px 14px;
+  display: grid;
+  gap: 6px;
+  border: 1px solid transparent;
+  border-radius: 18px;
+  background: color-mix(in srgb, var(--auction-surface-strong) 88%, transparent);
+  text-align: left;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+  transition:
+    transform 0.2s ease,
+    border-color 0.2s ease,
+    background 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.notificationItem:hover {
+  transform: translateY(-2px);
+  border-color: color-mix(in srgb, var(--accent) 24%, transparent);
+  box-shadow: 0 12px 20px color-mix(in srgb, var(--accent) 10%, transparent);
+}
+
+.notificationItemUnread {
+  border-color: color-mix(in srgb, var(--accent) 28%, transparent);
+  background: color-mix(in srgb, var(--accent) 10%, var(--auction-surface-strong) 90%);
+}
+
+.notificationTitle {
+  color: var(--auction-text);
+  font-size: 0.88rem;
+  font-weight: 800;
+}
+
+.notificationText {
+  color: var(--auction-text-soft);
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
+
+.notificationTime {
+  color: var(--auction-text-muted);
+  font-size: 0.78rem;
+}
+
+.notificationsEmpty {
+  padding: 16px 14px;
+  border-radius: 18px;
+  background: color-mix(in srgb, var(--auction-surface-strong) 84%, transparent);
+  color: var(--auction-text-muted);
+  font-size: 0.9rem;
+  line-height: 1.45;
+  text-align: center;
+}
+
 .navItem {
   min-height: 48px;
   padding: 0 16px;
@@ -301,6 +450,12 @@
   min-width: 0;
   display: grid;
   gap: 24px;
+}
+
+.contentSwitching {
+  opacity: 0.72;
+  filter: saturate(0.92);
+  transition: opacity 0.28s ease, filter 0.28s ease;
 }
 
 .hero {
@@ -588,6 +743,54 @@
   margin: 0;
   color: var(--auction-text-soft);
   line-height: 1.65;
+}
+
+.catalogStage {
+  position: relative;
+}
+
+.catalogContent,
+.catalogContentMuted {
+  transition:
+    opacity 0.28s ease,
+    transform 0.28s ease,
+    filter 0.28s ease;
+}
+
+.catalogContentMuted {
+  opacity: 0.46;
+  transform: scale(0.995);
+  filter: blur(1.5px) saturate(0.92);
+}
+
+.catalogOverlay {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  pointer-events: none;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding-top: 18px;
+  animation: catalogOverlayIn 0.24s ease both;
+}
+
+.catalogOverlayBadge {
+  min-height: 42px;
+  padding: 0 18px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--auction-surface-strong) 88%, transparent);
+  border: 1px solid color-mix(in srgb, var(--accent) 24%, transparent);
+  color: var(--auction-text);
+  box-shadow: 0 16px 30px color-mix(in srgb, var(--accent) 10%, transparent);
+  backdrop-filter: blur(14px);
+  font-size: 0.84rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
 }
 
 .grid {
@@ -909,6 +1112,17 @@
 
   50% {
     transform: translateY(-4px);
+  }
+}
+
+@keyframes catalogOverlayIn {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 

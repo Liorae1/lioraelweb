@@ -24,9 +24,10 @@ import {
   getWalletAmounts,
   normalizeAuctionEntity,
 } from "../utils/domain";
+import { clearAuthToken, getAuthToken } from "../utils/authStorage";
 
 const getAuthConfig = () => {
-  const token = localStorage.getItem("token");
+  const token = getAuthToken();
 
   return {
     headers: {
@@ -49,6 +50,13 @@ const normalizeAuctionCollection = (items) =>
   Array.isArray(items)
     ? items.map(normalizeAuctionEntity).filter(Boolean)
     : [];
+
+const isUnauthorizedError = (error) => error?.response?.status === 401;
+
+const getAuctionCardKey = (auction, index) =>
+  auction?.id ||
+  auction?.auctionId ||
+  `${auction?.title || "auction"}-${auction?.brand || "item"}-${index}`;
 
 const formatBirthDateShort = (value) => {
   if (!value) return "Не вказано";
@@ -180,7 +188,7 @@ function ProfilePage() {
 
   const fetchUser = useCallback(async () => {
     try {
-      const token = localStorage.getItem("token");
+      const token = getAuthToken();
 
       if (!token) {
         setAuth(false);
@@ -203,7 +211,12 @@ function ProfilePage() {
       setProfileForm(mapUserToProfileForm(userData));
       setAuth(true);
     } catch (err) {
-      console.error("Auth error:", err);
+      if (isUnauthorizedError(err)) {
+        clearAuthToken();
+      } else {
+        console.error("Auth error:", err);
+      }
+
       setAuth(false);
     } finally {
       setLoading(false);
@@ -226,7 +239,13 @@ function ProfilePage() {
         const data = await getMyFavorites();
         setFavorites(normalizeAuctionCollection(data));
       } catch (err) {
-        console.error("Favorites load error:", err);
+        if (isUnauthorizedError(err)) {
+          clearAuthToken();
+          setAuth(false);
+          setFavorites([]);
+          return;
+        }
+
         setFavorites(normalizeAuctionCollection(user?.favoriteAuctions));
       } finally {
         setFavoritesLoading(false);
@@ -844,8 +863,8 @@ function ProfilePage() {
                 <div className={styles.emptyStateCard}>У вибраному поки немає лотів.</div>
               ) : (
                 <div className={styles.auctionCollection}>
-                  {favoriteAuctions.map((auction) => (
-                    <article key={auction.id} className={styles.auctionCard}>
+                  {favoriteAuctions.map((auction, index) => (
+                    <article key={getAuctionCardKey(auction, index)} className={styles.auctionCard}>
                       <div className={styles.auctionCardMedia}>
                         {getAuctionImage(auction) ? (
                           <img
@@ -896,11 +915,11 @@ function ProfilePage() {
                 <div className={styles.emptyStateCard}>Поки що немає виграних лотів.</div>
               ) : (
                 <div className={styles.auctionCollection}>
-                  {wonAuctions.map((auction) => {
+                  {wonAuctions.map((auction, index) => {
                     const leader = getAuctionLeaderProfile(auction);
 
                     return (
-                      <article key={auction.id} className={styles.auctionCard}>
+                      <article key={getAuctionCardKey(auction, index)} className={styles.auctionCard}>
                         <div className={styles.auctionCardMedia}>
                           {getAuctionImage(auction) ? (
                             <img

@@ -36,8 +36,26 @@
 }
 
 .loader {
-  color: rgba(255,255,255,0.72);
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
   margin-bottom: 18px;
+}
+
+.loaderDot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.82);
+  animation: verifyPulse 1s ease-in-out infinite;
+}
+
+.loaderDot:nth-child(2) {
+  animation-delay: 0.18s;
+}
+
+.loaderDot:nth-child(3) {
+  animation-delay: 0.36s;
 }
 
 .button {
@@ -48,4 +66,16 @@
   color: black;
   text-decoration: none;
   font-weight: 600;
+}
+
+@keyframes verifyPulse {
+  0%,
+  100% {
+    transform: translateY(0);
+    opacity: 0.35;
+  }
+  50% {
+    transform: translateY(-4px);
+    opacity: 1;
+  }
 }

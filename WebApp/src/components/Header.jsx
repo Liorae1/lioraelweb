@@ -6,7 +6,6 @@ import api from "../api/axios";
 import { getMyWallet } from "../api/wallet";
 import {
   getMyNotifications,
-  getMyUnreadNotificationsCount,
   markAllNotificationsAsRead,
   markNotificationAsRead,
 } from "../api/notifications";
@@ -16,6 +15,16 @@ import {
   getWalletAmounts,
   normalizeAccountStatus,
 } from "../utils/domain";
+import { clearAuthToken, getAuthToken, hasAuthToken } from "../utils/authStorage";
+
+function isUnauthorizedError(error) {
+  return error?.response?.status === 401;
+}
+
+function clearAuthState() {
+  clearAuthToken();
+  window.dispatchEvent(new Event("authChanged"));
+}
 
 function Header() {
   const [user, setUser] = useState(null);
@@ -26,7 +35,6 @@ function Header() {
   const [avatarVersion, setAvatarVersion] = useState(Date.now());
   const [notifications, setNotifications] = useState([]);
   const [notificationsLoading, setNotificationsLoading] = useState(false);
-  const [unreadCount, setUnreadCount] = useState(0);
 
   const location = useLocation();
   const navigate = useNavigate();
@@ -34,7 +42,7 @@ function Header() {
   const menuRef = useRef(null);
 
   const getAuthConfig = () => {
-    const token = localStorage.getItem("token");
+    const token = getAuthToken();
 
     return {
       headers: {
@@ -45,7 +53,7 @@ function Header() {
 
   const loadUser = async () => {
     try {
-      const token = localStorage.getItem("token");
+      const token = getAuthToken();
 
       if (!token) {
         setUser(null);
@@ -63,7 +71,12 @@ function Header() {
       setWallet(walletData);
       setAvatarVersion(Date.now());
     } catch (error) {
-      console.error("Failed to load header user:", error);
+      if (isUnauthorizedError(error)) {
+        clearAuthState();
+      } else {
+        console.error("Failed to load header user:", error);
+      }
+
       setUser(null);
       setWallet(null);
     } finally {
@@ -72,9 +85,8 @@ function Header() {
   };
 
   const loadNotifications = async ({ silent = false } = {}) => {
-    if (!localStorage.getItem("token")) {
+    if (!hasAuthToken()) {
       setNotifications([]);
-      setUnreadCount(0);
       return;
     }
 
@@ -83,17 +95,16 @@ function Header() {
         setNotificationsLoading(true);
       }
 
-      const [items, count] = await Promise.all([
-        getMyNotifications(),
-        getMyUnreadNotificationsCount().catch(() => 0),
-      ]);
-
-      setNotifications(items);
-      setUnreadCount(count);
+      const items = await getMyNotifications();
+      setNotifications(items.filter((item) => !item?.isRead));
     } catch (error) {
-      console.error("Failed to load notifications:", error);
+      if (isUnauthorizedError(error)) {
+        clearAuthState();
+      } else {
+        console.error("Failed to load notifications:", error);
+      }
+
       setNotifications([]);
-      setUnreadCount(0);
     } finally {
       setNotificationsLoading(false);
     }
@@ -140,13 +151,12 @@ function Header() {
   }, [notificationsOpen]);
 
   const handleLogout = () => {
-    localStorage.removeItem("token");
+    clearAuthToken();
     setMenuOpen(false);
     setNotificationsOpen(false);
     setUser(null);
     setWallet(null);
     setNotifications([]);
-    setUnreadCount(0);
     window.dispatchEvent(new Event("authChanged"));
     navigate("/");
   };
@@ -243,14 +253,7 @@ function Header() {
     } catch (error) {
       console.error("Failed to mark notification as read:", error);
     } finally {
-      setNotifications((current) =>
-        current.map((item) =>
-          item.id === notification.id
-            ? { ...item, isRead: true, readAt: item.readAt || new Date().toISOString() }
-            : item
-        )
-      );
-      setUnreadCount((current) => Math.max(0, current - (notification?.isRead ? 0 : 1)));
+      setNotifications((current) => current.filter((item) => item.id !== notification.id));
       setNotificationsOpen(false);
       openNotificationTarget(target);
     }
@@ -259,14 +262,7 @@ function Header() {
   const handleReadAllNotifications = async () => {
     try {
       await markAllNotificationsAsRead();
-      setNotifications((current) =>
-        current.map((item) => ({
-          ...item,
-          isRead: true,
-          readAt: item.readAt || new Date().toISOString(),
-        }))
-      );
-      setUnreadCount(0);
+      setNotifications([]);
     } catch (error) {
       console.error("Failed to mark all notifications as read:", error);
     }
@@ -339,9 +335,9 @@ function Header() {
                     strokeLinecap="round"
                   />
                 </svg>
-                {unreadCount > 0 && (
+                {notifications.length > 0 && (
                   <span className={styles.notificationBadge}>
-                    {unreadCount > 99 ? "99+" : unreadCount}
+                    {notifications.length > 99 ? "99+" : notifications.length}
                   </span>
                 )}
               </button>
@@ -353,7 +349,7 @@ function Header() {
                       Сповіщення
                     </span>
                     <span className={styles.notificationsCount}>
-                      {unreadCount}
+                      {notifications.length}
                     </span>
                   </div>
 

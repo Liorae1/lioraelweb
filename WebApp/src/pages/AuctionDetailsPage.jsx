@@ -18,6 +18,7 @@ import {
   getWalletAmounts,
   normalizeMediaUrl,
 } from "../utils/domain";
+import { getAuthToken } from "../utils/authStorage";
 import styles from "./AuctionDetailsPage.module.css";
 
 function buildUserMatchKeys(user) {
@@ -221,7 +222,7 @@ async function requestBids(auctionId) {
 }
 
 async function requestCurrentUser() {
-  const token = localStorage.getItem("token");
+  const token = getAuthToken();
 
   if (!token) {
     return null;
@@ -536,7 +537,7 @@ function AuctionDetailsPage() {
   const handleBidSubmit = async (event) => {
     event.preventDefault();
 
-    const token = localStorage.getItem("token");
+    const token = getAuthToken();
     const nextAmount = Number(bidAmount);
 
     if (!token) {

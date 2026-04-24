@@ -14,6 +14,7 @@ import {
   getAccountStatusMeta,
   normalizeAccountStatus,
 } from "../utils/domain";
+import { getAuthToken } from "../utils/authStorage";
 
 function formatPrice(value, currency = "UAH") {
   const symbol = currency === "UAH" ? "₴" : currency;
@@ -112,7 +113,7 @@ function WalletPage() {
   }, [location.hash]);
 
   const loadWalletData = useCallback(async ({ silent = false } = {}) => {
-    const token = localStorage.getItem("token");
+    const token = getAuthToken();
 
     if (!token) {
       setAuth(false);
@@ -327,7 +328,32 @@ function WalletPage() {
           </section>
 
           {loading ? (
-            <section className={styles.loadingCard}>Завантаження гаманця...</section>
+            <section className={`${styles.loadingCard} ${styles.loadingShell}`} aria-hidden="true">
+              <div className={styles.loadingMetricRow}>
+                <span className={`${styles.loadingMetric} ${styles.loadingPrimary}`}></span>
+                <span className={styles.loadingMetric}></span>
+                <span className={styles.loadingMetric}></span>
+              </div>
+
+              <div className={styles.loadingWorkspace}>
+                <div className={styles.loadingSidebar}>
+                  <span className={styles.loadingNav}></span>
+                  <span className={styles.loadingNav}></span>
+                  <span className={styles.loadingNav}></span>
+                  <span className={styles.loadingNav}></span>
+                </div>
+
+                <div className={styles.loadingStage}>
+                  <span className={styles.loadingPanelTitle}></span>
+                  <div className={styles.loadingFeatureGrid}>
+                    <span className={styles.loadingFeature}></span>
+                    <span className={styles.loadingFeature}></span>
+                    <span className={styles.loadingFeature}></span>
+                    <span className={styles.loadingFeature}></span>
+                  </div>
+                </div>
+              </div>
+            </section>
           ) : (
             <>
               <section className={styles.metricsGrid}>
