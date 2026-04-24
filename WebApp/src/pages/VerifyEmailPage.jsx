@@ -2,12 +2,14 @@ import { useEffect, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import Header from "../components/Header";
 import api from "../api/axios";
+import useDeferredVisibility from "../hooks/useDeferredVisibility";
 import styles from "./VerifyEmailPage.module.css";
 
 function VerifyEmailPage() {
   const [searchParams] = useSearchParams();
   const [status, setStatus] = useState("loading");
   const [message, setMessage] = useState("Підтверджуємо вашу пошту...");
+  const showLoading = useDeferredVisibility(status === "loading", 120, 320);
 
   useEffect(() => {
     const userId = searchParams.get("userId");
@@ -50,7 +52,13 @@ function VerifyEmailPage() {
           <h1 className={styles.title}>Підтвердження пошти</h1>
           <p className={styles.message}>{message}</p>
 
-          {status === "loading" && <div className={styles.loader}>Зачекайте...</div>}
+          {showLoading && (
+            <div className={styles.loader} aria-hidden="true">
+              <span className={styles.loaderDot}></span>
+              <span className={styles.loaderDot}></span>
+              <span className={styles.loaderDot}></span>
+            </div>
+          )}
 
           {status === "success" && (
             <Link to="/auth" className={styles.button}>

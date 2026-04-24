@@ -62,7 +62,49 @@ function PublicProfilePage() {
       <Header />
       <main className={styles.main}>
         {loading ? (
-          <section className={styles.card}>Завантаження профілю...</section>
+          <>
+            <section className={`${styles.hero} ${styles.loadingShell}`} aria-hidden="true">
+              <div className={styles.loadingIdentity}>
+                <div className={styles.loadingAvatar}></div>
+                <div className={styles.loadingIdentityText}>
+                  <span className={styles.loadingTitle}></span>
+                  <span className={styles.loadingSubtitle}></span>
+                  <span className={styles.loadingSubtitleShort}></span>
+                </div>
+              </div>
+              <div className={styles.loadingWalletCard}>
+                <span className={styles.loadingWalletLabel}></span>
+                <span className={styles.loadingWalletValue}></span>
+                <span className={styles.loadingWalletLine}></span>
+                <span className={styles.loadingWalletLineShort}></span>
+              </div>
+            </section>
+
+            <section className={`${styles.card} ${styles.loadingShell}`} aria-hidden="true">
+              <div className={styles.loadingSectionHeader}>
+                <span className={styles.loadingTitle}></span>
+                <span className={styles.loadingSubtitle}></span>
+              </div>
+              <div className={styles.loadingGrid}>
+                <article className={styles.loadingAuctionCard}>
+                  <div className={styles.loadingMedia}></div>
+                  <div className={styles.loadingBody}>
+                    <span className={styles.loadingSubtitle}></span>
+                    <span className={styles.loadingTitle}></span>
+                    <span className={styles.loadingWalletLineShort}></span>
+                  </div>
+                </article>
+                <article className={styles.loadingAuctionCard}>
+                  <div className={styles.loadingMedia}></div>
+                  <div className={styles.loadingBody}>
+                    <span className={styles.loadingSubtitle}></span>
+                    <span className={styles.loadingTitle}></span>
+                    <span className={styles.loadingWalletLineShort}></span>
+                  </div>
+                </article>
+              </div>
+            </section>
+          </>
         ) : error ? (
           <section className={styles.card}>{error}</section>
         ) : !profile ? (

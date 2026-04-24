@@ -4,6 +4,11 @@ import Header from "../components/Header";
 import Toast from "../components/Toast";
 import styles from "./AuthPage.module.css";
 import api from "../api/axios";
+import {
+  getAuthToken,
+  getRememberMePreference,
+  setAuthToken,
+} from "../utils/authStorage";
 
 function AuthPage() {
   const [isLogin, setIsLogin] = useState(true);
@@ -31,15 +36,29 @@ const [resendMessage, setResendMessage] = useState("");
   const [forgotPasswordEmail, setForgotPasswordEmail] = useState("");
   const [forgotPasswordLoading, setForgotPasswordLoading] = useState(false);
   const [forgotPasswordMessage, setForgotPasswordMessage] = useState("");
+  const [showLoginPassword, setShowLoginPassword] = useState(false);
+  const [showRegisterPassword, setShowRegisterPassword] = useState(false);
+  const [showRegisterPasswordRepeat, setShowRegisterPasswordRepeat] = useState(false);
   const navigate = useNavigate();
 
-  // Load saved email on mount
   useEffect(() => {
     const savedEmail = localStorage.getItem("rememberedEmail");
+    const rememberMe = getRememberMePreference();
+
     if (savedEmail) {
-      setLoginData((prev) => ({ ...prev, email: savedEmail }));
+      setLoginData((prev) => ({ ...prev, email: savedEmail, rememberMe }));
+    }
+
+    if (!savedEmail && rememberMe) {
+      setLoginData((prev) => ({ ...prev, rememberMe: true }));
     }
   }, []);
+
+  useEffect(() => {
+    if (getAuthToken()) {
+      navigate("/profile");
+    }
+  }, [navigate]);
 
   useEffect(() => {
     if (!toast) return;
@@ -160,7 +179,7 @@ const [resendMessage, setResendMessage] = useState("");
       throw new Error("Сервер не повернув токен авторизації.");
     }
 
-    localStorage.setItem("token", authToken);
+    setAuthToken(authToken, loginData.rememberMe);
     window.dispatchEvent(new Event("authChanged"));
     
     // Handle "Remember Me"
@@ -488,16 +507,27 @@ const handleForgotPassword = async (e) => {
                     }`}
                   >
                     <label htmlFor="loginPassword">Пароль</label>
-                    <input
-                      id="loginPassword"
-                      type="password"
-                      placeholder="Введіть пароль"
-                      value={loginData.password}
-                      onChange={(e) => handleFieldChange("login", "password", e.target.value)}
-                      onBlur={() => handleFieldBlur("login", "password")}
-                      aria-invalid={!!getFieldError("login", "password")}
-                      aria-describedby="loginPasswordError"
-                    />
+                    <div className={styles.passwordField}>
+                      <input
+                        id="loginPassword"
+                        type={showLoginPassword ? "text" : "password"}
+                        placeholder="Введіть пароль"
+                        value={loginData.password}
+                        onChange={(e) => handleFieldChange("login", "password", e.target.value)}
+                        onBlur={() => handleFieldBlur("login", "password")}
+                        aria-invalid={!!getFieldError("login", "password")}
+                        aria-describedby="loginPasswordError"
+                      />
+                      <button
+                        type="button"
+                        className={styles.passwordToggle}
+                        onClick={() => setShowLoginPassword((current) => !current)}
+                        aria-label={showLoginPassword ? "Приховати пароль" : "Показати пароль"}
+                        aria-pressed={showLoginPassword}
+                      >
+                        {showLoginPassword ? "🙈" : "👁"}
+                      </button>
+                    </div>
                     {shouldShowError("login", "password") && (
                       <p id="loginPasswordError" className={styles.errorMessage}>
                         {getFieldError("login", "password")}
@@ -594,16 +624,27 @@ const handleForgotPassword = async (e) => {
                     }`}
                   >
                     <label htmlFor="registerPassword">Пароль</label>
-                    <input
-                      id="registerPassword"
-                      type="password"
-                      placeholder="Створіть пароль"
-                      value={registerData.password}
-                      onChange={(e) => handleFieldChange("register", "password", e.target.value)}
-                      onBlur={() => handleFieldBlur("register", "password")}
-                      aria-invalid={!!getFieldError("register", "password")}
-                      aria-describedby="registerPasswordError"
-                    />
+                    <div className={styles.passwordField}>
+                      <input
+                        id="registerPassword"
+                        type={showRegisterPassword ? "text" : "password"}
+                        placeholder="Створіть пароль"
+                        value={registerData.password}
+                        onChange={(e) => handleFieldChange("register", "password", e.target.value)}
+                        onBlur={() => handleFieldBlur("register", "password")}
+                        aria-invalid={!!getFieldError("register", "password")}
+                        aria-describedby="registerPasswordError"
+                      />
+                      <button
+                        type="button"
+                        className={styles.passwordToggle}
+                        onClick={() => setShowRegisterPassword((current) => !current)}
+                        aria-label={showRegisterPassword ? "Приховати пароль" : "Показати пароль"}
+                        aria-pressed={showRegisterPassword}
+                      >
+                        {showRegisterPassword ? "🙈" : "👁"}
+                      </button>
+                    </div>
                     {shouldShowError("register", "password") ? (
                       <p id="registerPasswordError" className={styles.errorMessage}>
                         {getFieldError("register", "password")}
@@ -621,16 +662,27 @@ const handleForgotPassword = async (e) => {
                     <label htmlFor="registerPasswordRepeat">
                       Підтвердження пароля
                     </label>
-                    <input
-                      id="registerPasswordRepeat"
-                      type="password"
-                      placeholder="Повторіть пароль"
-                      value={registerData.passwordRepeat}
-                      onChange={(e) => handleFieldChange("register", "passwordRepeat", e.target.value)}
-                      onBlur={() => handleFieldBlur("register", "passwordRepeat")}
-                      aria-invalid={!!getFieldError("register", "passwordRepeat")}
-                      aria-describedby="registerPasswordRepeatError"
-                    />
+                    <div className={styles.passwordField}>
+                      <input
+                        id="registerPasswordRepeat"
+                        type={showRegisterPasswordRepeat ? "text" : "password"}
+                        placeholder="Повторіть пароль"
+                        value={registerData.passwordRepeat}
+                        onChange={(e) => handleFieldChange("register", "passwordRepeat", e.target.value)}
+                        onBlur={() => handleFieldBlur("register", "passwordRepeat")}
+                        aria-invalid={!!getFieldError("register", "passwordRepeat")}
+                        aria-describedby="registerPasswordRepeatError"
+                      />
+                      <button
+                        type="button"
+                        className={styles.passwordToggle}
+                        onClick={() => setShowRegisterPasswordRepeat((current) => !current)}
+                        aria-label={showRegisterPasswordRepeat ? "Приховати пароль" : "Показати пароль"}
+                        aria-pressed={showRegisterPasswordRepeat}
+                      >
+                        {showRegisterPasswordRepeat ? "🙈" : "👁"}
+                      </button>
+                    </div>
                     {shouldShowError("register", "passwordRepeat") ? (
                       <p id="registerPasswordRepeatError" className={styles.errorMessage}>
                         {getFieldError("register", "passwordRepeat")}

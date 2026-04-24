@@ -9,6 +9,7 @@ import WalletPage from "./pages/WalletPage";
 import AuctionsPage from "./pages/AuctionsPage";
 import AuctionDetailsPage from "./pages/AuctionDetailsPage";
 import VerifyEmailPage from "./pages/VerifyEmailPage";
+import ResetPasswordPage from "./pages/ResetPasswordPage";
 
 function App() {
   const location = useLocation();
@@ -45,6 +46,7 @@ function App() {
           <Route path="/auction/history" element={<AuctionsPage />} />
           <Route path="/auction/:id" element={<AuctionDetailsPage />} />
           <Route path="/verify-email" element={<VerifyEmailPage />} />
+          <Route path="/reset-password" element={<ResetPasswordPage />} />
         </Routes>
       </div>
     </>

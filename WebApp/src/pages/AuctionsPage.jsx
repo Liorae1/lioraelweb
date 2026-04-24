@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import api from "../api/axios";
 import { getAllAuctions, getAuctionHistory } from "../api/auctions";
+import { getMyNotifications, markNotificationAsRead } from "../api/notifications";
 import Toast from "../components/Toast";
 import ThemeToggle from "../components/ThemeToggle";
 import { addAuctionToFavorites, removeAuctionFromFavorites } from "../api/profile";
@@ -18,6 +19,8 @@ import {
   normalizeAccountStatus,
 } from "../utils/domain";
 import { getAuctionMetaDateLabel, getAuctionPhase as resolveAuctionPhase } from "../utils/auctionPresentation";
+import useDeferredVisibility from "../hooks/useDeferredVisibility";
+import { getAuthToken, hasAuthToken } from "../utils/authStorage";
 import styles from "./AuctionsPage.module.css";
 const CATEGORY_OPTIONS = [
   { value: "clothing", label: "Одяг" },
@@ -58,18 +61,22 @@ function formatDate(value) {
   }).format(date);
 }
 
-function getAuctionPhase(auction, now) {
-  return resolveAuctionPhase(auction, now);
+function formatNotificationTime(value) {
+  if (!value) return "";
+
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "";
+
+  return new Intl.DateTimeFormat("uk-UA", {
+    day: "2-digit",
+    month: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+  }).format(date);
 }
 
-function getStatusLabel(auction, now) {
-  const phase = getAuctionPhase(auction, now);
-
-  if (phase === "active") return "Актуальний";
-  if (phase === "planned") return "Запланований";
-  if (phase === "closed") return "Завершений";
-
-  return "Лот";
+function getAuctionPhase(auction, now) {
+  return resolveAuctionPhase(auction, now);
 }
 
 function getTimeBadge(auction, now) {
@@ -153,7 +160,7 @@ function isAuctionEarlyAccess(auction, now) {
 }
 
 async function requestCurrentUser() {
-  const token = localStorage.getItem("token");
+  const token = getAuthToken();
 
   if (!token) {
     return null;
@@ -170,6 +177,9 @@ function AuctionsPage() {
   const [auctions, setAuctions] = useState([]);
   const [currentUser, setCurrentUser] = useState(null);
   const [wallet, setWallet] = useState(null);
+  const [notifications, setNotifications] = useState([]);
+  const [notificationsLoading, setNotificationsLoading] = useState(false);
+  const [notificationsOpen, setNotificationsOpen] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [search, setSearch] = useState("");
@@ -178,11 +188,34 @@ function AuctionsPage() {
   const [accessFilter, setAccessFilter] = useState("all");
   const [sortMode, setSortMode] = useState("closest");
   const [now, setNow] = useState(Date.now());
+  const showTransitionOverlay = useDeferredVisibility(loading && auctions.length > 0, 120, 260);
+  const showInitialLoading = loading && auctions.length === 0;
 
   useEffect(() => {
     const timer = window.setInterval(() => setNow(Date.now()), 1000);
     return () => window.clearInterval(timer);
   }, []);
+
+  const loadNotifications = async ({ silent = false } = {}) => {
+    if (!hasAuthToken()) {
+      setNotifications([]);
+      return;
+    }
+
+    try {
+      if (!silent) {
+        setNotificationsLoading(true);
+      }
+
+      const items = await getMyNotifications();
+      setNotifications(items.filter((item) => !item?.isRead));
+    } catch (err) {
+      console.error("Failed to load auction notifications:", err);
+      setNotifications([]);
+    } finally {
+      setNotificationsLoading(false);
+    }
+  };
 
   useEffect(() => {
     if (!error) return;
@@ -205,6 +238,11 @@ function AuctionsPage() {
         setAuctions(auctionsResponse);
         setCurrentUser(currentUserData);
         setWallet(walletData);
+        if (currentUserData) {
+          loadNotifications({ silent: true });
+        } else {
+          setNotifications([]);
+        }
       } catch (err) {
         console.error(err);
         setError(err?.response?.data?.message || "Не вдалося завантажити аукціони.");
@@ -233,6 +271,7 @@ function AuctionsPage() {
 
     const handleAuthChange = () => {
       syncCurrentUser();
+      loadNotifications({ silent: true });
     };
 
     window.addEventListener("authChanged", handleAuthChange);
@@ -243,6 +282,47 @@ function AuctionsPage() {
       window.removeEventListener("storage", handleAuthChange);
     };
   }, []);
+
+  const resolveNotificationTarget = (notification) => {
+    if (notification?.targetUrl) {
+      return notification.targetUrl;
+    }
+
+    if (notification?.auctionId) {
+      return `/auction/${notification.auctionId}`;
+    }
+
+    return "/profile";
+  };
+
+  const openNotificationTarget = (target) => {
+    if (!target) {
+      navigate("/profile");
+      return;
+    }
+
+    if (/^https?:\/\//i.test(target)) {
+      window.location.assign(target);
+      return;
+    }
+
+    navigate(target);
+  };
+
+  const handleNotificationClick = async (notification) => {
+    const target = resolveNotificationTarget(notification);
+
+    try {
+      if (notification?.id) {
+        await markNotificationAsRead(notification.id);
+      }
+    } catch (err) {
+      console.error("Failed to mark auction notification as read:", err);
+    } finally {
+      setNotifications((current) => current.filter((item) => item.id !== notification.id));
+      openNotificationTarget(target);
+    }
+  };
 
   const categories = useMemo(() => {
     return CATEGORY_OPTIONS;
@@ -378,7 +458,7 @@ function AuctionsPage() {
     }
   };
 
-  if (loading) {
+  if (showInitialLoading) {
     return (
       <div className={styles.page}>
         <div className={styles.layout}>
@@ -472,6 +552,74 @@ function AuctionsPage() {
               </div>
             </div>
 
+            <section className={styles.notificationsPanel} aria-labelledby="auction-notifications-title">
+              <button
+                type="button"
+                className={styles.notificationsToggle}
+                aria-expanded={notificationsOpen}
+                aria-controls="auction-sidebar-notifications"
+                onClick={() => setNotificationsOpen((current) => !current)}
+              >
+                <span id="auction-notifications-title" className={styles.notificationsTitle}>
+                  Сповіщення
+                </span>
+                <span className={styles.notificationsToggleMeta}>
+                  <span className={styles.notificationsCount}>
+                    {notifications.length}
+                  </span>
+                  <span
+                    className={`${styles.notificationsChevron} ${
+                      notificationsOpen ? styles.notificationsChevronOpen : ""
+                    }`}
+                    aria-hidden="true"
+                  >
+                    <svg viewBox="0 0 20 20">
+                      <path d="m5 7.5 5 5 5-5" />
+                    </svg>
+                  </span>
+                </span>
+              </button>
+
+              {notificationsOpen ? (
+                <div id="auction-sidebar-notifications">
+                  {currentUser ? (
+                    notificationsLoading ? (
+                      <div className={styles.notificationsEmpty}>Завантаження сповіщень...</div>
+                    ) : notifications.length > 0 ? (
+                      <div className={styles.notificationsList}>
+                        {notifications.map((notification) => (
+                          <button
+                            key={notification.id}
+                            type="button"
+                            className={`${styles.notificationItem} ${styles.notificationItemUnread}`}
+                            onClick={() => handleNotificationClick(notification)}
+                          >
+                            <span className={styles.notificationTitle}>
+                              {notification.title || "Сповіщення"}
+                            </span>
+                            <span className={styles.notificationText}>
+                              {notification.message || "Нове оновлення для вашого акаунта."}
+                            </span>
+                            <span className={styles.notificationTime}>
+                              {formatNotificationTime(notification.createdAt)}
+                            </span>
+                          </button>
+                        ))}
+                      </div>
+                    ) : (
+                      <div className={styles.notificationsEmpty}>
+                        Непрочитаних сповіщень немає
+                      </div>
+                    )
+                  ) : (
+                    <div className={styles.notificationsEmpty}>
+                      Увійдіть в акаунт, щоб бачити сповіщення
+                    </div>
+                  )}
+                </div>
+              ) : null}
+            </section>
+
             <nav className={styles.sidebarNav} aria-label="Навігація сторінкою">
               {navItems.map((item) => {
                 const isActive =
@@ -495,7 +643,7 @@ function AuctionsPage() {
 
         <main className={styles.content}>
           <section className={styles.hero}>
-            <div className={styles.heroMain}>
+            <div className={`${styles.heroMain} ${showTransitionOverlay ? styles.contentSwitching : ""}`}>
               <span className={styles.kicker}>Каталог аукціонів</span>
               <h1 className={styles.title}>
                 {isHistoryView ? "Історія аукціонів" : "Аукціони"}
@@ -503,7 +651,7 @@ function AuctionsPage() {
             </div>
           </section>
 
-          <section className={styles.statsStrip}>
+          <section className={`${styles.statsStrip} ${showTransitionOverlay ? styles.contentSwitching : ""}`}>
             <div className={styles.heroStat}>
               <span>Усього аукціонів</span>
               <strong>{auctions.length}</strong>
@@ -522,7 +670,7 @@ function AuctionsPage() {
             </div>
           </section>
 
-          <section className={styles.filtersPanel}>
+          <section className={`${styles.filtersPanel} ${showTransitionOverlay ? styles.contentSwitching : ""}`}>
             <div className={styles.filtersTop}>
               <div>
                 <h2 className={styles.sectionTitle}>
@@ -651,127 +799,139 @@ function AuctionsPage() {
             </div>
           ) : null}
 
-          {!filteredAuctions.length ? (
-            <div className={styles.empty}>
-              <span className={styles.emptyLabel}>Нічого не знайдено</span>
-              <h3>Під поточні параметри немає лотів</h3>
-              <p>Спробуйте інший статус, категорію або пошуковий запит, щоб побачити більше результатів.</p>
-            </div>
-          ) : (
-            <div className={styles.grid}>
-              {filteredAuctions.map((auction) => {
-                const badge = getTimeBadge(auction, now);
-                const mainImage = getAuctionImage(auction);
-                const shortDescription = getShortDescription(auction);
-                const accessBadge = getAccessBadge(auction);
-                const isEarlyAccess = isAuctionEarlyAccess(auction, now);
-                const accessMessage =
-                  auction?.accessDeniedMessage ||
-                  (accessBadge.tone === "private"
-                    ? "Цей аукціон доступний лише для користувачів рівня Private."
-                    : accessBadge.tone === "elite"
-                      ? "Ця функція доступна для статусу Elite або Private."
-                      : "");
+          <section className={styles.catalogStage}>
+            {showTransitionOverlay ? (
+              <div className={styles.catalogOverlay} aria-hidden="true">
+                <div className={styles.catalogOverlayBadge}>
+                  {isHistoryView ? "Показуємо завершені торги" : "Показуємо актуальні торги"}
+                </div>
+              </div>
+            ) : null}
 
-                return (
-                  <article key={auction.id} className={styles.card}>
-                    <div className={styles.cardMedia}>
-                      <div className={styles.cardMediaInner}>
-                      {mainImage ? (
-                        <img
-                          src={mainImage}
-                          alt={auction.title}
-                          className={styles.cardImage}
-                        />
-                      ) : (
-                        <div className={styles.noImage}>Немає фото</div>
-                      )}
-                      </div>
+            <div className={showTransitionOverlay ? styles.catalogContentMuted : styles.catalogContent}>
+              {!filteredAuctions.length ? (
+                <div className={styles.empty}>
+                  <span className={styles.emptyLabel}>Нічого не знайдено</span>
+                  <h3>Під поточні параметри немає лотів</h3>
+                  <p>Спробуйте інший статус, категорію або пошуковий запит, щоб побачити більше результатів.</p>
+                </div>
+              ) : (
+                <div className={styles.grid}>
+                  {filteredAuctions.map((auction) => {
+                    const badge = getTimeBadge(auction, now);
+                    const mainImage = getAuctionImage(auction);
+                    const shortDescription = getShortDescription(auction);
+                    const accessBadge = getAccessBadge(auction);
+                    const isEarlyAccess = isAuctionEarlyAccess(auction, now);
+                    const accessMessage =
+                      auction?.accessDeniedMessage ||
+                      (accessBadge.tone === "private"
+                        ? "Цей аукціон доступний лише для користувачів рівня Private."
+                        : accessBadge.tone === "elite"
+                          ? "Ця функція доступна для статусу Elite або Private."
+                          : "");
 
-                      <div className={styles.cardTopline}>
-                        <span
-                          className={`${styles.statusBadge} ${
-                            accessBadge.tone === "private"
-                              ? styles.statusBadgePrivate
-                              : accessBadge.tone === "elite"
-                                ? styles.statusBadgeElite
-                                : ""
-                          }`}
-                        >
-                          {accessBadge.shortLabel}
-                        </span>
-                        <span
-                          className={`${styles.timerBadge} ${
-                            badge.tone === "danger" ? styles.timerDanger : ""
-                          }`}
-                        >
-                          {badge.label}
-                        </span>
-                      </div>
+                    return (
+                      <article key={auction.id} className={styles.card}>
+                        <div className={styles.cardMedia}>
+                          <div className={styles.cardMediaInner}>
+                          {mainImage ? (
+                            <img
+                              src={mainImage}
+                              alt={auction.title}
+                              className={styles.cardImage}
+                            />
+                          ) : (
+                            <div className={styles.noImage}>Немає фото</div>
+                          )}
+                          </div>
 
-                      <button
-                        type="button"
-                        className={`${styles.favoriteButton} ${
-                          auction.isFavorite ? styles.favoriteButtonActive : ""
-                        }`}
-                        onClick={(event) =>
-                          handleFavoriteToggle(event, auction.id, auction.isFavorite)
-                        }
-                        aria-label={
-                          auction.isFavorite ? "Прибрати з обраного" : "Додати в обране"
-                        }
-                      >
-                        {auction.isFavorite ? "♥" : "♡"}
-                      </button>
-                    </div>
+                          <div className={styles.cardTopline}>
+                            <span
+                              className={`${styles.statusBadge} ${
+                                accessBadge.tone === "private"
+                                  ? styles.statusBadgePrivate
+                                  : accessBadge.tone === "elite"
+                                    ? styles.statusBadgeElite
+                                    : ""
+                              }`}
+                            >
+                              {accessBadge.shortLabel}
+                            </span>
+                            <span
+                              className={`${styles.timerBadge} ${
+                                badge.tone === "danger" ? styles.timerDanger : ""
+                              }`}
+                            >
+                              {badge.label}
+                            </span>
+                          </div>
 
-                    <div className={styles.cardBody}>
-                      <div className={styles.cardCopy}>
-                        <div className={styles.brandLine}>{auction.brand || "Добірний лот"}</div>
-                        <h3 className={styles.cardTitle}>{auction.title}</h3>
-                        {shortDescription ? (
-                          <p className={styles.cardDescription}>{shortDescription}</p>
-                        ) : null}
-                      </div>
-
-                      <div className={styles.cardStats}>
-                        <div className={styles.priceTile}>
-                          <span>{getAuctionMetaDateLabel(auction, now)}</span>
-                          <strong>{formatDate(auction.startTime)}</strong>
+                          <button
+                            type="button"
+                            className={`${styles.favoriteButton} ${
+                              auction.isFavorite ? styles.favoriteButtonActive : ""
+                            }`}
+                            onClick={(event) =>
+                              handleFavoriteToggle(event, auction.id, auction.isFavorite)
+                            }
+                            aria-label={
+                              auction.isFavorite ? "Прибрати з обраного" : "Додати в обране"
+                            }
+                          >
+                            {auction.isFavorite ? "♥" : "♡"}
+                          </button>
                         </div>
-                        <div className={styles.priceTile}>
-                          <span>Ціна</span>
-                          <strong>
-                            {formatMoneyWithCurrency(
-                              auction.currentPrice || auction.currentBid || 0,
-                              auction.currency || "UAH"
-                            )}
-                          </strong>
+
+                        <div className={styles.cardBody}>
+                          <div className={styles.cardCopy}>
+                            <div className={styles.brandLine}>{auction.brand || "Добірний лот"}</div>
+                            <h3 className={styles.cardTitle}>{auction.title}</h3>
+                            {shortDescription ? (
+                              <p className={styles.cardDescription}>{shortDescription}</p>
+                            ) : null}
+                          </div>
+
+                          <div className={styles.cardStats}>
+                            <div className={styles.priceTile}>
+                              <span>{getAuctionMetaDateLabel(auction, now)}</span>
+                              <strong>{formatDate(auction.startTime)}</strong>
+                            </div>
+                            <div className={styles.priceTile}>
+                              <span>Ціна</span>
+                              <strong>
+                                {formatMoneyWithCurrency(
+                                  auction.currentPrice || auction.currentBid || 0,
+                                  auction.currency || "UAH"
+                                )}
+                              </strong>
+                            </div>
+                          </div>
+
+                          <div className={styles.cardMeta}>
+                            <span>{getCategoryLabel(auction.category)}</span>
+                            <span>{getLocalizedCondition(auction.condition)}</span>
+                            <span>{getLocalizedSize(auction.size)}</span>
+                            {isEarlyAccess ? <span>Ранній доступ</span> : null}
+                          </div>
+
+                          {accessMessage && !auction?.canCurrentUserAccess ? (
+                            <p className={styles.cardAccessNote}>{accessMessage}</p>
+                          ) : null}
+
+                          <div className={styles.cardFooter}>
+                            <Link to={`/auction/${auction.id}`} className={styles.openLink}>
+                              Переглянути лот
+                            </Link>
+                          </div>
                         </div>
-                      </div>
-
-                      <div className={styles.cardMeta}>
-                        <span>{getCategoryLabel(auction.category)}</span>
-                        <span>{getLocalizedCondition(auction.condition)}</span>
-                        <span>{getLocalizedSize(auction.size)}</span>
-                        {isEarlyAccess ? <span>Ранній доступ</span> : null}
-                      </div>
-
-                      {accessMessage && !auction?.canCurrentUserAccess ? (
-                        <p className={styles.cardAccessNote}>{accessMessage}</p>
-                      ) : null}
-
-                      <div className={styles.cardFooter}>
-                        <Link to={`/auction/${auction.id}`} className={styles.openLink}>
-                          Переглянути лот
-                        </Link>
-                      </div>
-                    </div>
-                  </article>
-                );
-              })}
+                      </article>
+                    );
+                  })}
+                </div>
+              )}
             </div>
-          )}
+          </section>
         </main>
       </div>
     </div>

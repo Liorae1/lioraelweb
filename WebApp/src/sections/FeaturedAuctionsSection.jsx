@@ -18,6 +18,7 @@ import {
 function FeaturedAuctionsSection({ auctions, loading, error }) {
   const { ref, isVisible } = useReveal();
   const [now, setNow] = useState(0);
+  const loadingCards = Array.from({ length: 3 }, (_, index) => index);
 
   useEffect(() => {
     const timer = window.setInterval(() => setNow(Date.now()), 1000);
@@ -43,19 +44,39 @@ function FeaturedAuctionsSection({ auctions, loading, error }) {
 
         <div className={styles.grid}>
           {loading ? (
-            <article className={styles.card}>
-              <div className={styles.image}></div>
+            loadingCards.map((card) => (
+              <article key={card} className={`${styles.card} ${styles.cardLoading}`} aria-hidden="true">
+                <div className={`${styles.imageFrame} ${styles.loadingBlock}`}></div>
                 <div className={styles.content}>
                   <div className={styles.brandRow}>
-                    <div className={styles.brand}>Завантаження</div>
-                    <span className={styles.statusChip}>...</span>
+                    <div className={`${styles.loadingLine} ${styles.loadingLineShort}`}></div>
+                    <span className={`${styles.statusChip} ${styles.loadingChip}`}></span>
                   </div>
-                <h3 className={styles.cardTitle}>Підтягуємо заплановані аукціони</h3>
-                <p className={styles.metaText}>
-                  На головній сторінці тут показуються тільки майбутні торги.
-                </p>
-              </div>
-            </article>
+                  <div className={`${styles.loadingLine} ${styles.loadingLineTitle}`}></div>
+                  <div className={`${styles.loadingLine} ${styles.loadingLineTitleSmall}`}></div>
+                  <div className={`${styles.loadingLine} ${styles.loadingLineMeta}`}></div>
+
+                  <div className={styles.infoRow}>
+                    <div className={styles.loadingInfoBlock}>
+                      <div className={`${styles.loadingLine} ${styles.loadingLineLabel}`}></div>
+                      <div className={`${styles.loadingLine} ${styles.loadingLineValue}`}></div>
+                    </div>
+                    <div className={styles.loadingInfoBlock}>
+                      <div className={`${styles.loadingLine} ${styles.loadingLineLabel}`}></div>
+                      <div className={`${styles.loadingLine} ${styles.loadingLineValue}`}></div>
+                    </div>
+                  </div>
+
+                  <div className={styles.metaRow}>
+                    <span className={`${styles.loadingPill} ${styles.loadingBlock}`}></span>
+                    <span className={`${styles.loadingPill} ${styles.loadingBlock}`}></span>
+                    <span className={`${styles.loadingPill} ${styles.loadingBlock}`}></span>
+                  </div>
+
+                  <div className={`${styles.bidButton} ${styles.loadingButton}`} />
+                </div>
+              </article>
+            ))
           ) : auctions.length ? (
             auctions.map((item) => {
               const imageUrl = getAuctionImage(item);

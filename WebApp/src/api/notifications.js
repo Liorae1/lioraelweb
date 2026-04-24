@@ -1,4 +1,5 @@
 import api from "./axios";
+import { hasAuthToken } from "../utils/authStorage";
 
 function normalizeNotifications(payload) {
   if (Array.isArray(payload)) {
@@ -29,7 +30,7 @@ function normalizeNotification(item) {
 }
 
 export async function getMyNotifications() {
-  if (!localStorage.getItem("token")) {
+  if (!hasAuthToken()) {
     return [];
   }
 
@@ -38,7 +39,7 @@ export async function getMyNotifications() {
 }
 
 export async function getMyUnreadNotificationsCount() {
-  if (!localStorage.getItem("token")) {
+  if (!hasAuthToken()) {
     return 0;
   }
 
