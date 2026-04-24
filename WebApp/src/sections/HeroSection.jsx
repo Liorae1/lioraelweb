@@ -73,13 +73,7 @@ function HeroSection({ auction, stats, loading, error }) {
         <div className={`${styles.visual} fade-in-up`}>
           <div className={styles.visualImageWrap}>
             <img src={brandImage} alt="Liorael" className={styles.visualImage} />
-            {loading && (
-              <div className={styles.visualLoadingGlass} aria-hidden="true">
-                <span className={styles.visualLoadingBadge}>Оновлюємо каталог</span>
-              </div>
-            )}
           </div>
-          {!loading && !error && plannedInfo && <p className={styles.visualNote}>Найближчий акцент: {plannedInfo}</p>}
         </div>
       </div>
     </section>
