@@ -283,35 +283,7 @@ function AuctionsPage() {
     };
   }, []);
 
-  const resolveNotificationTarget = (notification) => {
-    if (notification?.targetUrl) {
-      return notification.targetUrl;
-    }
-
-    if (notification?.auctionId) {
-      return `/auction/${notification.auctionId}`;
-    }
-
-    return "/profile";
-  };
-
-  const openNotificationTarget = (target) => {
-    if (!target) {
-      navigate("/profile");
-      return;
-    }
-
-    if (/^https?:\/\//i.test(target)) {
-      window.location.assign(target);
-      return;
-    }
-
-    navigate(target);
-  };
-
   const handleNotificationClick = async (notification) => {
-    const target = resolveNotificationTarget(notification);
-
     try {
       if (notification?.id) {
         await markNotificationAsRead(notification.id);
@@ -320,7 +292,6 @@ function AuctionsPage() {
       console.error("Failed to mark auction notification as read:", err);
     } finally {
       setNotifications((current) => current.filter((item) => item.id !== notification.id));
-      openNotificationTarget(target);
     }
   };
 

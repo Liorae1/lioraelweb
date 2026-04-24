@@ -215,37 +215,7 @@ function Header() {
     }).format(date);
   };
 
-  const resolveNotificationTarget = (notification) => {
-    if (notification?.targetUrl) {
-      return notification.targetUrl;
-    }
-
-    if (notification?.auctionId) {
-      return `/auction/${notification.auctionId}`;
-    }
-
-    return "/profile";
-  };
-
-  const openNotificationTarget = (target) => {
-    if (!target) {
-      navigate("/profile");
-      return;
-    }
-
-    const isExternalTarget = /^https?:\/\//i.test(target);
-
-    if (isExternalTarget) {
-      window.location.assign(target);
-      return;
-    }
-
-    navigate(target);
-  };
-
   const handleNotificationClick = async (notification) => {
-    const target = resolveNotificationTarget(notification);
-
     try {
       if (!notification?.isRead && notification?.id) {
         await markNotificationAsRead(notification.id);
@@ -254,8 +224,6 @@ function Header() {
       console.error("Failed to mark notification as read:", error);
     } finally {
       setNotifications((current) => current.filter((item) => item.id !== notification.id));
-      setNotificationsOpen(false);
-      openNotificationTarget(target);
     }
   };
 
