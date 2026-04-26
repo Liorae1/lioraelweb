@@ -896,6 +896,44 @@
   }
 }
 
+@media (max-width: 480px) {
+  .authSection {
+    padding: 14px 10px 24px;
+  }
+
+  .authContainer {
+    border-radius: 20px;
+  }
+
+  .sidePanel,
+  .formPanel {
+    padding: 22px 16px;
+  }
+
+  .sideTitle {
+    font-size: 28px;
+  }
+
+  .formTitle {
+    font-size: 24px;
+  }
+
+  .modeSwitcher {
+    padding: 4px;
+  }
+
+  .modeButton,
+  .submitButton,
+  .secondaryButton {
+    min-height: 48px;
+  }
+
+  .verifyModal {
+    padding: 22px 18px;
+    border-radius: 18px;
+  }
+}
+
 .verifyOverlay {
   position: fixed;
   inset: 0;

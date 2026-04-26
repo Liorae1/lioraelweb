@@ -29,6 +29,7 @@ function clearAuthState() {
 function Header() {
   const [user, setUser] = useState(null);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const [notificationsOpen, setNotificationsOpen] = useState(false);
   const [loading, setLoading] = useState(true);
   const [wallet, setWallet] = useState(null);
@@ -40,6 +41,14 @@ function Header() {
   const navigate = useNavigate();
   const userControlsRef = useRef(null);
   const menuRef = useRef(null);
+  const mobileMenuRef = useRef(null);
+  const mobileToggleRef = useRef(null);
+
+  const navLinks = [
+    { to: "/", label: "Головна" },
+    { to: "/auction", label: "Аукціони" },
+    { to: "/about", label: "Про платформу" },
+  ];
 
   const getAuthConfig = () => {
     const token = getAuthToken();
@@ -121,6 +130,12 @@ function Header() {
         setMenuOpen(false);
       }
 
+      if (mobileMenuRef.current && !mobileMenuRef.current.contains(event.target)) {
+        if (!mobileToggleRef.current || !mobileToggleRef.current.contains(event.target)) {
+          setMobileNavOpen(false);
+        }
+      }
+
       if (
         userControlsRef.current &&
         !userControlsRef.current.contains(event.target)
@@ -150,9 +165,16 @@ function Header() {
     }
   }, [notificationsOpen]);
 
+  useEffect(() => {
+    setMenuOpen(false);
+    setMobileNavOpen(false);
+    setNotificationsOpen(false);
+  }, [location.pathname]);
+
   const handleLogout = () => {
     clearAuthToken();
     setMenuOpen(false);
+    setMobileNavOpen(false);
     setNotificationsOpen(false);
     setUser(null);
     setWallet(null);
@@ -245,30 +267,36 @@ function Header() {
         </Link>
 
         <nav className={styles.nav}>
-          <Link
-            to="/"
-            className={`${styles.link} ${isActive("/") ? styles.active : ""}`}
-          >
-            Головна
-          </Link>
-
-          <Link
-            to="/auction"
-            className={`${styles.link} ${isActive("/auction") ? styles.active : ""}`}
-          >
-            Аукціони
-          </Link>
-
-          <Link
-            to="/about"
-            className={`${styles.link} ${isActive("/about") ? styles.active : ""}`}
-          >
-            Про платформу
-          </Link>
+          {navLinks.map((item) => (
+            <Link
+              key={item.to}
+              to={item.to}
+              className={`${styles.link} ${isActive(item.to) ? styles.active : ""}`}
+            >
+              {item.label}
+            </Link>
+          ))}
         </nav>
 
         <div className={styles.actions}>
           <ThemeToggle />
+
+          <button
+            ref={mobileToggleRef}
+            type="button"
+            className={styles.menuToggle}
+            aria-label={mobileNavOpen ? "Закрити меню" : "Відкрити меню"}
+            aria-expanded={mobileNavOpen}
+            onClick={() => {
+              setMobileNavOpen((prev) => !prev);
+              setMenuOpen(false);
+              setNotificationsOpen(false);
+            }}
+          >
+            <span className={`${styles.menuBar} ${mobileNavOpen ? styles.menuBarTopOpen : ""}`}></span>
+            <span className={`${styles.menuBar} ${mobileNavOpen ? styles.menuBarMiddleOpen : ""}`}></span>
+            <span className={`${styles.menuBar} ${mobileNavOpen ? styles.menuBarBottomOpen : ""}`}></span>
+          </button>
 
           {!loading && isAuth ? (
             <div className={styles.userControls} ref={userControlsRef}>
@@ -453,6 +481,63 @@ function Header() {
           )}
         </div>
       </div>
+
+      {mobileNavOpen && (
+        <div className={styles.mobileMenu} ref={mobileMenuRef}>
+          <nav className={styles.mobileMenuLinks} aria-label="Мобільна навігація">
+            {navLinks.map((item) => (
+              <Link
+                key={item.to}
+                to={item.to}
+                className={`${styles.mobileMenuLink} ${isActive(item.to) ? styles.active : ""}`}
+                onClick={() => setMobileNavOpen(false)}
+              >
+                {item.label}
+              </Link>
+            ))}
+          </nav>
+
+          <div className={styles.mobileMenuActions}>
+            {isAuth ? (
+              <>
+                <Link
+                  to="/profile"
+                  className={styles.mobileMenuCard}
+                  onClick={() => setMobileNavOpen(false)}
+                >
+                  <span className={styles.mobileMenuMeta}>Профіль</span>
+                  <strong>{nickname}</strong>
+                </Link>
+                <Link
+                  to="/wallet"
+                  className={styles.mobileMenuCard}
+                  onClick={() => setMobileNavOpen(false)}
+                >
+                  <span className={styles.mobileMenuMeta}>Гаманець</span>
+                  <strong>{balanceLabel}</strong>
+                </Link>
+                <button
+                  type="button"
+                  className={styles.mobileMenuCard}
+                  onClick={handleLogout}
+                >
+                  <span className={styles.mobileMenuMeta}>Сесія</span>
+                  <strong>Вийти</strong>
+                </button>
+              </>
+            ) : (
+              <Link
+                to="/auth"
+                className={styles.mobileMenuCard}
+                onClick={() => setMobileNavOpen(false)}
+              >
+                <span className={styles.mobileMenuMeta}>Доступ</span>
+                <strong>Увійти або зареєструватися</strong>
+              </Link>
+            )}
+          </div>
+        </div>
+      )}
     </header>
   );
 }

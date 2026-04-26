@@ -798,6 +798,185 @@
   transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
 }
 
+.privilegeShowcase {
+  display: grid;
+  gap: 22px;
+}
+
+.privilegeSpotlight {
+  padding: 28px;
+  border-radius: 30px;
+  border: 1px solid color-mix(in srgb, var(--accent) 22%, var(--border-color));
+  background:
+    radial-gradient(circle at top right, color-mix(in srgb, var(--accent) 22%, transparent), transparent 28%),
+    linear-gradient(
+      135deg,
+      color-mix(in srgb, var(--surface-strong) 96%, transparent),
+      color-mix(in srgb, var(--surface) 92%, transparent)
+    );
+  box-shadow: var(--shadow-soft);
+  display: grid;
+  gap: 22px;
+}
+
+.privilegeSpotlightHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.privilegeSpotlightEyebrow,
+.privilegeCtaEyebrow,
+.privilegeStateBadge {
+  display: inline-flex;
+  align-items: center;
+  width: fit-content;
+  padding: 8px 12px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.privilegeSpotlightEyebrow,
+.privilegeCtaEyebrow {
+  background: color-mix(in srgb, var(--surface-strong) 92%, transparent);
+  border: 1px solid color-mix(in srgb, var(--accent) 22%, var(--border-color));
+  color: var(--accent);
+}
+
+.privilegeSpotlightCode {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 56px;
+  height: 56px;
+  padding: 0 14px;
+  border-radius: 18px;
+  background: linear-gradient(135deg, var(--accent) 0%, var(--accent-soft) 100%);
+  color: #fff;
+  font-size: 1rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  box-shadow: 0 12px 28px color-mix(in srgb, var(--accent) 22%, transparent);
+}
+
+.privilegeSpotlightCode svg {
+  width: 24px;
+  height: 24px;
+}
+
+.privilegeSpotlightBody {
+  display: grid;
+  gap: 10px;
+  max-width: 780px;
+}
+
+.privilegeSpotlightBody strong {
+  font-size: clamp(1.7rem, 4vw, 2.5rem);
+  line-height: 1.1;
+  color: var(--text-primary);
+  letter-spacing: -0.04em;
+}
+
+.privilegeSpotlightBody p {
+  margin: 0;
+  color: var(--text-secondary);
+  line-height: 1.75;
+  font-size: 15px;
+}
+
+.privilegeSpotlightFooter {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.privilegeMetric {
+  min-height: 102px;
+  padding: 18px 20px;
+  border-radius: 22px;
+  border: 1px solid var(--border-color);
+  background: color-mix(in srgb, var(--surface-strong) 88%, transparent);
+}
+
+.privilegeMetric span {
+  display: block;
+  margin-bottom: 8px;
+  color: var(--text-secondary);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.privilegeMetric strong {
+  color: var(--text-primary);
+  line-height: 1.5;
+  font-size: 15px;
+}
+
+.privilegeRail {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(260px, 1fr);
+  gap: 16px;
+  overflow-x: auto;
+  padding-bottom: 6px;
+  scroll-snap-type: x proximity;
+}
+
+.privilegeStoryCard {
+  min-height: 260px;
+  padding: 22px;
+  border-radius: 26px;
+  border: 1px solid var(--border-color);
+  background:
+    radial-gradient(circle at top right, color-mix(in srgb, var(--accent) 12%, transparent), transparent 30%),
+    color-mix(in srgb, var(--surface-strong) 94%, transparent);
+  box-shadow: var(--shadow-soft);
+  display: grid;
+  gap: 16px;
+  align-content: start;
+  scroll-snap-align: start;
+  transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+}
+
+.privilegeStoryCard:hover {
+  transform: translateY(-4px);
+  border-color: color-mix(in srgb, var(--accent) 42%, transparent);
+  box-shadow: 0 16px 30px rgba(0, 0, 0, 0.1);
+}
+
+.privilegeStoryCardActive {
+  border-color: color-mix(in srgb, #2f8f68 36%, var(--border-color));
+}
+
+.privilegeStoryCardMuted {
+  background:
+    radial-gradient(circle at top right, color-mix(in srgb, var(--text-secondary) 10%, transparent), transparent 34%),
+    color-mix(in srgb, var(--surface-strong) 90%, transparent);
+}
+
+.privilegeStoryCardNumeric {
+  background:
+    radial-gradient(circle at top right, color-mix(in srgb, var(--accent) 18%, transparent), transparent 32%),
+    linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--surface-strong) 94%, transparent),
+      color-mix(in srgb, var(--surface) 92%, transparent)
+    );
+}
+
+.privilegeStoryTop {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+}
+
 .privilegeCard:hover {
   transform: translateY(-3px);
   border-color: color-mix(in srgb, var(--accent) 42%, transparent);
@@ -816,6 +995,17 @@
   font-size: 1.15rem;
   font-weight: 800;
   box-shadow: 0 10px 22px color-mix(in srgb, var(--accent) 18%, transparent);
+}
+
+.privilegeIcon svg {
+  width: 24px;
+  height: 24px;
+}
+
+.privilegeStateBadge {
+  background: color-mix(in srgb, var(--surface-strong) 90%, transparent);
+  border: 1px solid var(--border-color);
+  color: var(--text-secondary);
 }
 
 .privilegeContent {
@@ -853,11 +1043,44 @@
   color: var(--accent);
 }
 
+.privilegeStoryTitle {
+  display: block;
+  color: var(--text-primary);
+  font-size: 1.1rem;
+  line-height: 1.45;
+  font-weight: 700;
+}
+
 .privilegeHint {
   margin: 0;
   color: var(--text-secondary);
   font-size: 14px;
   line-height: 1.65;
+}
+
+.privilegeCtaBar {
+  padding: 20px 22px;
+  border-radius: 24px;
+  border: 1px solid var(--border-color);
+  background:
+    linear-gradient(
+      135deg,
+      color-mix(in srgb, var(--surface-strong) 94%, transparent),
+      color-mix(in srgb, var(--surface) 96%, transparent)
+    );
+  box-shadow: var(--shadow-soft);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+}
+
+.privilegeCtaBar strong {
+  display: block;
+  margin-top: 10px;
+  color: var(--text-primary);
+  font-size: 1.05rem;
+  line-height: 1.5;
 }
 
 .quickAccessGrid {
@@ -1685,6 +1908,21 @@
   overflow: hidden;
 }
 
+.upgradeCardTop {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  min-height: 40px;
+}
+
+.statusRibbonSlot {
+  display: flex;
+  justify-content: flex-end;
+  align-items: flex-start;
+  min-width: 172px;
+}
+
 .currentSubscription {
   border-color: color-mix(in srgb, var(--accent) 54%, transparent);
   box-shadow:
@@ -1693,7 +1931,6 @@
 }
 
 .statusRibbon {
-  position: static;
   width: fit-content;
   border-radius: 999px;
   background: rgba(184, 138, 103, 0.12);
@@ -1735,6 +1972,7 @@
 
 .upgradeHeader {
   display: block;
+  min-height: 126px;
 }
 
 .upgradeHeader h3 {
@@ -1907,6 +2145,15 @@
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
+  .privilegeSpotlightFooter {
+    grid-template-columns: 1fr;
+  }
+
+  .privilegeCtaBar {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
   .upgradeGrid {
     grid-template-columns: 1fr;
   }
@@ -1918,6 +2165,10 @@
 
   .upgradeCard:hover {
     transform: translateY(-4px) !important;
+  }
+
+  .upgradeHeader {
+    min-height: 0;
   }
 
   .upgradeContainer {
@@ -2036,6 +2287,26 @@
     grid-template-columns: 1fr;
   }
 
+  .privilegeSpotlightHeader,
+  .privilegeStoryTop {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .privilegeRail {
+    grid-auto-columns: minmax(78%, 1fr);
+  }
+
+  .upgradeCardTop {
+    flex-direction: column;
+    align-items: flex-start;
+    min-height: 0;
+  }
+
+  .statusRibbonSlot {
+    min-width: 0;
+  }
+
   .privilegeCard {
     grid-template-columns: 1fr;
   }
@@ -2060,5 +2331,91 @@
   .heroActions > * {
     width: 100%;
     justify-content: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .profilePage {
+    padding: 16px 10px 28px;
+  }
+
+  .heroCard,
+  .statCard,
+  .panel,
+  .loadingHero,
+  .loadingPanel,
+  .fullscreenCard,
+  .upgradeContainer,
+  .settingsSection,
+  .avatarEditorCard,
+  .formColumn,
+  .overlayContent,
+  .settingsCard,
+  .subscriptionSummaryCard,
+  .checkoutCard {
+    padding: 16px;
+    border-radius: 20px;
+  }
+
+  .bigAvatar,
+  .loadingAvatar {
+    width: 84px;
+    height: 84px;
+  }
+
+  .bigAvatar {
+    font-size: 30px;
+  }
+
+  .userName {
+    font-size: 26px;
+  }
+
+  .balanceValue,
+  .statValue,
+  .upgradePrice {
+    font-size: 24px;
+  }
+
+  .heroButtons,
+  .cardActionsRow,
+  .checkoutActions {
+    flex-direction: column;
+  }
+
+  .cardActionsRow > .secondaryButton,
+  .cardActionsRow > .primaryButton,
+  .checkoutActions > *,
+  .heroButtons > *,
+  .heroMetaAction,
+  .primaryButton,
+  .secondaryButton,
+  .quickActionButton,
+  .backArrowButton {
+    width: 100%;
+  }
+
+  .sectionTabs {
+    padding: 8px;
+    gap: 8px;
+  }
+
+  .sectionTab {
+    flex-basis: 100%;
+  }
+
+  .auctionCollection,
+  .loadingGrid,
+  .loadingStats {
+    grid-template-columns: 1fr;
+  }
+
+  .auctionCardMedia {
+    height: 220px;
+  }
+
+  .input,
+  .textarea {
+    padding-inline: 14px;
   }
 }

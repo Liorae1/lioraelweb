@@ -8,7 +8,6 @@ import AvatarUpload from "../components/AvatarUpload";
 import {
   getMyFavorites,
   purchaseSubscription,
-  progressWinningDelivery,
   requestWinningDelivery,
 } from "../api/profile";
 import { getMyWallet } from "../api/wallet";
@@ -18,6 +17,7 @@ import {
   normalizeAccountStatus,
   formatMoney,
   formatMoneyWithCurrency,
+  getAuctionIdentifier,
   getAuctionLeaderProfile,
   getAuctionImage,
   getDeliveryStatusLabel,
@@ -54,8 +54,7 @@ const normalizeAuctionCollection = (items) =>
 const isUnauthorizedError = (error) => error?.response?.status === 401;
 
 const getAuctionCardKey = (auction, index) =>
-  auction?.id ||
-  auction?.auctionId ||
+  getAuctionIdentifier(auction) ||
   `${auction?.title || "auction"}-${auction?.brand || "item"}-${index}`;
 
 const formatBirthDateShort = (value) => {
@@ -150,6 +149,89 @@ const profileSections = [
   { id: "accountSettings", label: "Акаунт" },
   { id: "upgrade", label: "Статуси" },
 ];
+
+function PrivilegeIcon({ type }) {
+  switch (type) {
+    case "earlyAccess":
+      return (
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true">
+          <circle cx="12" cy="12" r="8" />
+          <path d="M12 7v5l3 2" strokeLinecap="round" strokeLinejoin="round" />
+          <path d="M16.5 5.5 18 4" strokeLinecap="round" />
+        </svg>
+      );
+    case "closedAuctionAccess":
+      return (
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true">
+          <rect x="5" y="11" width="14" height="9" rx="2.5" />
+          <path d="M8.5 11V8.8a3.5 3.5 0 1 1 7 0V11" strokeLinecap="round" />
+          <circle cx="12" cy="15.5" r="1.2" fill="currentColor" stroke="none" />
+        </svg>
+      );
+    case "elevatedLimits":
+      return (
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true">
+          <path d="M7 17V9" strokeLinecap="round" />
+          <path d="M12 17V6" strokeLinecap="round" />
+          <path d="M17 17v-4" strokeLinecap="round" />
+          <path d="m15 8 2-2 2 2" strokeLinecap="round" strokeLinejoin="round" />
+        </svg>
+      );
+    case "exclusiveOffers":
+      return (
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true">
+          <path
+            d="m12 4 2.2 4.5 5 .7-3.6 3.5.9 5-4.5-2.4-4.5 2.4.9-5L4.8 9.2l5-.7L12 4Z"
+            strokeLinejoin="round"
+          />
+        </svg>
+      );
+    case "activeBidLimit":
+      return (
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true">
+          <rect x="5" y="6" width="14" height="3.2" rx="1.6" />
+          <rect x="5" y="10.4" width="14" height="3.2" rx="1.6" />
+          <rect x="5" y="14.8" width="14" height="3.2" rx="1.6" />
+          <path d="M8 7.6h.01M8 12h.01M8 16.4h.01" strokeLinecap="round" />
+        </svg>
+      );
+    default:
+      return null;
+  }
+}
+
+const privilegePresentation = {
+  earlyAccess: {
+    eyebrow: "Швидший старт",
+    title: "Ранній доступ до вибраних лотів",
+    activeText: "Ви бачите частину лотів раніше за інших учасників.",
+    inactiveText: "На цьому рівні ранній доступ ще не відкритий.",
+  },
+  closedAuctionAccess: {
+    eyebrow: "Закритий формат",
+    title: "Доступ до закритих аукціонів",
+    activeText: "Відкриваються лоти, які недоступні для базового рівня.",
+    inactiveText: "Закриті добірки поки приховані для цього статусу.",
+  },
+  elevatedLimits: {
+    eyebrow: "Більше свободи",
+    title: "Підвищені ліміти на участь",
+    activeText: "Можна активніше працювати з кількома ставками одночасно.",
+    inactiveText: "Ліміти поки залишаються базовими.",
+  },
+  exclusiveOffers: {
+    eyebrow: "Спецможливості",
+    title: "Ексклюзивні пропозиції платформи",
+    activeText: "Ви потрапляєте до сегмента з окремими персональними пропозиціями.",
+    inactiveText: "Ексклюзивні пропозиції ще не входять до поточного плану.",
+  },
+  activeBidLimit: {
+    eyebrow: "Контроль активності",
+    title: "Ліміт одночасно активних ставок",
+    activeText: "Поточний ліміт визначає, скільки лотів можна вести паралельно.",
+    inactiveText: "Ліміт буде показано після оновлення даних акаунта.",
+  },
+};
 
 function ProfilePage() {
   const navigate = useNavigate();
@@ -284,10 +366,17 @@ function ProfilePage() {
   };
 
   const handleDeliveryAction = async (auction) => {
-    try {
-      setDeliveryLoadingId(auction.id);
+    const auctionId = getAuctionIdentifier(auction);
 
-      await requestWinningDelivery(auction.id);
+    if (!auctionId) {
+      showToast("Не вдалося визначити ідентифікатор лота", "error");
+      return;
+    }
+
+    try {
+      setDeliveryLoadingId(auctionId);
+
+      await requestWinningDelivery(auctionId);
 
       await refreshUser();
       showToast("Доставку оформлено. Ваш товар буде доставлено найближчим часом.", "success");
@@ -510,6 +599,36 @@ function ProfilePage() {
   const privileges = getUserPrivileges(user);
   const activeStatus = statuses.find((status) => status.name === normalizedStatus) || statuses[0];
   const activeSubscription = user?.subscription || null;
+  const privilegeCards = privileges.map((item) => {
+    const meta = privilegePresentation[item.key];
+    const isBooleanValue = typeof item.value === "boolean";
+    const isEnabled = isBooleanValue ? item.value : Boolean(item.value && item.value !== "—");
+    const displayValue = isBooleanValue ? (item.value ? "Увімкнено" : "Недоступно") : item.value;
+
+    return {
+      ...item,
+      ...meta,
+      isBooleanValue,
+      isEnabled,
+      displayValue,
+      summary: isBooleanValue
+        ? item.value
+          ? meta?.activeText
+          : meta?.inactiveText
+        : meta?.activeText,
+    };
+  });
+  const featuredPrivilege =
+    privilegeCards.find((item) => item.key === "closedAuctionAccess" && item.isEnabled) ||
+    privilegeCards.find((item) => item.key === "earlyAccess" && item.isEnabled) ||
+    privilegeCards.find((item) => item.key === "activeBidLimit") ||
+    privilegeCards[0];
+  const unlockedPrivilegesCount = privilegeCards.filter(
+    (item) => item.isBooleanValue && item.isEnabled
+  ).length;
+  const hasLockedPrivileges = privilegeCards.some(
+    (item) => item.isBooleanValue && !item.isEnabled
+  );
 
   if (loading) {
     return (
@@ -759,47 +878,98 @@ function ProfilePage() {
             <div className={styles.panel}>
               <div className={styles.panelHeader}>
                 <div>
-                  <h2>Мої привілеї</h2>
+                  <h2>Переваги рівня {activeStatus.label}</h2>
                   <p className={styles.sectionDescription}>
-                    Окремий розділ з усіма можливостями поточного рівня доступу.
+                    Вітрина можливостей вашого статусу у форматі, який швидко пояснює цінність доступу.
                   </p>
                 </div>
               </div>
 
-              <div className={styles.accountSnapshot}>
-                {privileges.map((item) => {
-                  const isBooleanValue = typeof item.value === "boolean";
-                  const resolvedValue = isBooleanValue ? (item.value ? "Так" : "Ні") : item.value;
+              <div className={styles.privilegeShowcase}>
+                <article className={styles.privilegeSpotlight}>
+                  <div className={styles.privilegeSpotlightHeader}>
+                    <span className={styles.privilegeSpotlightEyebrow}>Головна перевага</span>
+                    <span className={styles.privilegeSpotlightCode}>
+                      <PrivilegeIcon type={featuredPrivilege?.key} />
+                    </span>
+                  </div>
+                  <div className={styles.privilegeSpotlightBody}>
+                    <strong>{featuredPrivilege?.title}</strong>
+                    <p>{featuredPrivilege?.summary}</p>
+                  </div>
+                  <div className={styles.privilegeSpotlightFooter}>
+                    <div className={styles.privilegeMetric}>
+                      <span>Відкрито переваг</span>
+                      <strong>{unlockedPrivilegesCount}/4</strong>
+                    </div>
+                    <div className={styles.privilegeMetric}>
+                      <span>Активні ставки</span>
+                      <strong>
+                        {privilegeCards.find((item) => item.key === "activeBidLimit")?.displayValue || "—"}
+                      </strong>
+                    </div>
+                    <div className={styles.privilegeMetric}>
+                      <span>Рекомендація</span>
+                      <strong>{hasLockedPrivileges ? "Є куди зростати" : "Максимум можливостей"}</strong>
+                    </div>
+                  </div>
+                </article>
 
-                  return (
-                    <article key={item.key} className={styles.privilegeCard}>
-                      <div className={styles.privilegeIcon} aria-hidden="true">
-                        {isBooleanValue ? (item.value ? "✓" : "•") : "#"}
+                <div className={styles.privilegeRail}>
+                  {privilegeCards.map((item) => (
+                    <article
+                      key={item.key}
+                      className={`${styles.privilegeStoryCard} ${
+                        item.isEnabled ? styles.privilegeStoryCardActive : styles.privilegeStoryCardMuted
+                      } ${!item.isBooleanValue ? styles.privilegeStoryCardNumeric : ""}`}
+                    >
+                      <div className={styles.privilegeStoryTop}>
+                        <div className={styles.privilegeIcon} aria-hidden="true">
+                          <PrivilegeIcon type={item.key} />
+                        </div>
+                        <span className={styles.privilegeStateBadge}>
+                          {item.isBooleanValue
+                            ? item.isEnabled
+                              ? "Доступно"
+                              : "Недоступно"
+                            : "Поточний ліміт"}
+                        </span>
                       </div>
                       <div className={styles.privilegeContent}>
-                        <span className={styles.privilegeLabel}>{item.label}</span>
+                        <span className={styles.privilegeLabel}>{item.eyebrow}</span>
+                        <strong className={styles.privilegeStoryTitle}>{item.title}</strong>
                         <strong
                           className={`${styles.privilegeValue} ${
-                            isBooleanValue
-                              ? item.value
+                            item.isBooleanValue
+                              ? item.isEnabled
                                 ? styles.privilegeValuePositive
                                 : styles.privilegeValueMuted
                               : styles.privilegeValueNumeric
                           }`}
                         >
-                          {resolvedValue}
+                          {item.displayValue}
                         </strong>
-                        <p className={styles.privilegeHint}>
-                          {isBooleanValue
-                            ? item.value
-                              ? "Функція вже входить у ваш поточний рівень доступу."
-                              : "Ця перевага поки недоступна на вашому рівні."
-                            : "Поточне обмеження для одночасно активних ставок."}
-                        </p>
+                        <p className={styles.privilegeHint}>{item.summary}</p>
                       </div>
                     </article>
-                  );
-                })}
+                  ))}
+                </div>
+
+                {hasLockedPrivileges ? (
+                  <div className={styles.privilegeCtaBar}>
+                    <div>
+                      <span className={styles.privilegeCtaEyebrow}>Більше можливостей</span>
+                      <strong>Підвищіть статус, щоб відкрити всі переваги платформи.</strong>
+                    </div>
+                    <button
+                      type="button"
+                      className={styles.secondaryButton}
+                      onClick={() => setView("upgrade")}
+                    >
+                      Переглянути підписки
+                    </button>
+                  </div>
+                ) : null}
               </div>
             </div>
           </section>
@@ -863,36 +1033,46 @@ function ProfilePage() {
                 <div className={styles.emptyStateCard}>У вибраному поки немає лотів.</div>
               ) : (
                 <div className={styles.auctionCollection}>
-                  {favoriteAuctions.map((auction, index) => (
-                    <article key={getAuctionCardKey(auction, index)} className={styles.auctionCard}>
-                      <div className={styles.auctionCardMedia}>
-                        {getAuctionImage(auction) ? (
-                          <img
-                            src={getAuctionImage(auction)}
-                            alt={auction.title}
-                            className={styles.auctionCardImage}
-                          />
-                        ) : (
-                          <div className={styles.auctionCardPlaceholder}>Немає фото</div>
-                        )}
-                      </div>
-                      <div className={styles.auctionCardBody}>
-                        <h3>{auction.title}</h3>
-                        <p>{auction.brand || auction.category || "Аукціон"}</p>
-                        <strong>
-                          {formatMoneyWithCurrency(
-                            auction.currentPrice || auction.startPrice,
-                            auction.currency || currency
+                  {favoriteAuctions.map((auction, index) => {
+                    const auctionId = getAuctionIdentifier(auction);
+
+                    return (
+                      <article key={getAuctionCardKey(auction, index)} className={styles.auctionCard}>
+                        <div className={styles.auctionCardMedia}>
+                          {getAuctionImage(auction) ? (
+                            <img
+                              src={getAuctionImage(auction)}
+                              alt={auction.title}
+                              className={styles.auctionCardImage}
+                            />
+                          ) : (
+                            <div className={styles.auctionCardPlaceholder}>Немає фото</div>
                           )}
-                        </strong>
-                        <div className={styles.cardActionsRow}>
-                          <Link to={`/auction/${auction.id}`} className={styles.secondaryButton}>
-                            Відкрити лот
-                          </Link>
                         </div>
-                      </div>
-                    </article>
-                  ))}
+                        <div className={styles.auctionCardBody}>
+                          <h3>{auction.title}</h3>
+                          <p>{auction.brand || auction.category || "Аукціон"}</p>
+                          <strong>
+                            {formatMoneyWithCurrency(
+                              auction.currentPrice || auction.startPrice,
+                              auction.currency || currency
+                            )}
+                          </strong>
+                          <div className={styles.cardActionsRow}>
+                            {auctionId ? (
+                              <Link to={`/auction/${auctionId}`} className={styles.secondaryButton}>
+                                Відкрити лот
+                              </Link>
+                            ) : (
+                              <button type="button" className={styles.secondaryButton} disabled>
+                                Лот недоступний
+                              </button>
+                            )}
+                          </div>
+                        </div>
+                      </article>
+                    );
+                  })}
                 </div>
               )}
             </div>
@@ -916,6 +1096,7 @@ function ProfilePage() {
               ) : (
                 <div className={styles.auctionCollection}>
                   {wonAuctions.map((auction, index) => {
+                    const auctionId = getAuctionIdentifier(auction);
                     const leader = getAuctionLeaderProfile(auction);
 
                     return (
@@ -946,17 +1127,23 @@ function ProfilePage() {
                             {getDeliveryDisplayLabel(auction.deliveryStatus, auction.canRequestDelivery)}
                           </span>
                           <div className={styles.cardActionsRow}>
-                            <Link to={`/auction/${auction.id}`} className={styles.secondaryButton}>
-                              Відкрити лот
-                            </Link>
+                            {auctionId ? (
+                              <Link to={`/auction/${auctionId}`} className={styles.secondaryButton}>
+                                Відкрити лот
+                              </Link>
+                            ) : (
+                              <button type="button" className={styles.secondaryButton} disabled>
+                                Лот недоступний
+                              </button>
+                            )}
                             {auction.canRequestDelivery && (
                               <button
                                 type="button"
                                 className={styles.primaryButton}
                                 onClick={() => handleDeliveryAction(auction)}
-                                disabled={deliveryLoadingId === auction.id}
+                                disabled={deliveryLoadingId === auctionId}
                               >
-                                {deliveryLoadingId === auction.id
+                                {deliveryLoadingId === auctionId
                                   ? "Оновлення..."
                                   : "Оформити доставку"}
                               </button>
@@ -1262,11 +1449,14 @@ function ProfilePage() {
                         status.accent === "private" ? styles.upgradeCardVip : ""
                       }`}
                     >
-                      {normalizedStatus === status.name && (
-                        <div className={styles.statusRibbon}>АКТИВНА ПІДПИСКА</div>
-                      )}
-
-                      <span className={styles.planKicker}>{status.kicker}</span>
+                      <div className={styles.upgradeCardTop}>
+                        <span className={styles.planKicker}>{status.kicker}</span>
+                        <div className={styles.statusRibbonSlot}>
+                          {normalizedStatus === status.name ? (
+                            <div className={styles.statusRibbon}>АКТИВНА ПІДПИСКА</div>
+                          ) : null}
+                        </div>
+                      </div>
 
                       <div className={styles.upgradeHeader}>
                         <div>

@@ -3,14 +3,11 @@ import styles from "./HeroSection.module.css";
 import { useParallax } from "../hooks/useParallax";
 import brandImage from "../app/images/heroImg.jpg";
 
-function HeroSection({ auction, stats, loading, error }) {
+function HeroSection({ stats, loading }) {
   const slowOffset = useParallax(0.12);
   const totalLots = stats?.totalLots ?? 0;
   const totalBids = stats?.totalBids ?? 0;
   const activeAuctions = stats?.activeAuctions ?? 0;
-  const plannedTitle = auction?.title?.trim();
-  const plannedBrand = auction?.brand?.trim();
-  const plannedInfo = [plannedBrand, plannedTitle].filter(Boolean).join(" • ");
 
   return (
     <section className={styles.section}>

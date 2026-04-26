@@ -407,3 +407,37 @@
     min-width: 0;
   }
 }
+
+@media (max-width: 480px) {
+  .main {
+    padding: 18px 10px 40px;
+    gap: 16px;
+  }
+
+  .hero,
+  .card {
+    padding: 18px 16px;
+    border-radius: 20px;
+  }
+
+  .identity,
+  .loadingIdentity {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .avatar,
+  .loadingAvatar {
+    width: 84px;
+    height: 84px;
+  }
+
+  .grid {
+    grid-template-columns: 1fr;
+  }
+
+  .walletCard,
+  .loadingWalletCard {
+    padding: 16px;
+  }
+}

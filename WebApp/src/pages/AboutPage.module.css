@@ -428,3 +428,52 @@
     padding: 24px;
   }
 }
+
+@media (max-width: 480px) {
+  .hero,
+  .aboutSection,
+  .stepsSection,
+  .faqSection {
+    padding-inline: 14px;
+  }
+
+  .hero {
+    padding-top: 48px;
+    padding-bottom: 56px;
+  }
+
+  .heroContainer,
+  .aboutGrid,
+  .stepsGrid {
+    gap: 16px;
+  }
+
+  .title {
+    font-size: 30px;
+    line-height: 1.08;
+  }
+
+  .text,
+  .sectionIntro,
+  .faqIntro {
+    font-size: 15px;
+    line-height: 1.7;
+  }
+
+  .sectionTitle,
+  .faqTitle {
+    font-size: 28px;
+  }
+
+  .aboutCard,
+  .stepCard,
+  .faqItem {
+    padding: 20px;
+    border-radius: 20px;
+  }
+
+  .faqButton {
+    font-size: 18px;
+    gap: 12px;
+  }
+}
