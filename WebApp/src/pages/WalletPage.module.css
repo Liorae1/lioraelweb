@@ -646,3 +646,58 @@
     width: 100%;
   }
 }
+
+@media (max-width: 480px) {
+  .page {
+    padding: 18px 10px 44px;
+  }
+
+  .heroMain,
+  .heroAside,
+  .metricCard,
+  .workspace,
+  .topUpSection,
+  .panel,
+  .loadingCard,
+  .sidebar {
+    padding: 16px;
+    border-radius: 20px;
+  }
+
+  .heroMain h1 {
+    font-size: 1.9rem;
+    line-height: 1.05;
+  }
+
+  .profileTop {
+    align-items: flex-start;
+  }
+
+  .profileSummary,
+  .quickButtons,
+  .featureGrid,
+  .shortcutGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .topUpControls input,
+  .primaryButton,
+  .refreshButton,
+  .quickButton,
+  .secondaryLink,
+  .navButton {
+    min-height: 48px;
+  }
+
+  .metricCard strong,
+  .featureCard strong,
+  .shortcutCard strong {
+    font-size: 1.1rem;
+  }
+
+  .profileAvatar {
+    width: 54px;
+    height: 54px;
+    border-radius: 18px;
+  }
+}

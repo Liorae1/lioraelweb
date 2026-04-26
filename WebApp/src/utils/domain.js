@@ -100,6 +100,7 @@ export function normalizeAuctionEntity(auction) {
 
   return {
     ...auction,
+    id: getAuctionIdentifier(auction),
     images: normalizeAuctionImages(auction.images),
     leader: auction?.leader
       ? { ...auction.leader, avatarUrl: normalizeMediaUrl(auction.leader.avatarUrl) }
@@ -224,6 +225,14 @@ export function getPersonProfile(person, fallbackLabel = "Користувач")
 
 export function getAuctionLeaderProfile(auction) {
   return getPersonProfile(auction?.leader || auction?.currentLeader || null, "Лідер ще не визначений");
+}
+
+export function getAuctionIdentifier(auction) {
+  if (!auction || typeof auction !== "object") {
+    return "";
+  }
+
+  return auction.id || auction.auctionId || auction?.auction?.id || auction?.auction?.auctionId || "";
 }
 
 export function getBidderProfile(bid) {

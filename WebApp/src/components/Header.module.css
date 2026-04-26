@@ -84,6 +84,40 @@
   gap: 16px;
 }
 
+.menuToggle {
+  display: none;
+  width: 46px;
+  height: 46px;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 5px;
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
+  background: var(--surface-strong);
+  box-shadow: var(--shadow-soft);
+}
+
+.menuBar {
+  width: 18px;
+  height: 2px;
+  border-radius: 999px;
+  background: var(--text-primary);
+  transition: transform 0.25s ease, opacity 0.25s ease;
+}
+
+.menuBarTopOpen {
+  transform: translateY(7px) rotate(45deg);
+}
+
+.menuBarMiddleOpen {
+  opacity: 0;
+}
+
+.menuBarBottomOpen {
+  transform: translateY(-7px) rotate(-45deg);
+}
+
 .userControls {
   position: relative;
   display: flex;
@@ -461,6 +495,42 @@
   transform: translateX(2px);
 }
 
+.mobileMenu {
+  display: none;
+}
+
+.mobileMenuLinks,
+.mobileMenuActions {
+  display: grid;
+  gap: 10px;
+}
+
+.mobileMenuLink,
+.mobileMenuCard {
+  width: 100%;
+  padding: 14px 16px;
+  border-radius: 18px;
+  border: 1px solid var(--border-color);
+  background: var(--surface-strong);
+  color: var(--text-primary);
+  text-align: left;
+  box-shadow: var(--shadow-soft);
+}
+
+.mobileMenuLink {
+  font-weight: 600;
+}
+
+.mobileMenuMeta {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
 .active {
   color: var(--accent-color, #d6b36a);
 }
@@ -472,6 +542,22 @@
 
   .nav {
     display: none;
+  }
+
+  .menuToggle {
+    display: inline-flex;
+  }
+
+  .authButton {
+    display: none;
+  }
+
+  .mobileMenu {
+    display: grid;
+    gap: 14px;
+    padding: 0 18px 18px;
+    border-top: 1px solid var(--border-color);
+    background: var(--header-bg);
   }
 }
 
@@ -501,5 +587,64 @@
   .notificationsPopover {
     right: 0;
     width: min(300px, calc(100vw - 32px));
+  }
+}
+
+@media (max-width: 480px) {
+  .container {
+    padding: 14px;
+    gap: 12px;
+  }
+
+  .subtitle {
+    display: none;
+  }
+
+  .logo {
+    font-size: 22px;
+    letter-spacing: 0.18em;
+  }
+
+  .actions {
+    gap: 10px;
+  }
+
+  .notificationButton,
+  .menuToggle {
+    width: 42px;
+    height: 42px;
+  }
+
+  .profileButton {
+    min-height: 42px;
+    padding: 6px 8px;
+  }
+
+  .avatar {
+    width: 34px;
+    height: 34px;
+    font-size: 13px;
+  }
+
+  .crownBadge {
+    top: -10px;
+    right: -4px;
+  }
+
+  .notificationsPopover {
+    position: fixed;
+    top: 72px;
+    left: 12px;
+    right: 12px;
+    width: auto;
+  }
+
+  .dropdown {
+    right: 0;
+    min-width: min(210px, calc(100vw - 24px));
+  }
+
+  .mobileMenu {
+    padding: 0 14px 14px;
   }
 }

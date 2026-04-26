@@ -5,7 +5,6 @@ import Toast from "../components/Toast";
 import { getAuctionBids, getAuctionById } from "../api/auctions";
 import {
   addAuctionToFavorites,
-  progressWinningDelivery,
   removeAuctionFromFavorites,
   requestWinningDelivery,
 } from "../api/profile";

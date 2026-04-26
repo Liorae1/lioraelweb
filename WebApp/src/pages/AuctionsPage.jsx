@@ -159,6 +159,28 @@ function isAuctionEarlyAccess(auction, now) {
   return Boolean(earlyAccessStart && !Number.isNaN(earlyAccessStart) && earlyAccessStart <= now);
 }
 
+function getAccessFilterOptions(accountStatus) {
+  switch (accountStatus) {
+    case "Private":
+      return [
+        { id: "all", label: "Усі добірки" },
+        { id: "member", label: "Базові" },
+        { id: "elite", label: "Elite" },
+        { id: "private", label: "Private" },
+        { id: "early", label: "Ранній доступ" },
+      ];
+    case "Elite":
+      return [
+        { id: "all", label: "Усі добірки" },
+        { id: "member", label: "Базові" },
+        { id: "elite", label: "Elite" },
+        { id: "early", label: "Ранній доступ" },
+      ];
+    default:
+      return [];
+  }
+}
+
 async function requestCurrentUser() {
   const token = getAuthToken();
 
@@ -386,7 +408,26 @@ function AuctionsPage() {
   const statusMeta = getAccountStatusMeta(currentUser?.status);
   const isPremiumUser = normalizedStatus === "Elite";
   const isVipUser = normalizedStatus === "Private";
+  const accessFilterOptions = useMemo(
+    () => getAccessFilterOptions(normalizedStatus),
+    [normalizedStatus]
+  );
+  const shouldShowAccessFilter = accessFilterOptions.length > 0;
   const shouldShowLoginAction = !currentUser && /увійти/i.test(error);
+
+  useEffect(() => {
+    if (!shouldShowAccessFilter && accessFilter !== "all") {
+      setAccessFilter("all");
+      return;
+    }
+
+    if (
+      shouldShowAccessFilter &&
+      !accessFilterOptions.some((item) => item.id === accessFilter)
+    ) {
+      setAccessFilter("all");
+    }
+  }, [accessFilter, accessFilterOptions, shouldShowAccessFilter]);
 
   const navItems = [
     { label: "Головна", path: "/" },
@@ -690,27 +731,22 @@ function AuctionsPage() {
               ))}
             </div>
 
-            <div className={styles.filterChips}>
-              {[
-                { id: "all", label: "Усі рівні" },
-                { id: "accessible", label: "Доступні мені" },
-                { id: "member", label: "Member" },
-                { id: "elite", label: "Elite" },
-                { id: "private", label: "Private" },
-                { id: "early", label: "Ранній доступ" },
-              ].map((item) => (
-                <button
-                  key={item.id}
-                  type="button"
-                  className={`${styles.filterChip} ${
-                    accessFilter === item.id ? styles.filterChipActive : ""
-                  }`}
-                  onClick={() => setAccessFilter(item.id)}
-                >
-                  {item.label}
-                </button>
-              ))}
-            </div>
+            {shouldShowAccessFilter ? (
+              <div className={styles.filterChips}>
+                {accessFilterOptions.map((item) => (
+                  <button
+                    key={item.id}
+                    type="button"
+                    className={`${styles.filterChip} ${
+                      accessFilter === item.id ? styles.filterChipActive : ""
+                    }`}
+                    onClick={() => setAccessFilter(item.id)}
+                  >
+                    {item.label}
+                  </button>
+                ))}
+              </div>
+            ) : null}
 
             <div className={styles.filterChips}>
               <button

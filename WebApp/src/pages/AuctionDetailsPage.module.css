@@ -672,3 +672,90 @@
     align-items: flex-start;
   }
 }
+
+@media (max-width: 480px) {
+  .page {
+    padding: 18px 10px 48px;
+  }
+
+  .hero,
+  .infoGrid,
+  .timelineSection {
+    gap: 14px;
+  }
+
+  .visualStage,
+  .commandPanel,
+  .infoCard,
+  .timelineSection,
+  .loadingCard,
+  .notFound {
+    border-radius: 20px;
+  }
+
+  .visualStage,
+  .commandPanel,
+  .infoCard,
+  .timelineSection {
+    padding: 16px;
+  }
+
+  .headingBlock h1 {
+    font-size: 1.85rem;
+    line-height: 1.02;
+  }
+
+  .mainImage,
+  .mainImagePlaceholder {
+    height: 260px;
+    border-radius: 20px;
+  }
+
+  .thumbnailRail {
+    gap: 8px;
+  }
+
+  .thumbnailActive img,
+  .thumbnailMuted img {
+    height: 72px;
+  }
+
+  .statusBadge,
+  .liveBadge,
+  .leadingBadge {
+    min-height: 34px;
+    padding: 0 12px;
+    font-size: 0.72rem;
+  }
+
+  .heroCard,
+  .summaryTile,
+  .descriptionCard,
+  .userDock,
+  .bidPanel {
+    padding: 14px 16px;
+    border-radius: 18px;
+  }
+
+  .quickBidRow,
+  .actionButtons,
+  .deliveryActions {
+    grid-template-columns: 1fr;
+  }
+
+  .quickBidButton,
+  .primaryButton,
+  .secondaryButton {
+    width: 100%;
+    min-height: 48px;
+  }
+
+  .field input {
+    height: 50px;
+    padding: 0 14px;
+  }
+
+  .timelineItem {
+    gap: 10px;
+  }
+}

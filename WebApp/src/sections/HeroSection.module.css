@@ -306,3 +306,49 @@
     max-height: 420px;
   }
 }
+
+@media (max-width: 480px) {
+  .section {
+    padding: 46px 14px 60px;
+  }
+
+  .title {
+    font-size: 2.35rem;
+  }
+
+  .description {
+    font-size: 15px;
+    line-height: 1.65;
+  }
+
+  .actions {
+    gap: 12px;
+  }
+
+  .primaryButton,
+  .secondaryButton {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .statCard {
+    padding: 14px;
+    border-radius: 18px;
+  }
+
+  .visualImageWrap,
+  .visualImage {
+    border-radius: 22px;
+  }
+
+  .visualImage {
+    min-height: 240px;
+    max-height: 320px;
+  }
+
+  .visualLoadingGlass {
+    inset: auto 12px 12px 12px;
+    padding: 14px;
+    border-radius: 18px;
+  }
+}

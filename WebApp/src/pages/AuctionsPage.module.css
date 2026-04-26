@@ -1206,3 +1206,92 @@
     width: 100%;
   }
 }
+
+@media (max-width: 480px) {
+  .layout {
+    padding: 10px;
+    gap: 14px;
+  }
+
+  .sidebarShell,
+  .heroMain,
+  .filtersPanel,
+  .cardBody,
+  .profileCard,
+  .sidebarPanel,
+  .notificationsPanel,
+  .empty,
+  .error {
+    padding: 16px;
+    border-radius: 20px;
+  }
+
+  .hero {
+    gap: 14px;
+  }
+
+  .title {
+    font-size: 1.7rem;
+    line-height: 1.05;
+  }
+
+  .sectionTitle {
+    font-size: 1.15rem;
+  }
+
+  .brandBlock strong {
+    font-size: 1.15rem;
+  }
+
+  .profileTop {
+    align-items: flex-start;
+  }
+
+  .filterChip {
+    flex-basis: 100%;
+  }
+
+  .field input,
+  .field select {
+    min-height: 50px;
+    padding: 0 14px;
+  }
+
+  .grid {
+    gap: 14px;
+  }
+
+  .card {
+    border-radius: 22px;
+  }
+
+  .cardMedia {
+    aspect-ratio: 1 / 0.88;
+    max-height: 220px;
+  }
+
+  .cardTopline {
+    padding: 10px;
+    gap: 8px;
+  }
+
+  .cardTitle {
+    font-size: 1.18rem;
+  }
+
+  .cardFooter,
+  .resultsPill,
+  .filtersTop {
+    gap: 10px;
+  }
+
+  .statusBadge,
+  .timerBadge,
+  .cardMeta span {
+    font-size: 11px;
+  }
+
+  .openLink {
+    min-height: 46px;
+  }
+}
