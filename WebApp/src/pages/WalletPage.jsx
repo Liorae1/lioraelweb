@@ -10,10 +10,6 @@ import {
   getMyWalletTransactions,
 } from "../api/wallet";
 import styles from "./WalletPage.module.css";
-import {
-  getAccountStatusMeta,
-  normalizeAccountStatus,
-} from "../utils/domain";
 import { getAuthToken } from "../utils/authStorage";
 
 function formatPrice(value, currency = "UAH") {
@@ -89,13 +85,13 @@ function getSectionFromHash(hash) {
       return "transactions";
     case "#bids":
       return "bids";
-    case "#overview":
     default:
-      return "overview";
+      return "transactions";
   }
 }
 
 function WalletPage() {
+  const TRANSACTIONS_STEP = 5;
   const location = useLocation();
   const navigate = useNavigate();
   const [auth, setAuth] = useState(true);
@@ -105,6 +101,7 @@ function WalletPage() {
   const [profile, setProfile] = useState(null);
   const [wallet, setWallet] = useState(null);
   const [transactions, setTransactions] = useState([]);
+  const [visibleTransactionsCount, setVisibleTransactionsCount] = useState(TRANSACTIONS_STEP);
   const [topUpAmount, setTopUpAmount] = useState("1000");
   const [toast, setToast] = useState(null);
 
@@ -198,16 +195,15 @@ function WalletPage() {
     );
   }, [activeSection, transactions]);
 
-  const userDisplayName =
-    [profile?.firstName, profile?.lastName].filter(Boolean).join(" ") ||
-    profile?.userName ||
-    profile?.email ||
-    "Користувач";
-  const userAvatarLetter = userDisplayName.charAt(0).toUpperCase();
-  const normalizedStatus = normalizeAccountStatus(profile?.status);
-  const statusMeta = getAccountStatusMeta(profile?.status);
-  const isPremium = normalizedStatus === "Elite";
-  const isVip = normalizedStatus === "Private";
+  const visibleTransactions = useMemo(() => {
+    return sortedTransactions.slice(0, visibleTransactionsCount);
+  }, [sortedTransactions, visibleTransactionsCount]);
+
+  const hasMoreTransactions = visibleTransactionsCount < sortedTransactions.length;
+
+  useEffect(() => {
+    setVisibleTransactionsCount(TRANSACTIONS_STEP);
+  }, [activeSection]);
 
   const openSection = (section) => {
     navigate(`/wallet#${section}`);
@@ -252,79 +248,8 @@ function WalletPage() {
         <div className={styles.container}>
           <section className={styles.hero}>
             <div className={styles.heroMain}>
-              <span className={styles.kicker}>Гаманець</span>
-              <h1>Гаманець у розділеному форматі</h1>
-              <p>
-                Кожна задача в окремій секції: огляд, поповнення, резерви та транзакції.
-                Без змішування всього в один довгий екран.
-              </p>
+              <h1>Гаманець</h1>
             </div>
-
-            <aside className={styles.heroAside}>
-              <div className={styles.profileCard}>
-                <div className={styles.profileTop}>
-                  <div
-                    className={`${styles.profileAvatar} ${
-                      isVip ? styles.profileAvatarVip : isPremium ? styles.profileAvatarPremium : ""
-                    }`}
-                  >
-                    {isVip && (
-                      <span className={styles.profileAvatarCrown} aria-hidden="true">
-                        <svg viewBox="0 0 24 24" className={styles.profileAvatarCrownIcon}>
-                          <path d="M4 18 2.5 7.5l5.2 3.7L12 4l4.3 7.2 5.2-3.7L20 18H4Z" />
-                          <path d="M5 20h14" />
-                        </svg>
-                      </span>
-                    )}
-                    {profile?.avatarUrl ? (
-                      <img
-                        src={profile.avatarUrl}
-                        alt={userDisplayName}
-                        className={styles.profileAvatarImage}
-                      />
-                    ) : (
-                      userAvatarLetter
-                    )}
-                  </div>
-                  <div className={styles.profileMeta}>
-                    <span className={styles.cardLabel}>Користувач</span>
-                    <strong>{userDisplayName}</strong>
-                    <b>
-                      {profile?.userName ? `@${profile.userName}` : "Профіль"} • {statusMeta.label}
-                    </b>
-                  </div>
-                </div>
-
-                <div className={styles.profileSummary}>
-                  <div className={styles.profileStat}>
-                    <span>Доступно</span>
-                    <strong>{formatPrice(wallet?.availableBalance, wallet?.currency)}</strong>
-                  </div>
-                  <div className={styles.profileStat}>
-                    <span>У резерві</span>
-                    <strong>{formatPrice(wallet?.lockedBalance, wallet?.currency)}</strong>
-                  </div>
-                </div>
-
-                <div className={styles.heroActions}>
-                  <button
-                    type="button"
-                    className={styles.refreshButton}
-                    onClick={() => loadWalletData({ silent: true })}
-                    disabled={refreshing}
-                  >
-                    {refreshing ? "Оновлення..." : "Оновити дані"}
-                  </button>
-                  <button
-                    type="button"
-                    className={styles.quickButton}
-                    onClick={() => navigate("/profile")}
-                  >
-                    До профілю
-                  </button>
-                </div>
-              </div>
-            </aside>
           </section>
 
           {loading ? (
@@ -356,32 +281,23 @@ function WalletPage() {
             </section>
           ) : (
             <>
-              <section className={styles.metricsGrid}>
-                <article className={`${styles.metricCard} ${styles.metricCardPrimary}`}>
-                  <span>Доступно зараз</span>
+              <section className={styles.balanceGrid}>
+                <article className={`${styles.balanceCard} ${styles.balanceCardPrimary}`}>
+                  <span className={styles.cardLabel}>Доступно</span>
                   <strong>{formatPrice(wallet?.availableBalance, wallet?.currency)}</strong>
                 </article>
-                <article className={styles.metricCard}>
-                  <span>Загальний баланс</span>
-                  <strong>{formatPrice(wallet?.balance, wallet?.currency)}</strong>
-                </article>
-                <article className={styles.metricCard}>
-                  <span>У резерві</span>
+                <article className={styles.balanceCard}>
+                  <span className={styles.cardLabel}>У резерві</span>
                   <strong>{formatPrice(wallet?.lockedBalance, wallet?.currency)}</strong>
+                </article>
+                <article className={styles.balanceCard}>
+                  <span className={styles.cardLabel}>Всього</span>
+                  <strong>{formatPrice(wallet?.balance, wallet?.currency)}</strong>
                 </article>
               </section>
 
               <section className={styles.workspace}>
                 <aside className={styles.sidebar}>
-                  <button
-                    type="button"
-                    className={`${styles.navButton} ${
-                      activeSection === "overview" ? styles.navButtonActive : ""
-                    }`}
-                    onClick={() => openSection("overview")}
-                  >
-                    Огляд
-                  </button>
                   <button
                     type="button"
                     className={`${styles.navButton} ${
@@ -421,103 +337,10 @@ function WalletPage() {
                 </aside>
 
                 <div className={styles.stage}>
-                  {activeSection === "overview" && (
-                    <section className={styles.overviewGrid}>
-                      <article className={styles.panel}>
-                        <div className={styles.panelHeader}>
-                          <div>
-                            <h2>Огляд гаманця</h2>
-                            <p>Основні суми та останні рухи без перевантаження екрана.</p>
-                          </div>
-                        </div>
-
-                        <div className={styles.featureGrid}>
-                          <div className={styles.featureCard}>
-                            <span className={styles.cardLabel}>Доступно</span>
-                            <strong>{formatPrice(wallet?.availableBalance, wallet?.currency)}</strong>
-                            <b>Гроші для нових ставок і покупок.</b>
-                          </div>
-                          <div className={styles.featureCard}>
-                            <span className={styles.cardLabel}>У резерві</span>
-                            <strong>{formatPrice(wallet?.lockedBalance, wallet?.currency)}</strong>
-                            <b>Заблоковано вашими активними лідерськими ставками.</b>
-                          </div>
-                          <div className={styles.featureCard}>
-                            <span className={styles.cardLabel}>Всього</span>
-                            <strong>{formatPrice(wallet?.balance, wallet?.currency)}</strong>
-                            <b>Повний баланс акаунта разом із резервами.</b>
-                          </div>
-                          <div className={styles.featureCard}>
-                            <span className={styles.cardLabel}>Остання операція</span>
-                            <strong>
-                              {sortedTransactions[0]
-                                ? getTransactionLabel(sortedTransactions[0].type)
-                                : "Немає"}
-                            </strong>
-                            <b>
-                              {sortedTransactions[0]
-                                ? getSignedAmount(
-                                    sortedTransactions[0].type,
-                                    sortedTransactions[0].amount,
-                                    wallet?.currency
-                                  )
-                                : "Історія ще порожня"}
-                            </b>
-                          </div>
-                        </div>
-                      </article>
-
-                      <article className={styles.panel}>
-                        <div className={styles.panelHeader}>
-                          <div>
-                            <h2>Швидкі дії</h2>
-                            <p>Кожен сценарій винесений окремо, щоб блоки не наїжджали один на одного.</p>
-                          </div>
-                        </div>
-
-                        <div className={styles.shortcutGrid}>
-                          <button
-                            type="button"
-                            className={styles.shortcutCard}
-                            onClick={() => openSection("topup")}
-                          >
-                            <strong>Поповнити баланс</strong>
-                            <span>Окрема форма поповнення та швидкі суми.</span>
-                          </button>
-                          <button
-                            type="button"
-                            className={styles.shortcutCard}
-                            onClick={() => openSection("locks")}
-                          >
-                            <strong>Переглянути резерви</strong>
-                            <span>Активні блокування по лідерських ставках.</span>
-                          </button>
-                          <button
-                            type="button"
-                            className={styles.shortcutCard}
-                            onClick={() => openSection("transactions")}
-                          >
-                            <strong>Відкрити історію</strong>
-                            <span>Усі операції гаманця в одному чистому списку.</span>
-                          </button>
-                          <button
-                            type="button"
-                            className={styles.shortcutCard}
-                            onClick={() => openSection("bids")}
-                          >
-                            <strong>Операції по ставках</strong>
-                            <span>Резерви, повернення і покупки без зайвого шуму.</span>
-                          </button>
-                        </div>
-                      </article>
-                    </section>
-                  )}
-
                   {activeSection === "topup" && (
                     <section className={styles.topUpSection}>
                       <div>
                         <h2>Тестове поповнення</h2>
-                        <p>Окрема секція тільки для поповнення, без змішування з історією та резервами.</p>
                       </div>
 
                       <form
@@ -565,7 +388,6 @@ function WalletPage() {
                       <div className={styles.panelHeader}>
                         <div>
                           <h2>Активні резерви</h2>
-                          <p>Суми, які зараз заблоковані лідерськими ставками.</p>
                         </div>
                         <Link to="/auction" className={styles.secondaryLink}>
                           До аукціонів
@@ -605,11 +427,6 @@ function WalletPage() {
                       <div className={styles.panelHeader}>
                         <div>
                           <h2>{activeSection === "bids" ? "Мої ставки та рух коштів" : "Транзакції"}</h2>
-                          <p>
-                            {activeSection === "bids"
-                              ? "Показані тільки операції, пов’язані зі ставками: резерв, повернення резерву та покупка."
-                              : "Deposit, BidLock, BidRefund та Purchase з уже готового бекенду."}
-                          </p>
                         </div>
                       </div>
 
@@ -620,8 +437,9 @@ function WalletPage() {
                             : "Транзакцій поки немає."}
                         </div>
                       ) : (
-                        <div className={styles.transactions}>
-                          {sortedTransactions.map((transaction, index) => (
+                        <>
+                          <div className={styles.transactions}>
+                            {visibleTransactions.map((transaction, index) => (
                             <article
                               key={transaction.id || `${transaction.type}-${transaction.createdAt || index}`}
                               className={styles.transactionItem}
@@ -654,8 +472,23 @@ function WalletPage() {
                                 <span>{transaction.description || transaction.reference || "Без додаткового опису"}</span>
                               </div>
                             </article>
-                          ))}
-                        </div>
+                            ))}
+                          </div>
+
+                          {hasMoreTransactions ? (
+                            <button
+                              type="button"
+                              className={styles.loadMoreButton}
+                              onClick={() =>
+                                setVisibleTransactionsCount((currentCount) =>
+                                  currentCount + TRANSACTIONS_STEP
+                                )
+                              }
+                            >
+                              Завантажити ще
+                            </button>
+                          ) : null}
+                        </>
                       )}
                     </section>
                   )}

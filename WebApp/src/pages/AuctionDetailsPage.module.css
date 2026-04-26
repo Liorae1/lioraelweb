@@ -586,6 +586,223 @@
   color: #f2c987;
 }
 
+.loadingPulse,
+.loadingPulse::after {
+  border-radius: inherit;
+}
+
+.loadingPulse {
+  position: relative;
+  overflow: hidden;
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.02)),
+    rgba(255, 255, 255, 0.04);
+}
+
+.loadingPulse::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  transform: translateX(-100%);
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.06) 34%,
+    rgba(255, 255, 255, 0.18) 50%,
+    rgba(255, 255, 255, 0.06) 66%,
+    transparent 100%
+  );
+  animation: auctionSkeletonWave 1.8s ease-in-out infinite;
+}
+
+.loadingBadge,
+.loadingBadgeWide,
+.loadingBrand,
+.loadingLabel,
+.loadingValue,
+.loadingValueLarge,
+.loadingLineSmall,
+.loadingLineMedium,
+.loadingTitle,
+.loadingTitleShort,
+.loadingTextLine,
+.loadingTextLineWide,
+.loadingButton,
+.loadingButtonSecondary,
+.loadingInput,
+.loadingQuickBid,
+.loadingPercent,
+.loadingProgress,
+.loadingSectionTitle,
+.loadingAvatar,
+.loadingAvatarSmall,
+.loadingThumbnail {
+  display: block;
+}
+
+.loadingBadge,
+.loadingBadgeWide {
+  min-height: 40px;
+  border-radius: 999px;
+}
+
+.loadingBadge {
+  width: 108px;
+}
+
+.loadingBadgeWide {
+  width: 164px;
+}
+
+.loadingBrand {
+  width: 132px;
+  height: 12px;
+  margin-bottom: 12px;
+  border-radius: 999px;
+}
+
+.loadingTitle,
+.loadingTitleShort,
+.loadingTextLine,
+.loadingTextLineWide,
+.loadingLineSmall,
+.loadingLineMedium,
+.loadingLabel,
+.loadingValue,
+.loadingValueLarge,
+.loadingSectionTitle {
+  border-radius: 999px;
+}
+
+.loadingTitle {
+  width: min(100%, 420px);
+  height: 52px;
+  margin-bottom: 12px;
+}
+
+.loadingTitleShort {
+  width: min(78%, 320px);
+  height: 52px;
+  margin-bottom: 16px;
+}
+
+.loadingTextLineWide {
+  width: 100%;
+  height: 12px;
+  margin-bottom: 10px;
+}
+
+.loadingTextLine {
+  width: 82%;
+  height: 12px;
+  margin-bottom: 10px;
+}
+
+.loadingLabel {
+  width: 92px;
+  height: 10px;
+  margin-bottom: 12px;
+}
+
+.loadingValue {
+  width: 132px;
+  height: 18px;
+}
+
+.loadingValueLarge {
+  width: 184px;
+  height: 28px;
+}
+
+.loadingLineSmall {
+  width: 96px;
+  height: 12px;
+  margin-top: 8px;
+}
+
+.loadingLineMedium {
+  width: 144px;
+  height: 12px;
+}
+
+.loadingButton,
+.loadingButtonSecondary {
+  width: 100%;
+  min-height: 54px;
+  border-radius: 16px;
+}
+
+.loadingButtonSecondary {
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0.02)),
+    rgba(255, 255, 255, 0.02);
+}
+
+.loadingInput {
+  width: 100%;
+  height: 56px;
+  border-radius: 16px;
+}
+
+.loadingQuickBid {
+  width: 132px;
+  height: 44px;
+  border-radius: 999px;
+}
+
+.loadingPercent {
+  width: 72px;
+  height: 44px;
+  border-radius: 999px;
+}
+
+.loadingProgress {
+  width: 100%;
+  height: 14px;
+  margin-bottom: 10px;
+  border-radius: 999px;
+}
+
+.loadingSectionHead,
+.loadingIdentity {
+  width: 100%;
+}
+
+.loadingSectionTitle {
+  width: 240px;
+  height: 28px;
+  margin-bottom: 12px;
+}
+
+.loadingAvatar,
+.loadingAvatarSmall {
+  flex-shrink: 0;
+  border-radius: 18px;
+}
+
+.loadingAvatar {
+  width: 56px;
+  height: 56px;
+}
+
+.loadingAvatarSmall {
+  width: 48px;
+  height: 48px;
+}
+
+.loadingThumbnail {
+  height: 100px;
+  border-radius: 18px;
+}
+
+.loadingImageGlow {
+  width: min(280px, 60%);
+  height: min(280px, 60%);
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(212, 153, 74, 0.18), transparent 70%);
+  filter: blur(2px);
+}
+
 .loadingCard,
 .notFound {
   max-width: 720px;
@@ -604,6 +821,12 @@
   line-height: 1.64;
 }
 
+@keyframes auctionSkeletonWave {
+  100% {
+    transform: translateX(100%);
+  }
+}
+
 @media (max-width: 1100px) {
   .hero,
   .infoGrid {
@@ -620,6 +843,11 @@
 
   .timelineValues {
     text-align: left;
+  }
+
+  .loadingTitle,
+  .loadingTitleShort {
+    height: 42px;
   }
 }
 
@@ -662,6 +890,10 @@
 
   .thumbnailActive img,
   .thumbnailMuted img {
+    height: 86px;
+  }
+
+  .loadingThumbnail {
     height: 86px;
   }
 
@@ -753,6 +985,24 @@
   .field input {
     height: 50px;
     padding: 0 14px;
+  }
+
+  .loadingTitle,
+  .loadingTitleShort {
+    height: 34px;
+  }
+
+  .loadingInput {
+    height: 50px;
+  }
+
+  .loadingQuickBid {
+    width: 100%;
+    min-height: 48px;
+  }
+
+  .loadingThumbnail {
+    height: 72px;
   }
 
   .timelineItem {

@@ -231,6 +231,191 @@ async function requestCurrentUser() {
   return response.data;
 }
 
+function AuctionDetailsSkeleton() {
+  return (
+    <div className={styles.page}>
+      <div className={styles.container}>
+        <div className={styles.breadcrumbs}>
+          <span className={`${styles.loadingBadge} ${styles.loadingPulse}`}></span>
+          <span>/</span>
+          <span className={`${styles.loadingBadgeWide} ${styles.loadingPulse}`}></span>
+          <span>/</span>
+          <span className={`${styles.loadingLineMedium} ${styles.loadingPulse}`}></span>
+        </div>
+
+        <section className={styles.hero}>
+          <div className={styles.visualStage}>
+            <div className={styles.visualTopline}>
+              <span className={`${styles.loadingBadge} ${styles.loadingPulse}`}></span>
+              <span className={`${styles.loadingBadge} ${styles.loadingPulse}`}></span>
+              <span className={`${styles.loadingBadgeWide} ${styles.loadingPulse}`}></span>
+            </div>
+
+            <div className={`${styles.mainImagePlaceholder} ${styles.loadingPulse}`}>
+              <div className={styles.loadingImageGlow}></div>
+            </div>
+
+            <div className={styles.thumbnailRail}>
+              {Array.from({ length: 4 }).map((_, index) => (
+                <div
+                  key={index}
+                  className={`${styles.loadingThumbnail} ${styles.loadingPulse}`}
+                ></div>
+              ))}
+            </div>
+          </div>
+
+          <div className={styles.commandPanel}>
+            <div className={styles.headingBlock}>
+              <div className={`${styles.loadingBrand} ${styles.loadingPulse}`}></div>
+              <div className={`${styles.loadingTitle} ${styles.loadingPulse}`}></div>
+              <div className={`${styles.loadingTitleShort} ${styles.loadingPulse}`}></div>
+              <div className={`${styles.loadingTextLine} ${styles.loadingPulse}`}></div>
+              <div className={`${styles.loadingTextLineWide} ${styles.loadingPulse}`}></div>
+              <div className={styles.headingActions}>
+                <div className={`${styles.loadingButton} ${styles.loadingPulse}`}></div>
+              </div>
+            </div>
+
+            <div className={styles.heroCards}>
+              {Array.from({ length: 4 }).map((_, index) => (
+                <div key={index} className={styles.heroCard}>
+                  <div className={`${styles.loadingLabel} ${styles.loadingPulse}`}></div>
+                  <div className={`${styles.loadingValue} ${styles.loadingPulse}`}></div>
+                </div>
+              ))}
+            </div>
+
+            <div className={styles.userDock}>
+              <div className={styles.userIdentity}>
+                <div className={`${styles.loadingAvatar} ${styles.loadingPulse}`}></div>
+                <div className={styles.loadingIdentity}>
+                  <div className={`${styles.loadingValue} ${styles.loadingPulse}`}></div>
+                  <div className={`${styles.loadingLineSmall} ${styles.loadingPulse}`}></div>
+                </div>
+              </div>
+
+              <div className={styles.userMeta}>
+                {Array.from({ length: 3 }).map((_, index) => (
+                  <div key={index}>
+                    <div className={`${styles.loadingLabel} ${styles.loadingPulse}`}></div>
+                    <div className={`${styles.loadingValue} ${styles.loadingPulse}`}></div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className={styles.bidPanel}>
+              <div className={styles.bidPanelTop}>
+                <div>
+                  <div className={`${styles.loadingLabel} ${styles.loadingPulse}`}></div>
+                  <div className={`${styles.loadingValueLarge} ${styles.loadingPulse}`}></div>
+                </div>
+                <div className={`${styles.loadingBadgeWide} ${styles.loadingPulse}`}></div>
+              </div>
+
+              <div className={styles.field}>
+                <div className={`${styles.loadingLabel} ${styles.loadingPulse}`}></div>
+                <div className={`${styles.loadingInput} ${styles.loadingPulse}`}></div>
+              </div>
+
+              <div className={styles.quickBidRow}>
+                {Array.from({ length: 3 }).map((_, index) => (
+                  <div
+                    key={index}
+                    className={`${styles.loadingQuickBid} ${styles.loadingPulse}`}
+                  ></div>
+                ))}
+              </div>
+
+              <div className={styles.actionButtons}>
+                <div className={`${styles.loadingButton} ${styles.loadingPulse}`}></div>
+                <div className={`${styles.loadingButtonSecondary} ${styles.loadingPulse}`}></div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section className={styles.infoGrid}>
+          {Array.from({ length: 2 }).map((_, index) => (
+            <div key={index} className={styles.infoCard}>
+              <div className={styles.sectionHeader}>
+                <div className={styles.loadingSectionHead}>
+                  <div className={`${styles.loadingSectionTitle} ${styles.loadingPulse}`}></div>
+                  <div className={`${styles.loadingTextLineWide} ${styles.loadingPulse}`}></div>
+                </div>
+                {index === 1 ? (
+                  <div className={`${styles.loadingPercent} ${styles.loadingPulse}`}></div>
+                ) : null}
+              </div>
+
+              {index === 1 ? (
+                <>
+                  <div className={`${styles.loadingProgress} ${styles.loadingPulse}`}></div>
+                  <div className={styles.progressLabels}>
+                    <div className={`${styles.loadingLineMedium} ${styles.loadingPulse}`}></div>
+                    <div className={`${styles.loadingLineMedium} ${styles.loadingPulse}`}></div>
+                  </div>
+                </>
+              ) : null}
+
+              <div className={styles.summaryTiles}>
+                {Array.from({ length: 4 }).map((__, tileIndex) => (
+                  <div key={tileIndex} className={styles.summaryTile}>
+                    <div className={`${styles.loadingLabel} ${styles.loadingPulse}`}></div>
+                    <div className={`${styles.loadingValue} ${styles.loadingPulse}`}></div>
+                  </div>
+                ))}
+              </div>
+
+              {index === 0 ? (
+                <div className={styles.descriptionCard}>
+                  <div className={`${styles.loadingLabel} ${styles.loadingPulse}`}></div>
+                  <div className={`${styles.loadingTextLineWide} ${styles.loadingPulse}`}></div>
+                  <div className={`${styles.loadingTextLine} ${styles.loadingPulse}`}></div>
+                  <div className={`${styles.loadingLineSmall} ${styles.loadingPulse}`}></div>
+                </div>
+              ) : null}
+            </div>
+          ))}
+        </section>
+
+        <section className={styles.timelineSection}>
+          <div className={styles.sectionHeader}>
+            <div className={styles.loadingSectionHead}>
+              <div className={`${styles.loadingSectionTitle} ${styles.loadingPulse}`}></div>
+              <div className={`${styles.loadingLineMedium} ${styles.loadingPulse}`}></div>
+            </div>
+            <div className={`${styles.loadingBadgeWide} ${styles.loadingPulse}`}></div>
+          </div>
+
+          <div className={styles.timeline}>
+            {Array.from({ length: 3 }).map((_, index) => (
+              <div key={index} className={styles.timelineItem}>
+                <div className={styles.timelineAccent} />
+                <div className={styles.timelineBody}>
+                  <div className={styles.timelineIdentity}>
+                    <div className={`${styles.loadingAvatarSmall} ${styles.loadingPulse}`}></div>
+                    <div className={styles.loadingIdentity}>
+                      <div className={`${styles.loadingValue} ${styles.loadingPulse}`}></div>
+                      <div className={`${styles.loadingLineSmall} ${styles.loadingPulse}`}></div>
+                    </div>
+                  </div>
+
+                  <div className={styles.timelineValues}>
+                    <div className={`${styles.loadingValue} ${styles.loadingPulse}`}></div>
+                    <div className={`${styles.loadingLineSmall} ${styles.loadingPulse}`}></div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+      </div>
+    </div>
+  );
+}
+
 function AuctionDetailsPage() {
   const { id } = useParams();
 
@@ -599,15 +784,7 @@ function AuctionDetailsPage() {
   };
 
   if (loading) {
-    return (
-      <div className={styles.page}>
-        <div className={styles.container}>
-          <div className={styles.loadingCard}>
-            <p>Завантаження аукціону...</p>
-          </div>
-        </div>
-      </div>
-    );
+    return <AuctionDetailsSkeleton />;
   }
 
   if (!auction) {

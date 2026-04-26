@@ -6,8 +6,6 @@ import { getProfileByUserId } from "../api/profile";
 import {
   getAccountStatusMeta,
   getAuctionImage,
-  getWalletAmounts,
-  formatMoney,
   formatMoneyWithCurrency,
   normalizeAccountStatus,
   normalizeAuctionEntity,
@@ -55,7 +53,47 @@ function PublicProfilePage() {
   const statusMeta = getAccountStatusMeta(profile?.status);
   const isPremium = normalizedStatus === "Elite";
   const isVip = normalizedStatus === "Private";
-  const { availableBalance, lockedBalance, balance, currency } = getWalletAmounts(null, profile);
+  const favoriteAuctions = Array.isArray(profile?.favoriteAuctions) ? profile.favoriteAuctions : [];
+  const wonAuctions = Array.isArray(profile?.wonAuctions) ? profile.wonAuctions : [];
+  const totalWonValue = wonAuctions.reduce(
+    (total, auction) => total + Number(auction?.currentPrice || auction?.finalPrice || 0),
+    0
+  );
+  const publicStats = [
+    {
+      label: "Середній виграш",
+      value: formatMoneyWithCurrency(
+        wonAuctions.length ? totalWonValue / wonAuctions.length : 0,
+        wonAuctions[0]?.currency || favoriteAuctions[0]?.currency || "UAH"
+      ),
+    },
+    {
+      label: "Виграні лоти",
+      value: wonAuctions.length,
+    },
+    {
+      label: "Сума виграшів",
+      value: formatMoneyWithCurrency(
+        totalWonValue,
+        wonAuctions[0]?.currency || favoriteAuctions[0]?.currency || "UAH"
+      ),
+    },
+  ];
+  const publicInfo = [
+    {
+      label: "Нікнейм",
+      value: profile?.userName ? `@${profile.userName}` : "Не вказано",
+    },
+    {
+      label: "Рівень",
+      value: statusMeta.label,
+    },
+    {
+      label: "Про профіль",
+      value: profile?.bio || "Користувач ще не додав опис профілю.",
+      wide: true,
+    },
+  ];
 
   return (
     <div className={styles.page}>
@@ -72,37 +110,50 @@ function PublicProfilePage() {
                   <span className={styles.loadingSubtitleShort}></span>
                 </div>
               </div>
-              <div className={styles.loadingWalletCard}>
-                <span className={styles.loadingWalletLabel}></span>
-                <span className={styles.loadingWalletValue}></span>
-                <span className={styles.loadingWalletLine}></span>
-                <span className={styles.loadingWalletLineShort}></span>
+              <div className={styles.loadingStatsGrid}>
+                <span className={styles.loadingStatCard}></span>
+                <span className={styles.loadingStatCard}></span>
+                <span className={styles.loadingStatCard}></span>
               </div>
             </section>
 
-            <section className={`${styles.card} ${styles.loadingShell}`} aria-hidden="true">
-              <div className={styles.loadingSectionHeader}>
-                <span className={styles.loadingTitle}></span>
-                <span className={styles.loadingSubtitle}></span>
-              </div>
-              <div className={styles.loadingGrid}>
-                <article className={styles.loadingAuctionCard}>
-                  <div className={styles.loadingMedia}></div>
-                  <div className={styles.loadingBody}>
-                    <span className={styles.loadingSubtitle}></span>
-                    <span className={styles.loadingTitle}></span>
-                    <span className={styles.loadingWalletLineShort}></span>
-                  </div>
-                </article>
-                <article className={styles.loadingAuctionCard}>
-                  <div className={styles.loadingMedia}></div>
-                  <div className={styles.loadingBody}>
-                    <span className={styles.loadingSubtitle}></span>
-                    <span className={styles.loadingTitle}></span>
-                    <span className={styles.loadingWalletLineShort}></span>
-                  </div>
-                </article>
-              </div>
+            <section className={styles.infoGrid} aria-hidden="true">
+              <section className={`${styles.card} ${styles.loadingShell}`}>
+                <div className={styles.loadingSectionHeader}>
+                  <span className={styles.loadingTitle}></span>
+                  <span className={styles.loadingSubtitle}></span>
+                </div>
+                <div className={styles.loadingInfoGrid}>
+                  <span className={styles.loadingInfoCard}></span>
+                  <span className={styles.loadingInfoCard}></span>
+                  <span className={`${styles.loadingInfoCard} ${styles.loadingInfoCardWide}`}></span>
+                </div>
+              </section>
+
+              <section className={`${styles.card} ${styles.loadingShell}`}>
+                <div className={styles.loadingSectionHeader}>
+                  <span className={styles.loadingTitle}></span>
+                  <span className={styles.loadingSubtitle}></span>
+                </div>
+                <div className={styles.loadingGrid}>
+                  <article className={styles.loadingAuctionCard}>
+                    <div className={styles.loadingMedia}></div>
+                    <div className={styles.loadingBody}>
+                      <span className={styles.loadingSubtitle}></span>
+                      <span className={styles.loadingTitle}></span>
+                      <span className={styles.loadingWalletLineShort}></span>
+                    </div>
+                  </article>
+                  <article className={styles.loadingAuctionCard}>
+                    <div className={styles.loadingMedia}></div>
+                    <div className={styles.loadingBody}>
+                      <span className={styles.loadingSubtitle}></span>
+                      <span className={styles.loadingTitle}></span>
+                      <span className={styles.loadingWalletLineShort}></span>
+                    </div>
+                  </article>
+                </div>
+              </section>
             </section>
           </>
         ) : error ? (
@@ -136,60 +187,84 @@ function PublicProfilePage() {
                   <h1>{fullName || profile.userName || "Користувач"}</h1>
                   <p>{profile.userName ? `@${profile.userName}` : "Публічний профіль"}</p>
                   <p>{statusMeta.label}</p>
-                  {profile.bio && <b>{profile.bio}</b>}
                 </div>
               </div>
 
-              <div className={styles.walletCard}>
-                <span>Доступно</span>
-                <strong>{formatMoneyWithCurrency(availableBalance, currency)}</strong>
-                <p>Всього: {formatMoney(balance)} {currency}</p>
-                <p>В резерві: {formatMoney(lockedBalance)} {currency}</p>
+              <div className={styles.statsGrid}>
+                {publicStats.map((item) => (
+                  <article key={item.label} className={styles.statCard}>
+                    <span>{item.label}</span>
+                    <strong>{item.value}</strong>
+                  </article>
+                ))}
               </div>
             </section>
 
-            <section className={styles.card}>
-              <div className={styles.sectionHeader}>
-                <div>
-                  <h2>Улюблені лоти</h2>
-                  <p>Добірка збережених аукціонів.</p>
+            <section className={styles.infoGrid}>
+              <section className={styles.card}>
+                <div className={styles.sectionHeader}>
+                  <div>
+                    <h2>Інформація профілю</h2>
+                    <p>Коротка публічна інформація про користувача.</p>
+                  </div>
                 </div>
-              </div>
 
-              {!profile.favoriteAuctions?.length ? (
-                <div className={styles.empty}>У цього користувача поки немає улюблених лотів.</div>
-              ) : (
-                <div className={styles.grid}>
-                  {profile.favoriteAuctions.map((auction) => (
-                    <article key={auction.id} className={styles.auctionCard}>
-                      <div className={styles.media}>
-                        {getAuctionImage(auction) ? (
-                          <img
-                            src={getAuctionImage(auction)}
-                            alt={auction.title}
-                            className={styles.mediaImage}
-                          />
-                        ) : (
-                          <div className={styles.mediaPlaceholder}>Немає фото</div>
-                        )}
-                      </div>
-                      <div className={styles.body}>
-                        <h3>{auction.title}</h3>
-                        <p>{auction.brand || auction.category || "Аукціон"}</p>
-                        <strong>
-                          {formatMoneyWithCurrency(
-                            auction.currentPrice || auction.startPrice,
-                            auction.currency || currency
-                          )}
-                        </strong>
-                        <Link to={`/auction/${auction.id}`} className={styles.linkButton}>
-                          Перейти до лота
-                        </Link>
-                      </div>
+                <div className={styles.profileInfoGrid}>
+                  {publicInfo.map((item) => (
+                    <article
+                      key={item.label}
+                      className={`${styles.infoCard} ${item.wide ? styles.infoCardWide : ""}`}
+                    >
+                      <span>{item.label}</span>
+                      <strong>{item.value}</strong>
                     </article>
                   ))}
                 </div>
-              )}
+              </section>
+
+              <section className={styles.card}>
+                <div className={styles.sectionHeader}>
+                  <div>
+                    <h2>Улюблені лоти</h2>
+                    <p>Добірка збережених аукціонів.</p>
+                  </div>
+                </div>
+
+                {!favoriteAuctions.length ? (
+                  <div className={styles.empty}>У цього користувача поки немає улюблених лотів.</div>
+                ) : (
+                  <div className={styles.grid}>
+                    {favoriteAuctions.map((auction) => (
+                      <article key={auction.id} className={styles.auctionCard}>
+                        <div className={styles.media}>
+                          {getAuctionImage(auction) ? (
+                            <img
+                              src={getAuctionImage(auction)}
+                              alt={auction.title}
+                              className={styles.mediaImage}
+                            />
+                          ) : (
+                            <div className={styles.mediaPlaceholder}>Немає фото</div>
+                          )}
+                        </div>
+                        <div className={styles.body}>
+                          <h3>{auction.title}</h3>
+                          <p>{auction.brand || auction.category || "Аукціон"}</p>
+                          <strong>
+                            {formatMoneyWithCurrency(
+                              auction.currentPrice || auction.startPrice,
+                              auction.currency || "UAH"
+                            )}
+                          </strong>
+                          <Link to={`/auction/${auction.id}`} className={styles.linkButton}>
+                            Перейти до лота
+                          </Link>
+                        </div>
+                      </article>
+                    ))}
+                  </div>
+                )}
+              </section>
             </section>
           </>
         )}
