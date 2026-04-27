@@ -6,6 +6,7 @@ import Toast from "../components/Toast";
 import styles from "./ProfilePage.module.css";
 import AvatarUpload from "../components/AvatarUpload";
 import {
+  cancelSubscription,
   getMyFavorites,
   purchaseSubscription,
   requestWinningDelivery,
@@ -150,6 +151,13 @@ const profileSections = [
   { id: "upgrade", label: "Статуси" },
 ];
 
+const subscriptionCancelReasons = [
+  "Зараз не користуюся перевагами підписки",
+  "Підписка для мене занадто дорога",
+  "Потрібен інший формат або план",
+  "Оформлю повторно пізніше",
+];
+
 function PrivilegeIcon({ type }) {
   switch (type) {
     case "earlyAccess":
@@ -247,6 +255,9 @@ function ProfilePage() {
   const [view, setView] = useState("overview");
   const [checkoutPlan, setCheckoutPlan] = useState(null);
   const [checkoutLoading, setCheckoutLoading] = useState(false);
+  const [unsubscribeLoading, setUnsubscribeLoading] = useState(false);
+  const [cancelModalOpen, setCancelModalOpen] = useState(false);
+  const [cancelReason, setCancelReason] = useState(subscriptionCancelReasons[0]);
   const [paymentForm, setPaymentForm] = useState({
     cardNumber: "",
     expiryDate: "",
@@ -528,6 +539,11 @@ function ProfilePage() {
     });
   };
 
+  const closeCancelModal = () => {
+    setCancelModalOpen(false);
+    setCancelReason(subscriptionCancelReasons[0]);
+  };
+
   const handleSubscriptionCheckout = async (event) => {
     event.preventDefault();
 
@@ -572,6 +588,25 @@ function ProfilePage() {
     }
   };
 
+  const handleSubscriptionCancel = async () => {
+    try {
+      setUnsubscribeLoading(true);
+
+      await cancelSubscription();
+      await refreshUser();
+      showToast("Підписку скасовано", "success");
+      closeCancelModal();
+    } catch (err) {
+      console.error("Subscription cancel error:", err);
+      showToast(
+        err?.response?.data?.message || "Не вдалося скасувати підписку",
+        "error"
+      );
+    } finally {
+      setUnsubscribeLoading(false);
+    }
+  };
+
   const fullName = useMemo(
     () => [user?.firstName, user?.lastName].filter(Boolean).join(" "),
     [user?.firstName, user?.lastName]
@@ -599,6 +634,7 @@ function ProfilePage() {
   const privileges = getUserPrivileges(user);
   const activeStatus = statuses.find((status) => status.name === normalizedStatus) || statuses[0];
   const activeSubscription = user?.subscription || null;
+  const isSubscriptionCancelled = Boolean(activeSubscription?.cancelledAt);
   const privilegeCards = privileges.map((item) => {
     const meta = privilegePresentation[item.key];
     const isBooleanValue = typeof item.value === "boolean";
@@ -1416,6 +1452,17 @@ function ProfilePage() {
                         <span className={styles.statusPromoKicker}>Поточний план</span>
                         <strong>{activeStatus.label}</strong>
                       </div>
+
+                      <button
+                        type="button"
+                        className={styles.secondaryButton}
+                        onClick={() => setCancelModalOpen(true)}
+                        disabled={unsubscribeLoading || isSubscriptionCancelled}
+                      >
+                        {isSubscriptionCancelled
+                          ? "Підписку скасовано"
+                          : "Відписатися"}
+                      </button>
                     </div>
 
                     <div className={styles.subscriptionSummaryGrid}>
@@ -1627,6 +1674,83 @@ function ProfilePage() {
                   </div>
                 </div>
               </form>
+            </div>
+          </div>
+        </div>
+      ) : null}
+
+      {cancelModalOpen ? (
+        <div className={styles.modalOverlay} onClick={closeCancelModal}>
+          <div
+            className={styles.modalDialog}
+            onClick={(event) => event.stopPropagation()}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="subscription-cancel-title"
+          >
+            <div className={styles.checkoutCard}>
+              <div className={styles.checkoutHeader}>
+                <div>
+                  <p className={styles.sectionEyebrow}>Скасування підписки</p>
+                  <h3 id="subscription-cancel-title">Чому хочете відписатися?</h3>
+                  <p className={styles.sectionDescription}>
+                    Оберіть одну з причин перед скасуванням підписки.
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  className={styles.modalCloseButton}
+                  onClick={closeCancelModal}
+                  aria-label="Закрити скасування підписки"
+                >
+                  ×
+                </button>
+              </div>
+
+              <div className={styles.cancelReasonList}>
+                {subscriptionCancelReasons.map((reason) => (
+                  <label
+                    key={reason}
+                    className={`${styles.cancelReasonOption} ${
+                      cancelReason === reason ? styles.cancelReasonOptionActive : ""
+                    }`}
+                  >
+                    <input
+                      type="radio"
+                      name="subscription-cancel-reason"
+                      value={reason}
+                      checked={cancelReason === reason}
+                      onChange={(event) => setCancelReason(event.target.value)}
+                    />
+                    <span>{reason}</span>
+                  </label>
+                ))}
+              </div>
+
+              <div className={styles.checkoutFooter}>
+                <p className={styles.checkoutHint}>
+                  Це демонстраційна форма причини скасування для візуального сценарію.
+                </p>
+
+                <div className={styles.checkoutActions}>
+                  <button
+                    type="button"
+                    className={styles.secondaryButton}
+                    onClick={closeCancelModal}
+                    disabled={unsubscribeLoading}
+                  >
+                    Назад
+                  </button>
+                  <button
+                    type="button"
+                    className={styles.primaryButton}
+                    onClick={handleSubscriptionCancel}
+                    disabled={unsubscribeLoading}
+                  >
+                    {unsubscribeLoading ? "Скасування..." : "Підтвердити відписку"}
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
         </div>

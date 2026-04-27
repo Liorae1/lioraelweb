@@ -1810,6 +1810,8 @@
 
 .checkoutCard {
   margin-top: 0;
+  display: grid;
+  gap: 28px;
   animation: panelReveal 0.3s ease;
 }
 
@@ -1819,6 +1821,11 @@
   align-items: flex-start;
   justify-content: space-between;
   gap: 18px;
+}
+
+.checkoutHeader > div {
+  display: grid;
+  gap: 10px;
 }
 
 .subscriptionSummaryHeader strong,
@@ -1862,16 +1869,58 @@
 }
 
 .checkoutForm {
-  margin-top: 24px;
   display: grid;
-  gap: 20px;
+  gap: 24px;
 }
 
 .checkoutFooter {
+  margin-top: 4px;
+  padding-top: 8px;
   display: flex;
   align-items: flex-end;
   justify-content: space-between;
   gap: 18px;
+  border-top: 1px solid color-mix(in srgb, var(--border-color) 82%, transparent);
+}
+
+.cancelReasonList {
+  display: grid;
+  gap: 14px;
+}
+
+.cancelReasonOption {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 18px 20px;
+  border-radius: 22px;
+  border: 1px solid var(--border-color);
+  background: color-mix(in srgb, var(--surface-strong) 88%, transparent);
+  cursor: pointer;
+  transition: border-color 0.25s ease, transform 0.25s ease, background 0.25s ease;
+}
+
+.cancelReasonOption:hover {
+  transform: translateY(-1px);
+  border-color: color-mix(in srgb, var(--accent) 36%, transparent);
+}
+
+.cancelReasonOption input {
+  margin: 0;
+  accent-color: var(--accent);
+}
+
+.cancelReasonOption span {
+  color: var(--text-primary);
+  font-size: 15px;
+  line-height: 1.6;
+}
+
+.cancelReasonOptionActive {
+  border-color: color-mix(in srgb, var(--accent) 42%, transparent);
+  background:
+    radial-gradient(circle at right top, color-mix(in srgb, var(--accent) 14%, transparent), transparent 34%),
+    color-mix(in srgb, var(--surface-strong) 92%, transparent);
 }
 
 .checkoutHint {

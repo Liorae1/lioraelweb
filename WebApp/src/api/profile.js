@@ -69,6 +69,31 @@ export async function purchaseSubscription(payload) {
   return res.data;
 }
 
+export async function cancelSubscription() {
+  const attempts = [
+    () => api.post("/api/profile/me/subscription/cancel"),
+    () => api.post("/api/profile/me/subscription/unsubscribe"),
+    () => api.delete("/api/profile/me/subscription"),
+  ];
+
+  let lastError = null;
+
+  for (const attempt of attempts) {
+    try {
+      const res = await attempt();
+      return res.data;
+    } catch (error) {
+      lastError = error;
+
+      if (![404, 405].includes(error?.response?.status)) {
+        throw error;
+      }
+    }
+  }
+
+  throw lastError;
+}
+
 export function logout() {
   clearAuthToken();
   window.dispatchEvent(new Event("authChanged"));

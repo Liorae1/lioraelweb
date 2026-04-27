@@ -26,10 +26,8 @@
 .loadingTitle,
 .loadingSubtitle,
 .loadingSubtitleShort,
-.loadingWalletLabel,
-.loadingWalletValue,
-.loadingWalletLine,
-.loadingWalletLineShort,
+.loadingStatCard,
+.loadingInfoCard,
 .loadingMedia {
   position: relative;
   overflow: hidden;
@@ -39,10 +37,8 @@
 .loadingTitle::after,
 .loadingSubtitle::after,
 .loadingSubtitleShort::after,
-.loadingWalletLabel::after,
-.loadingWalletValue::after,
-.loadingWalletLine::after,
-.loadingWalletLineShort::after,
+.loadingStatCard::after,
+.loadingInfoCard::after,
 .loadingMedia::after,
 .loadingShell::after {
   content: "";
@@ -95,13 +91,10 @@
 .loadingTitle,
 .loadingSubtitle,
 .loadingSubtitleShort,
-.loadingWalletLabel,
-.loadingWalletValue,
-.loadingWalletLine,
-.loadingWalletLineShort,
+.loadingStatCard,
+.loadingInfoCard,
 .loadingMedia {
   display: block;
-  border-radius: 999px;
   background: color-mix(in srgb, var(--accent) 12%, var(--surface) 88%);
 }
 
@@ -124,6 +117,17 @@
   display: flex;
   align-items: center;
   gap: 18px;
+}
+
+.statsGrid,
+.loadingStatsGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.statsGrid {
+  min-width: min(100%, 560px);
 }
 
 .avatar {
@@ -222,50 +226,16 @@
 .identity b,
 .body p,
 .sectionHeader p,
-.walletCard p,
+.infoCard strong,
 .empty {
   color: var(--text-secondary);
 }
 
 .identity p,
 .body p,
-.sectionHeader p,
-.walletCard p {
+.sectionHeader p {
   margin: 8px 0 0;
   line-height: 1.6;
-}
-
-.walletCard {
-  min-width: 280px;
-  padding: 20px 22px;
-  border-radius: 24px;
-  background: color-mix(in srgb, var(--surface) 94%, transparent);
-  border: 1px solid var(--border-color);
-}
-
-.loadingWalletCard {
-  min-width: 280px;
-  display: grid;
-  gap: 12px;
-  padding: 20px 22px;
-  border-radius: 24px;
-  background: color-mix(in srgb, var(--surface) 94%, transparent);
-  border: 1px solid var(--border-color);
-}
-
-.loadingWalletLabel {
-  width: 84px;
-  height: 12px;
-}
-
-.loadingWalletValue {
-  width: 160px;
-  height: 30px;
-}
-
-.loadingWalletLine {
-  width: 200px;
-  height: 14px;
 }
 
 .loadingWalletLineShort {
@@ -273,19 +243,66 @@
   height: 14px;
 }
 
-.walletCard span {
+.statCard,
+.infoCard,
+.loadingStatCard,
+.loadingInfoCard {
+  padding: 20px 22px;
+  border-radius: 24px;
+  border: 1px solid var(--border-color);
+  background: color-mix(in srgb, var(--surface) 94%, transparent);
+}
+
+.statCard span,
+.infoCard span {
   display: block;
-  margin-bottom: 8px;
+  margin-bottom: 10px;
   font-size: 12px;
   text-transform: uppercase;
   letter-spacing: 0.12em;
   color: var(--text-secondary);
 }
 
-.walletCard strong {
+.statCard strong {
   display: block;
-  font-size: 1.8rem;
+  font-size: 1.6rem;
   color: var(--text-primary);
+}
+
+.loadingStatCard {
+  min-height: 108px;
+  border-radius: 24px;
+}
+
+.infoGrid {
+  display: grid;
+  grid-template-columns: minmax(320px, 0.85fr) minmax(0, 1.15fr);
+  gap: 24px;
+}
+
+.profileInfoGrid,
+.loadingInfoGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.infoCard strong {
+  display: block;
+  color: var(--text-primary);
+  font-size: 1rem;
+  line-height: 1.65;
+  white-space: pre-wrap;
+}
+
+.infoCardWide,
+.loadingInfoCardWide {
+  grid-column: 1 / -1;
+}
+
+.loadingInfoCard {
+  min-height: 116px;
+  border-radius: 24px;
 }
 
 .card {
@@ -393,18 +410,13 @@
     align-items: flex-start;
   }
 
+  .statsGrid,
+  .loadingStatsGrid,
+  .infoGrid,
+  .profileInfoGrid,
+  .loadingInfoGrid,
   .loadingGrid {
     grid-template-columns: 1fr;
-  }
-
-  .walletCard {
-    width: 100%;
-    min-width: 0;
-  }
-
-  .loadingWalletCard {
-    width: 100%;
-    min-width: 0;
   }
 }
 

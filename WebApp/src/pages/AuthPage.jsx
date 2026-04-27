@@ -10,6 +10,118 @@ import {
   setAuthToken,
 } from "../utils/authStorage";
 
+function extractServerMessage(error) {
+  const payload = error?.response?.data;
+
+  if (typeof payload === "string") {
+    return payload;
+  }
+
+  if (typeof payload?.message === "string") {
+    return payload.message;
+  }
+
+  if (typeof payload?.title === "string") {
+    return payload.title;
+  }
+
+  if (Array.isArray(payload?.errors)) {
+    return payload.errors[0];
+  }
+
+  if (payload?.errors && typeof payload.errors === "object") {
+    const firstGroup = Object.values(payload.errors).find((value) => Array.isArray(value) && value.length);
+    if (firstGroup) {
+      return firstGroup[0];
+    }
+  }
+
+  return "";
+}
+
+function translateAuthError(error, fallbackMessage) {
+  const status = error?.response?.status;
+  const rawMessage = String(extractServerMessage(error) || error?.message || "").trim();
+  const normalized = rawMessage.toLowerCase();
+
+  if (!navigator.onLine) {
+    return "Немає з'єднання з інтернетом. Перевірте мережу та спробуйте ще раз.";
+  }
+
+  if (status === 429 || normalized.includes("too many")) {
+    return "Забагато спроб. Зачекайте трохи й спробуйте ще раз.";
+  }
+
+  if (status >= 500 || normalized.includes("server error")) {
+    return "На сервері сталася помилка. Спробуйте ще раз трохи пізніше.";
+  }
+
+  if (
+    normalized.includes("confirm your email") ||
+    normalized.includes("email not confirmed") ||
+    normalized.includes("verify your email")
+  ) {
+    return "Підтвердіть електронну пошту, щоб увійти в акаунт.";
+  }
+
+  if (
+    status === 401 ||
+    normalized.includes("invalid credentials") ||
+    normalized.includes("invalid login") ||
+    normalized.includes("wrong password") ||
+    normalized.includes("invalid password") ||
+    normalized.includes("incorrect password") ||
+    normalized.includes("invalid email or password")
+  ) {
+    return "Неправильний email або пароль. Перевірте дані й спробуйте ще раз.";
+  }
+
+  if (
+    status === 409 ||
+    normalized.includes("email already exists") ||
+    normalized.includes("email is already taken") ||
+    normalized.includes("user with this email") ||
+    normalized.includes("duplicate email")
+  ) {
+    return "Цей email уже використовується.";
+  }
+
+  if (
+    normalized.includes("username already exists") ||
+    normalized.includes("username is already taken") ||
+    normalized.includes("duplicate user") ||
+    normalized.includes("user name") && normalized.includes("taken")
+  ) {
+    return "Це ім'я користувача вже зайняте.";
+  }
+
+  if (
+    normalized.includes("password requires") ||
+    normalized.includes("password must") ||
+    normalized.includes("weak password")
+  ) {
+    return "Пароль не відповідає вимогам безпеки. Використайте щонайменше 8 символів, велику літеру та цифру.";
+  }
+
+  if (
+    status === 404 ||
+    normalized.includes("user not found") ||
+    normalized.includes("email not found")
+  ) {
+    return "Користувача з таким email не знайдено.";
+  }
+
+  if (
+    normalized.includes("invalid token") ||
+    normalized.includes("token expired") ||
+    normalized.includes("expired token")
+  ) {
+    return "Посилання або код більше не дійсні. Запросіть новий лист.";
+  }
+
+  return fallbackMessage;
+}
+
 function AuthPage() {
   const [isLogin, setIsLogin] = useState(true);
   const [loginData, setLoginData] = useState({ email: "", password: "", rememberMe: false });
@@ -193,12 +305,18 @@ const [resendMessage, setResendMessage] = useState("");
   } catch (err) {
     console.error(err);
 
-    const serverMessage =
-      err?.response?.data?.message ||
-      err?.response?.data ||
-      "Помилка входу. Перевірте дані та спробуйте ще раз.";
+    const serverMessage = translateAuthError(
+      err,
+      "Не вдалося увійти. Перевірте дані та спробуйте ще раз."
+    );
 
-    if (serverMessage.toString().toLowerCase().includes("confirm your email")) {
+    const rawServerMessage = String(extractServerMessage(err) || "").toLowerCase();
+
+    if (
+      rawServerMessage.includes("confirm your email") ||
+      rawServerMessage.includes("email not confirmed") ||
+      rawServerMessage.includes("verify your email")
+    ) {
       setVerificationNotice({
         open: true,
         email: loginData.email.trim(),
@@ -259,14 +377,22 @@ const [resendMessage, setResendMessage] = useState("");
   } catch (err) {
     console.error(err);
 
-    const serverMessage =
-      err?.response?.data?.message ||
-      err?.response?.data ||
-      "Помилка реєстрації. Перевірте дані та спробуйте ще раз.";
+    const serverMessage = translateAuthError(
+      err,
+      "Не вдалося завершити реєстрацію. Перевірте дані та спробуйте ще раз."
+    );
+    const rawServerMessage = String(extractServerMessage(err) || "").toLowerCase();
 
     const conflictEmail =
       err?.response?.status === 409 ||
-      serverMessage?.toString().toLowerCase().includes("email already exists");
+      rawServerMessage.includes("email already exists") ||
+      rawServerMessage.includes("email is already taken") ||
+      rawServerMessage.includes("user with this email");
+
+    const conflictUsername =
+      rawServerMessage.includes("username already exists") ||
+      rawServerMessage.includes("username is already taken") ||
+      rawServerMessage.includes("duplicate user");
 
     if (conflictEmail) {
       setErrors((prev) => ({
@@ -274,6 +400,14 @@ const [resendMessage, setResendMessage] = useState("");
         registerEmail: "Цей email уже використовується",
       }));
       setTouched((prev) => ({ ...prev, registerEmail: true }));
+    }
+
+    if (conflictUsername) {
+      setErrors((prev) => ({
+        ...prev,
+        registerUsername: "Це ім'я користувача вже зайняте",
+      }));
+      setTouched((prev) => ({ ...prev, registerUsername: true }));
     }
 
     setToast({ message: serverMessage, type: "error" });
@@ -299,8 +433,10 @@ const handleResendVerification = async () => {
   } catch (err) {
     console.error(err);
     setResendMessage(
-      err?.response?.data?.message ||
-        "Не вдалося повторно надіслати лист. Спробуйте пізніше."
+      translateAuthError(
+        err,
+        "Не вдалося повторно надіслати лист. Спробуйте ще раз трохи пізніше."
+      )
     );
   } finally {
     setResendLoading(false);
@@ -343,14 +479,13 @@ const handleForgotPassword = async (e) => {
     }, 2500);
   } catch (err) {
     console.error(err);
-    setForgotPasswordMessage(
-      err?.response?.data?.message ||
-        "Не вдалося надіслати лист. Перевірте email і спробуйте знову."
+    const translatedMessage = translateAuthError(
+      err,
+      "Не вдалося надіслати лист для відновлення пароля. Перевірте email і спробуйте знову."
     );
+    setForgotPasswordMessage(translatedMessage);
     setToast({
-      message:
-        err?.response?.data?.message ||
-        "Не вдалося надіслати лист. Перевірте email і спробуйте знову.",
+      message: translatedMessage,
       type: "error",
     });
   } finally {

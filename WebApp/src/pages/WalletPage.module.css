@@ -13,21 +13,17 @@
 }
 
 .hero,
-.metricsGrid,
+.balanceGrid,
 .workspace,
 .loadingCard {
   margin-bottom: 24px;
 }
 
 .hero {
-  display: grid;
-  grid-template-columns: minmax(0, 1.2fr) minmax(280px, 0.8fr);
-  gap: 24px;
+  display: block;
 }
 
 .heroMain,
-.heroAside,
-.metricCard,
 .workspace,
 .topUpSection,
 .panel,
@@ -41,12 +37,11 @@
 }
 
 .heroMain,
-.heroAside,
 .workspace,
 .topUpSection,
 .panel,
 .loadingCard {
-  padding: 24px;
+  padding: 20px;
 }
 
 .loadingShell,
@@ -176,10 +171,14 @@
   margin: 0 0 10px;
 }
 
+.heroMain h1 {
+  font-size: clamp(1.9rem, 3.2vw, 2.8rem);
+  line-height: 1.02;
+}
+
 .heroMain p,
 .panelHeader p,
 .topUpSection p,
-.profileCard b,
 .transactionItem span,
 .lockMeta span,
 .transactionMeta span,
@@ -191,148 +190,32 @@
   line-height: 1.65;
 }
 
-.heroAside {
+.balanceGrid {
   display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 16px;
-  align-content: start;
 }
 
-.profileCard {
-  display: grid;
-  gap: 18px;
-  padding: 18px 20px;
-  border-radius: 20px;
-  background: color-mix(in srgb, var(--surface) 92%, transparent);
+.balanceCard {
+  padding: 26px 24px;
+  border-radius: 28px;
   border: 1px solid var(--border-color);
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--surface-strong) 96%, transparent), color-mix(in srgb, var(--surface) 92%, transparent));
+  box-shadow: var(--shadow-soft);
 }
 
-.profileCard strong {
-  font-size: 1.2rem;
-}
-
-.profileTop {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-}
-
-.profileAvatar {
-  position: relative;
-  isolation: isolate;
-  width: 64px;
-  height: 64px;
-  border-radius: 22px;
-  overflow: visible;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  background: linear-gradient(135deg, var(--accent), color-mix(in srgb, var(--accent-soft) 70%, #fff 30%));
-  color: #1a130d;
-  font-size: 1.15rem;
-  font-weight: 800;
-}
-
-.profileAvatar::before {
-  content: "";
-  position: absolute;
-  inset: -4px;
-  border-radius: 26px;
-  z-index: -1;
-  opacity: 0;
-}
-
-.profileAvatarPremium::before {
-  opacity: 1;
-  background: linear-gradient(135deg, #c8a96b 0%, #f4e2a5 45%, #8e6b3f 100%);
-  box-shadow: 0 0 0 1px rgba(244, 226, 165, 0.45);
-}
-
-.profileAvatarVip::before {
-  opacity: 1;
-  background: conic-gradient(
-    from 180deg,
-    #7d4bff 0deg,
-    #c996ff 70deg,
-    #ffd873 150deg,
-    #fff2ae 220deg,
-    #d6a3ff 300deg,
-    #7d4bff 360deg
-  );
-  box-shadow:
-    0 0 0 1px rgba(255, 235, 173, 0.5),
-    0 0 18px rgba(201, 150, 255, 0.28);
-}
-
-.profileAvatarImage {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
+.balanceCard strong {
   display: block;
-  border-radius: 22px;
+  font-size: clamp(1.9rem, 2.4vw, 2.8rem);
+  line-height: 1;
 }
 
-.profileAvatarCrown {
-  position: absolute;
-  top: -10px;
-  right: -8px;
-  width: 22px;
-  height: 22px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 999px;
-  background: linear-gradient(135deg, #fff6c4 0%, #e9bf56 55%, #9b6b1d 100%);
-  color: #5b3a00;
-  box-shadow:
-    0 6px 12px rgba(130, 92, 20, 0.24),
-    0 0 0 2px var(--surface-strong);
-}
-
-.profileAvatarCrownIcon {
-  width: 12px;
-  height: 12px;
-  fill: currentColor;
-  stroke: currentColor;
-  stroke-width: 1.4;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-}
-
-.profileMeta {
-  min-width: 0;
-}
-
-.profileSummary {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 12px;
-}
-
-.profileStat {
-  padding: 14px;
-  border-radius: 18px;
-  background: color-mix(in srgb, var(--surface-strong) 88%, transparent);
-  border: 1px solid var(--border-color);
-}
-
-.profileStat span {
-  display: block;
-  margin-bottom: 8px;
-  color: var(--text-secondary);
-  font-size: 0.78rem;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-}
-
-.profileStat strong {
-  font-size: 1rem;
-}
-
-.heroActions {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 12px;
+.balanceCardPrimary {
+  background:
+    radial-gradient(circle at top right, color-mix(in srgb, var(--accent) 24%, transparent), transparent 38%),
+    linear-gradient(180deg, color-mix(in srgb, var(--surface-strong) 96%, transparent), color-mix(in srgb, var(--surface) 92%, transparent));
+  border-color: color-mix(in srgb, var(--accent) 26%, transparent);
 }
 
 .refreshButton,
@@ -340,7 +223,8 @@
 .quickButton,
 .secondaryLink,
 .navButton,
-.shortcutCard {
+.shortcutCard,
+.loadMoreButton {
   min-height: 48px;
   border-radius: 16px;
   display: inline-flex;
@@ -354,7 +238,8 @@
 .refreshButton,
 .quickButton,
 .secondaryLink,
-.navButton {
+.navButton,
+.loadMoreButton {
   border: 1px solid var(--border-color);
   background: transparent;
   color: var(--text-primary);
@@ -374,52 +259,23 @@
   opacity: 0.6;
 }
 
-.metricsGrid {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 16px;
-}
-
-.metricCard {
-  padding: 22px;
-}
-
-.metricCard span {
-  display: block;
-  margin-bottom: 10px;
-  color: var(--text-secondary);
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  font-size: 0.8rem;
-}
-
-.metricCard strong {
-  font-size: 1.5rem;
-}
-
-.metricCardPrimary {
-  background:
-    radial-gradient(circle at top right, color-mix(in srgb, var(--accent) 22%, transparent), transparent 34%),
-    color-mix(in srgb, var(--surface-strong) 94%, transparent);
-  border-color: color-mix(in srgb, var(--accent) 26%, transparent);
-}
-
 .workspace {
   display: grid;
-  grid-template-columns: 240px minmax(0, 1fr);
-  gap: 24px;
+  grid-template-columns: 200px minmax(0, 1fr);
+  gap: 20px;
 }
 
 .sidebar {
-  padding: 16px;
+  padding: 14px;
   display: grid;
-  gap: 10px;
+  gap: 8px;
   align-content: start;
 }
 
 .navButton {
   justify-content: flex-start;
-  padding: 0 16px;
+  min-height: 44px;
+  padding: 0 14px;
 }
 
 .navButtonActive {
@@ -503,6 +359,20 @@
 .transactions {
   display: grid;
   gap: 12px;
+}
+
+.loadMoreButton {
+  justify-self: start;
+  padding: 0 18px;
+}
+
+.loadMoreButton:hover,
+.navButton:hover,
+.refreshButton:hover,
+.quickButton:hover,
+.secondaryLink:hover {
+  border-color: color-mix(in srgb, var(--accent) 28%, transparent);
+  color: var(--accent);
 }
 
 .lockCard,
@@ -597,8 +467,8 @@
 
 @media (max-width: 1024px) {
   .hero,
+  .balanceGrid,
   .workspace,
-  .metricsGrid,
   .featureGrid,
   .shortcutGrid,
   .loadingMetricRow,
@@ -607,10 +477,6 @@
     grid-template-columns: 1fr;
   }
 
-  .heroActions,
-  .profileSummary {
-    grid-template-columns: 1fr;
-  }
 }
 
 @media (max-width: 768px) {
@@ -653,8 +519,6 @@
   }
 
   .heroMain,
-  .heroAside,
-  .metricCard,
   .workspace,
   .topUpSection,
   .panel,
@@ -669,11 +533,6 @@
     line-height: 1.05;
   }
 
-  .profileTop {
-    align-items: flex-start;
-  }
-
-  .profileSummary,
   .quickButtons,
   .featureGrid,
   .shortcutGrid {
@@ -689,15 +548,13 @@
     min-height: 48px;
   }
 
-  .metricCard strong,
   .featureCard strong,
   .shortcutCard strong {
     font-size: 1.1rem;
   }
 
-  .profileAvatar {
-    width: 54px;
-    height: 54px;
-    border-radius: 18px;
+  .balanceCard {
+    padding: 20px 18px;
+    border-radius: 22px;
   }
 }
