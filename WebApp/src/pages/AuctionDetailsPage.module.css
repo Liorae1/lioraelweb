@@ -1,11 +1,28 @@
 .page {
+  --details-bg-top: color-mix(in srgb, var(--accent) 10%, transparent);
+  --details-bg-side: color-mix(in srgb, var(--accent-soft) 12%, transparent);
+  --details-surface: color-mix(in srgb, var(--surface) 92%, transparent);
+  --details-surface-strong: color-mix(in srgb, var(--surface-strong) 96%, transparent);
+  --details-border: color-mix(in srgb, var(--text-primary) 10%, transparent);
+  --details-text: var(--text-primary);
+  --details-soft: color-mix(in srgb, var(--text-primary) 74%, transparent);
+  --details-muted: color-mix(in srgb, var(--text-primary) 56%, transparent);
+  --details-shadow: 0 18px 42px rgba(0, 0, 0, 0.08);
+  --details-accent: var(--accent);
+  --details-accent-soft: color-mix(in srgb, var(--accent-soft) 72%, #fff 28%);
+
   min-height: 100vh;
-  padding: 36px 20px 84px;
+  padding: 28px 20px 120px;
   background:
-    radial-gradient(circle at 8% 0%, rgba(212, 153, 74, 0.14), transparent 24%),
-    radial-gradient(circle at 100% 16%, rgba(245, 230, 201, 0.1), transparent 24%),
-    linear-gradient(180deg, #120f0b 0%, #15110d 38%, #0e0c0a 100%);
-  color: #f6efe7;
+    radial-gradient(circle at 0% 0%, var(--details-bg-top), transparent 24%),
+    radial-gradient(circle at 100% 18%, var(--details-bg-side), transparent 22%),
+    linear-gradient(
+      180deg,
+      var(--hero-gradient-start) 0%,
+      var(--hero-gradient-middle) 42%,
+      var(--hero-gradient-end) 100%
+    );
+  color: var(--details-text);
 }
 
 .container {
@@ -13,300 +30,317 @@
   margin: 0 auto;
 }
 
+.topbar,
+.galleryCard,
+.summaryCard,
+.bidCard,
+.feedCard,
+.infoCard,
+.loadingCard,
+.notFound {
+  border: 1px solid var(--details-border);
+  background: var(--details-surface);
+  box-shadow: var(--details-shadow);
+  backdrop-filter: blur(16px);
+}
+
+.topbar {
+  position: sticky;
+  top: 12px;
+  z-index: 40;
+  margin-bottom: 24px;
+  padding: 16px 20px;
+  border-radius: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  transition:
+    padding 0.28s ease,
+    border-color 0.28s ease,
+    background 0.28s ease,
+    box-shadow 0.28s ease,
+    transform 0.28s ease;
+}
+
+.topbarScrolled {
+  padding: 12px 16px;
+  border-color: color-mix(in srgb, var(--accent) 18%, var(--details-border));
+  background: color-mix(in srgb, var(--details-surface-strong) 92%, transparent);
+  box-shadow: 0 20px 36px rgba(0, 0, 0, 0.12);
+}
+
+.topbarPrimary {
+  min-width: 0;
+  display: grid;
+  gap: 10px;
+}
+
+.topbarSummary {
+  min-width: 0;
+  display: grid;
+  justify-items: end;
+  gap: 2px;
+  opacity: 0;
+  transform: translateY(-8px);
+  pointer-events: none;
+  transition:
+    opacity 0.24s ease,
+    transform 0.24s ease;
+}
+
+.topbarSummaryVisible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.topbarSummary span,
+.topbarSummary small {
+  color: var(--details-muted);
+  font-size: 0.78rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.topbarSummary strong {
+  max-width: min(32vw, 360px);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 1rem;
+}
+
+.backLink {
+  display: inline-flex;
+  align-items: center;
+  min-height: 42px;
+  padding: 0 16px;
+  border-radius: 999px;
+  background: var(--details-surface-strong);
+  color: var(--details-text);
+  font-weight: 700;
+}
+
 .breadcrumbs {
   display: flex;
   flex-wrap: wrap;
-  gap: 10px;
-  margin-bottom: 18px;
-  color: rgba(246, 239, 231, 0.62);
+  gap: 8px;
+  color: var(--details-muted);
+  font-size: 0.92rem;
+  transition:
+    opacity 0.24s ease,
+    transform 0.24s ease;
 }
 
-.breadcrumbs a {
-  color: inherit;
-}
-
-.hero,
-.infoCard,
-.timelineSection,
-.loadingCard,
-.notFound,
-.alertError,
-.alertSuccess {
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  box-shadow: 0 22px 50px rgba(0, 0, 0, 0.22);
-}
-
-.alertError,
-.alertSuccess {
-  margin-bottom: 18px;
-  padding: 14px 16px;
-  border-radius: 18px;
-}
-
-.alertError {
-  background: rgba(168, 67, 67, 0.12);
-  color: #ef9b9b;
-}
-
-.alertSuccess {
-  background: rgba(69, 140, 95, 0.12);
-  color: #8fd8a6;
+.topbarScrolled .breadcrumbs {
+  opacity: 0.72;
 }
 
 .hero {
   display: grid;
-  grid-template-columns: minmax(0, 1.1fr) minmax(360px, 0.9fr);
+  grid-template-columns: minmax(0, 1.05fr) minmax(360px, 0.95fr);
   gap: 24px;
   margin-bottom: 24px;
 }
 
-.visualStage,
-.commandPanel {
-  border-radius: 34px;
-  background: rgba(21, 17, 12, 0.92);
-  backdrop-filter: blur(16px);
+.galleryCard,
+.summaryCard,
+.bidCard,
+.feedCard,
+.infoCard {
+  border-radius: 30px;
 }
 
-.visualStage {
+.galleryCard {
   position: relative;
   overflow: hidden;
-  padding: 18px;
+  padding: 24px;
 }
 
-.visualTopline {
+.favoriteButton {
   position: absolute;
-  inset: 24px 24px auto;
-  z-index: 3;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
+  top: 36px;
+  right: 36px;
+  z-index: 2;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  border: 1px solid var(--details-border);
+  background: rgba(20, 17, 15, 0.42);
+  color: #fff2f2;
 }
 
-.statusBadge,
-.liveBadge,
-.leadingBadge {
-  display: inline-flex;
-  align-items: center;
-  min-height: 40px;
-  padding: 0 14px;
-  border-radius: 999px;
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  backdrop-filter: blur(10px);
-  font-size: 0.82rem;
-  font-weight: 800;
+.favoriteButtonActive {
+  color: #df6576;
+  background: rgba(223, 101, 118, 0.12);
 }
 
-.statusBadge {
-  background: rgba(24, 19, 14, 0.68);
-  color: #f2c987;
-}
-
-.liveBadge {
-  background: rgba(24, 19, 14, 0.68);
-  color: #fff3e2;
+.imageFrame,
+.mainImagePlaceholder {
+  overflow: hidden;
+  border-radius: 24px;
+  background: color-mix(in srgb, var(--bg-secondary) 68%, transparent);
 }
 
 .mainImage,
 .mainImagePlaceholder {
   width: 100%;
-  height: 620px;
-  border-radius: 26px;
+  height: 600px;
 }
 
 .mainImage {
   object-fit: cover;
-  display: block;
 }
 
 .mainImagePlaceholder {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(255, 255, 255, 0.04);
-  color: rgba(246, 239, 231, 0.58);
+  color: var(--details-muted);
 }
 
 .thumbnailRail {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 12px;
-  margin-top: 14px;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+  margin-top: 20px;
 }
 
 .thumbnailActive,
 .thumbnailMuted {
   overflow: hidden;
-  border-radius: 18px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+  border: 1px solid var(--details-border);
   padding: 0;
-  background: transparent;
-  cursor: pointer;
 }
 
 .thumbnailActive {
-  box-shadow: 0 0 0 2px rgba(212, 153, 74, 0.5);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent) 28%, transparent);
 }
 
 .thumbnailMuted {
-  opacity: 0.58;
+  opacity: 0.75;
 }
 
 .thumbnailActive img,
 .thumbnailMuted img {
   width: 100%;
-  height: 100px;
+  height: 88px;
   object-fit: cover;
-  display: block;
 }
 
-.commandPanel {
+.summaryCard {
   padding: 28px;
   display: grid;
-  gap: 20px;
+  gap: 22px;
 }
 
-.headingBlock h1 {
-  margin: 6px 0 12px;
-  font-size: clamp(2.2rem, 4vw, 3.8rem);
-  line-height: 0.96;
-}
-
-.brand {
-  margin: 0;
-  color: #f2c987;
-  text-transform: uppercase;
-  letter-spacing: 0.14em;
-  font-size: 0.75rem;
-  font-weight: 800;
-}
-
-.lead {
-  margin: 0;
-  color: rgba(246, 239, 231, 0.76);
-  line-height: 1.72;
-}
-
-.headingActions {
-  margin-top: 16px;
-}
-
-.heroCards,
-.summaryTiles {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 12px;
-}
-
-.heroCard,
-.summaryTile,
-.descriptionCard,
-.userDock,
-.bidPanel,
-.loadingCard,
-.notFound {
-  padding: 18px 20px;
-  border-radius: 24px;
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.06);
-}
-
-.heroCard span,
-.summaryTile span,
-.mutedLabel,
-.userMeta span,
-.field span {
-  display: block;
-  margin-bottom: 8px;
-  color: rgba(246, 239, 231, 0.6);
-  font-size: 0.8rem;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-}
-
-.heroCard strong {
-  font-size: 1.28rem;
-}
-
-.userDock {
-  display: grid;
+.summaryTop,
+.metaRow,
+.actionRow,
+.winnerPanel,
+.sectionHeader,
+.leaderIdentity,
+.feedItem,
+.feedIdentity,
+.specRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   gap: 16px;
 }
 
-.userIdentity {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-}
-
-.userAvatar,
-.bidderAvatar {
-  width: 56px;
-  height: 56px;
-  border-radius: 18px;
-  overflow: hidden;
-  display: flex;
+.statusBadge,
+.accessBadge,
+.statePill,
+.feedCount,
+.progressValue {
+  display: inline-flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, #d4994a, #f3d29a);
-  color: #1a130d;
-  font-size: 1.15rem;
+  min-height: 38px;
+  padding: 0 14px;
+  border-radius: 999px;
+  font-size: 0.82rem;
   font-weight: 800;
-  flex-shrink: 0;
 }
 
-.userAvatarImage,
-.bidderAvatarImage {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
+.statusBadgeactive {
+  background: rgba(68, 150, 98, 0.12);
+  color: #347a4e;
 }
 
-.userName,
-.bidderName {
-  font-size: 1rem;
-  font-weight: 700;
+.statusBadgeplanned {
+  background: rgba(184, 143, 54, 0.14);
+  color: #9b7422;
 }
 
-.userNick,
-.bidderUserName,
-.bidDate,
-.timelineCount,
-.sectionHeader p {
-  color: rgba(246, 239, 231, 0.66);
+.statusBadgeclosed {
+  background: rgba(191, 99, 99, 0.12);
+  color: #a55353;
 }
 
-.userNick,
-.bidderUserName {
-  margin-top: 4px;
-  font-size: 0.9rem;
+.accessBadge,
+.progressValue {
+  background: color-mix(in srgb, var(--accent) 14%, transparent);
+  color: var(--accent);
 }
 
-.userMeta {
+.summaryCard h1 {
+  margin: 0;
+  font-size: clamp(2.15rem, 4vw, 3.9rem);
+  line-height: 0.98;
+  letter-spacing: -0.03em;
+}
+
+.metaRow {
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  gap: 10px;
+  color: var(--details-muted);
+}
+
+.metaRow span {
+  padding: 8px 12px;
+  border-radius: 999px;
+  background: var(--details-surface-strong);
+}
+
+.quickFacts,
+.priceGrid,
+.bottomGrid {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 12px;
-}
-
-.userMeta strong {
-  font-size: 1.15rem;
-}
-
-.bidPanel {
-  display: grid;
-  gap: 16px;
-}
-
-.bidPanelTop {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
   gap: 14px;
 }
 
-.bidPanelValue {
-  font-size: 1.5rem;
+.quickFacts,
+.priceGrid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.factItem,
+.priceTile,
+.detailBlock,
+.progressCard,
+.winnerPanel,
+.emptyFeed {
+  padding: 18px;
+  border-radius: 22px;
+  border: 1px solid var(--details-border);
+  background: var(--details-surface-strong);
+}
+
+.factItem span,
+.priceTile span,
+.cardLabel,
+.field span,
+.specRow span {
+  display: block;
+  margin-bottom: 8px;
+  color: var(--details-muted);
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
 }
 
 .field {
@@ -314,698 +348,482 @@
   gap: 10px;
 }
 
-.field input {
-  width: 100%;
-  height: 56px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 16px;
-  background: rgba(12, 10, 7, 0.84);
-  color: #f6efe7;
-  padding: 0 16px;
-  font: inherit;
-  outline: none;
+.leaderRow {
+  padding: 18px;
+  border-radius: 22px;
+  border: 1px solid var(--details-border);
+  background: var(--details-surface-strong);
 }
 
-.field input:focus {
-  border-color: rgba(212, 153, 74, 0.5);
-  box-shadow: 0 0 0 4px rgba(212, 153, 74, 0.14);
+.leaderIdentity,
+.feedIdentity {
+  justify-content: flex-start;
 }
 
-.quickBidRow {
+.leaderIdentity strong,
+.feedIdentity strong {
+  display: block;
+}
+
+.leaderIdentity small,
+.feedIdentity small,
+.feedMeta small {
+  color: var(--details-muted);
+}
+
+.userAvatar,
+.bidderAvatar {
+  width: 54px;
+  height: 54px;
+  border-radius: 18px;
+  overflow: hidden;
   display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-}
-
-.quickBidButton {
-  min-height: 44px;
-  padding: 0 14px;
-  border-radius: 999px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  background: rgba(255, 255, 255, 0.03);
-  color: #f6efe7;
-  cursor: pointer;
-  font: inherit;
-  font-weight: 700;
-}
-
-.quickBidButton:hover {
-  border-color: rgba(212, 153, 74, 0.42);
-  color: #f2c987;
-}
-
-.actionButtons {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
-}
-
-.primaryButton,
-.secondaryButton {
-  min-height: 54px;
-  border-radius: 16px;
-  display: inline-flex;
   align-items: center;
   justify-content: center;
-  cursor: pointer;
-  font-size: 0.95rem;
+  flex-shrink: 0;
+  background: linear-gradient(135deg, var(--details-accent), var(--details-accent-soft));
+  color: #1a130d;
   font-weight: 800;
 }
 
-.primaryButton {
-  border: none;
-  background: linear-gradient(135deg, #d4994a, #f3d29a);
-  color: #1a130d;
+.bidderAvatar {
+  width: 46px;
+  height: 46px;
+  border-radius: 16px;
 }
 
-.secondaryButton {
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  background: transparent;
-  color: #f6efe7;
+.userAvatarImage,
+.bidderAvatarImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
-.favoriteActionActive {
-  border-color: rgba(255, 180, 180, 0.32);
-  color: #ffb4b4;
-}
-
-.bidHint {
-  margin: 0;
-  color: rgba(246, 239, 231, 0.7);
-  line-height: 1.6;
-}
-
-.deliveryPanel {
-  padding: 18px 20px;
-  border-radius: 24px;
-  background: rgba(255, 180, 180, 0.06);
-  border: 1px solid rgba(255, 180, 180, 0.12);
-}
-
-.deliveryHeader {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-}
-
-.deliveryHeader strong {
-  display: block;
-  font-size: 1.12rem;
-}
-
-.deliveryActions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 12px;
-}
-
-.walletFeed {
-  padding: 14px 16px;
-  border-radius: 18px;
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.06);
-}
-
-.walletFeed strong {
-  display: block;
-  font-size: 1rem;
-  line-height: 1.5;
-}
-
-.liveLine {
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-  color: rgba(246, 239, 231, 0.66);
-  font-size: 0.9rem;
-}
-
-.liveDot {
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  background: #98e6ae;
-  box-shadow: 0 0 0 6px rgba(152, 230, 174, 0.12);
-}
-
-.infoGrid {
+.contentGrid {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: minmax(0, 1fr) 360px;
   gap: 24px;
   margin-bottom: 24px;
 }
 
-.infoCard,
-.timelineSection {
+.bidCard,
+.feedCard {
   padding: 24px;
-  border-radius: 30px;
-  background: rgba(21, 17, 12, 0.92);
-  backdrop-filter: blur(16px);
+}
+
+.bidCard {
+  display: grid;
+  gap: 18px;
+}
+
+.bidCardRaise {
+  animation: bidRaise 0.9s ease;
+}
+
+.bidCardOutbid {
+  animation: bidOutbid 0.8s ease;
 }
 
 .sectionHeader {
-  display: flex;
   align-items: flex-start;
-  justify-content: space-between;
-  gap: 16px;
-  margin-bottom: 18px;
 }
 
 .sectionHeader h2 {
-  margin: 0 0 8px;
-  font-size: 1.7rem;
+  margin: 0 0 6px;
+  font-size: 1.45rem;
 }
 
-.sectionHeader p {
+.sectionHeader p,
+.detailBlock p,
+.bidHint,
+.emptyFeed,
+.notFound p {
   margin: 0;
-  line-height: 1.62;
+  color: var(--details-muted);
+  line-height: 1.65;
 }
 
-.descriptionCard p {
+.bidHint {
   margin: 0;
-  color: rgba(246, 239, 231, 0.76);
-  line-height: 1.72;
 }
 
-.progressPercent {
+.bidForm {
+  display: grid;
+  gap: 14px;
+}
+
+.field input {
+  width: 100%;
+  height: 56px;
+  padding: 0 16px;
+  border: 1px solid var(--details-border);
+  border-radius: 16px;
+  background: var(--details-surface-strong);
+  color: var(--details-text);
+  outline: none;
+}
+
+.field input:focus {
+  border-color: color-mix(in srgb, var(--accent) 38%, transparent);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent) 12%, transparent);
+}
+
+.statePillleader {
+  background: rgba(68, 150, 98, 0.12);
+  color: #347a4e;
+}
+
+.statePilloutbid {
+  background: rgba(191, 99, 99, 0.12);
+  color: #a55353;
+}
+
+.statePillidle,
+.statePillclosed {
+  background: color-mix(in srgb, var(--text-primary) 8%, transparent);
+  color: var(--details-muted);
+}
+
+.statePillwon {
+  background: color-mix(in srgb, var(--accent) 14%, transparent);
+  color: var(--accent);
+}
+
+.quickBidGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.quickBidButton {
+  min-height: 74px;
+  padding: 16px;
+  border-radius: 18px;
+  border: 1px solid color-mix(in srgb, var(--accent) 26%, var(--details-border));
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--details-surface-strong) 92%, #fff 8%) 0%,
+    color-mix(in srgb, var(--bg-secondary) 58%, var(--details-surface-strong) 42%) 100%
+  );
+  color: var(--details-text);
+  text-align: left;
+}
+
+.quickBidButton strong {
+  display: block;
+  margin-bottom: 6px;
+}
+
+.quickBidButton span {
+  color: var(--details-soft);
+  font-size: 0.9rem;
+}
+
+.primaryButton,
+.secondaryButton {
+  min-height: 52px;
+  padding: 0 20px;
+  border-radius: 16px;
   display: inline-flex;
   align-items: center;
-  min-height: 44px;
-  padding: 0 14px;
-  border-radius: 999px;
-  background: rgba(212, 153, 74, 0.14);
-  color: #f2c987;
+  justify-content: center;
   font-weight: 800;
+}
+
+.primaryButton {
+  background: linear-gradient(135deg, var(--details-accent), var(--details-accent-soft));
+  color: #1a130d;
+}
+
+.secondaryButton {
+  border: 1px solid var(--details-border);
+  background: var(--details-surface-strong);
+  color: var(--details-text);
+}
+
+.actionRow .primaryButton,
+.actionRow .secondaryButton {
+  flex: 1;
+}
+
+.feedCard {
+  display: grid;
+  gap: 18px;
+}
+
+.feedCount {
+  min-width: 38px;
+  background: color-mix(in srgb, var(--accent) 14%, transparent);
+  color: var(--accent);
+}
+
+.liveFeedList {
+  display: grid;
+  gap: 12px;
+  max-height: 540px;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+.feedItem {
+  padding: 16px;
+  border-radius: 18px;
+  border: 1px solid var(--details-border);
+  background: var(--details-surface-strong);
+}
+
+.feedItemLatest {
+  border-color: color-mix(in srgb, var(--accent) 34%, transparent);
+}
+
+.feedMeta {
+  text-align: right;
+}
+
+.feedMeta strong {
+  display: block;
+}
+
+.bottomGrid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.infoCard {
+  padding: 24px;
+  display: grid;
+  gap: 18px;
+}
+
+.specList {
+  display: grid;
+}
+
+.specRow {
+  padding: 14px 0;
+  border-bottom: 1px solid var(--details-border);
+}
+
+.specRow:last-child {
+  border-bottom: none;
+}
+
+.specRow span {
+  margin-bottom: 0;
 }
 
 .progressBar {
   height: 14px;
   border-radius: 999px;
   overflow: hidden;
-  background: rgba(255, 255, 255, 0.08);
+  background: color-mix(in srgb, var(--text-primary) 10%, transparent);
 }
 
 .progressFill {
   height: 100%;
   border-radius: 999px;
-  background: linear-gradient(90deg, #d4994a, #f3d29a);
+  background: linear-gradient(90deg, var(--details-accent) 0%, var(--details-accent-soft) 100%);
+  transition: width 0.4s ease;
 }
 
-.progressLabels {
-  display: flex;
-  justify-content: space-between;
-  gap: 16px;
-  margin-top: 10px;
-  color: rgba(246, 239, 231, 0.64);
-  font-size: 0.9rem;
-}
-
-.timelineSection {
-  display: grid;
-  gap: 18px;
-}
-
-.emptyTimeline {
-  padding: 24px;
-  border-radius: 24px;
-  background: rgba(255, 255, 255, 0.04);
-  color: rgba(246, 239, 231, 0.68);
-}
-
-.timeline {
-  display: grid;
-  gap: 14px;
-}
-
-.timelineItem {
-  display: grid;
-  grid-template-columns: 6px 1fr;
-  gap: 14px;
-}
-
-.timelineAccent {
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.1);
-}
-
-.timelineItemActive .timelineAccent {
-  background: linear-gradient(180deg, #d4994a, #f3d29a);
-}
-
-.timelineBody {
-  display: flex;
+.mobileBidBar {
+  position: fixed;
+  left: 12px;
+  right: 12px;
+  bottom: 12px;
+  z-index: 30;
+  display: none;
   align-items: center;
   justify-content: space-between;
-  gap: 16px;
-  padding: 18px 20px;
-  border-radius: 24px;
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.06);
-}
-
-.timelineIdentity {
-  display: flex;
-  align-items: center;
   gap: 14px;
-  color: inherit;
-  text-decoration: none;
+  padding: 14px;
+  border: 1px solid var(--details-border);
+  border-radius: 20px;
+  background: color-mix(in srgb, var(--details-surface) 94%, transparent);
+  box-shadow: var(--details-shadow);
+  backdrop-filter: blur(16px);
 }
 
-.timelineValues {
-  text-align: right;
+.mobileBidBar span {
+  display: block;
+  color: var(--details-muted);
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
 }
 
-.bidAmount {
-  font-size: 1.18rem;
-  font-weight: 800;
-}
-
-.leadingBadge {
-  background: rgba(212, 153, 74, 0.14);
-  color: #f2c987;
-}
-
-.loadingPulse,
-.loadingPulse::after {
-  border-radius: inherit;
-}
-
-.loadingPulse {
-  position: relative;
-  overflow: hidden;
-  background:
-    linear-gradient(135deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.02)),
-    rgba(255, 255, 255, 0.04);
-}
-
-.loadingPulse::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  transform: translateX(-100%);
-  background: linear-gradient(
-    90deg,
-    transparent 0%,
-    rgba(255, 255, 255, 0.06) 34%,
-    rgba(255, 255, 255, 0.18) 50%,
-    rgba(255, 255, 255, 0.06) 66%,
-    transparent 100%
-  );
-  animation: auctionSkeletonWave 1.8s ease-in-out infinite;
-}
-
-.loadingBadge,
-.loadingBadgeWide,
-.loadingBrand,
-.loadingLabel,
-.loadingValue,
-.loadingValueLarge,
-.loadingLineSmall,
-.loadingLineMedium,
-.loadingTitle,
-.loadingTitleShort,
-.loadingTextLine,
-.loadingTextLineWide,
-.loadingButton,
-.loadingButtonSecondary,
-.loadingInput,
-.loadingQuickBid,
-.loadingPercent,
-.loadingProgress,
-.loadingSectionTitle,
-.loadingAvatar,
-.loadingAvatarSmall,
-.loadingThumbnail {
+.mobileBidBar strong {
   display: block;
 }
 
-.loadingBadge,
-.loadingBadgeWide {
-  min-height: 40px;
-  border-radius: 999px;
+.loadingCard {
+  max-width: 920px;
+  margin: 40px auto 0;
+  padding: 24px;
+  border-radius: 28px;
 }
 
-.loadingBadge {
-  width: 108px;
+.loadingHero,
+.loadingBody,
+.loadingBodyShort {
+  border-radius: 18px;
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.05),
+    rgba(184, 138, 103, 0.16),
+    rgba(255, 255, 255, 0.05)
+  );
+  background-size: 200% 100%;
+  animation: skeletonMove 1.8s ease-in-out infinite;
 }
 
-.loadingBadgeWide {
-  width: 164px;
+.loadingHero {
+  height: 420px;
+  margin-bottom: 18px;
 }
 
-.loadingBrand {
-  width: 132px;
-  height: 12px;
-  margin-bottom: 12px;
-  border-radius: 999px;
-}
-
-.loadingTitle,
-.loadingTitleShort,
-.loadingTextLine,
-.loadingTextLineWide,
-.loadingLineSmall,
-.loadingLineMedium,
-.loadingLabel,
-.loadingValue,
-.loadingValueLarge,
-.loadingSectionTitle {
-  border-radius: 999px;
-}
-
-.loadingTitle {
-  width: min(100%, 420px);
-  height: 52px;
-  margin-bottom: 12px;
-}
-
-.loadingTitleShort {
-  width: min(78%, 320px);
-  height: 52px;
-  margin-bottom: 16px;
-}
-
-.loadingTextLineWide {
-  width: 100%;
-  height: 12px;
-  margin-bottom: 10px;
-}
-
-.loadingTextLine {
-  width: 82%;
-  height: 12px;
-  margin-bottom: 10px;
-}
-
-.loadingLabel {
-  width: 92px;
-  height: 10px;
-  margin-bottom: 12px;
-}
-
-.loadingValue {
-  width: 132px;
-  height: 18px;
-}
-
-.loadingValueLarge {
-  width: 184px;
-  height: 28px;
-}
-
-.loadingLineSmall {
-  width: 96px;
-  height: 12px;
-  margin-top: 8px;
-}
-
-.loadingLineMedium {
-  width: 144px;
-  height: 12px;
-}
-
-.loadingButton,
-.loadingButtonSecondary {
-  width: 100%;
-  min-height: 54px;
-  border-radius: 16px;
-}
-
-.loadingButtonSecondary {
-  background:
-    linear-gradient(135deg, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0.02)),
-    rgba(255, 255, 255, 0.02);
-}
-
-.loadingInput {
-  width: 100%;
-  height: 56px;
-  border-radius: 16px;
-}
-
-.loadingQuickBid {
-  width: 132px;
-  height: 44px;
-  border-radius: 999px;
-}
-
-.loadingPercent {
-  width: 72px;
-  height: 44px;
-  border-radius: 999px;
-}
-
-.loadingProgress {
-  width: 100%;
-  height: 14px;
-  margin-bottom: 10px;
-  border-radius: 999px;
-}
-
-.loadingSectionHead,
-.loadingIdentity {
-  width: 100%;
-}
-
-.loadingSectionTitle {
-  width: 240px;
+.loadingBody {
   height: 28px;
   margin-bottom: 12px;
 }
 
-.loadingAvatar,
-.loadingAvatarSmall {
-  flex-shrink: 0;
-  border-radius: 18px;
+.loadingBodyShort {
+  width: 62%;
+  height: 28px;
 }
 
-.loadingAvatar {
-  width: 56px;
-  height: 56px;
-}
-
-.loadingAvatarSmall {
-  width: 48px;
-  height: 48px;
-}
-
-.loadingThumbnail {
-  height: 100px;
-  border-radius: 18px;
-}
-
-.loadingImageGlow {
-  width: min(280px, 60%);
-  height: min(280px, 60%);
-  border-radius: 50%;
-  background: radial-gradient(circle, rgba(212, 153, 74, 0.18), transparent 70%);
-  filter: blur(2px);
-}
-
-.loadingCard,
 .notFound {
   max-width: 720px;
   margin: 80px auto 0;
+  padding: 32px;
+  border-radius: 28px;
   text-align: center;
 }
 
-.notFound h1 {
-  margin: 0 0 10px;
-}
-
-.notFound p,
-.loadingCard p {
-  margin: 0;
-  color: rgba(246, 239, 231, 0.7);
-  line-height: 1.64;
-}
-
-@keyframes auctionSkeletonWave {
+@keyframes bidRaise {
+  0%,
   100% {
-    transform: translateX(100%);
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-2px);
   }
 }
 
-@media (max-width: 1100px) {
+@keyframes bidOutbid {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+
+  25% {
+    transform: translateX(-4px);
+  }
+
+  75% {
+    transform: translateX(4px);
+  }
+}
+
+@keyframes skeletonMove {
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+@media (max-width: 1120px) {
   .hero,
-  .infoGrid {
+  .contentGrid,
+  .bottomGrid {
     grid-template-columns: 1fr;
   }
+}
 
-  .timelineBody,
+@media (max-width: 760px) {
+  .page {
+    padding: 18px 12px 110px;
+  }
+
+  .topbar {
+    top: 8px;
+  }
+
+  .topbar,
+  .hero,
+  .contentGrid,
+  .bottomGrid {
+    gap: 16px;
+  }
+
+  .topbar,
+  .galleryCard,
+  .summaryCard,
+  .bidCard,
+  .feedCard,
+  .infoCard,
+  .loadingCard,
+  .notFound {
+    border-radius: 22px;
+  }
+
+  .topbar,
+  .summaryCard,
+  .bidCard,
+  .feedCard,
+  .infoCard {
+    padding: 18px;
+  }
+
+  .topbar,
   .sectionHeader,
-  .bidPanelTop,
-  .deliveryHeader {
+  .feedItem,
+  .specRow,
+  .winnerPanel {
     flex-direction: column;
     align-items: flex-start;
   }
 
-  .timelineValues {
-    text-align: left;
+  .topbarSummary {
+    width: 100%;
+    justify-items: start;
   }
 
-  .loadingTitle,
-  .loadingTitleShort {
-    height: 42px;
-  }
-}
-
-@media (max-width: 768px) {
-  .page {
-    padding: 24px 14px 64px;
-  }
-
-  .visualStage,
-  .commandPanel,
-  .infoCard,
-  .timelineSection,
-  .loadingCard,
-  .notFound {
-    border-radius: 24px;
-  }
-
-  .commandPanel,
-  .infoCard,
-  .timelineSection {
-    padding: 20px;
+  .topbarSummary strong {
+    max-width: 100%;
+    white-space: normal;
   }
 
   .mainImage,
   .mainImagePlaceholder {
-    height: 340px;
+    height: 360px;
+  }
+
+  .galleryCard {
+    padding: 18px;
+  }
+
+  .favoriteButton {
+    top: 28px;
+    right: 28px;
   }
 
   .thumbnailRail,
-  .heroCards,
-  .summaryTiles,
-  .userMeta,
-  .actionButtons {
+  .quickFacts,
+  .priceGrid,
+  .quickBidGrid {
     grid-template-columns: 1fr;
   }
 
-  .thumbnailRail {
-    grid-template-columns: repeat(2, 1fr);
-  }
-
-  .thumbnailActive img,
-  .thumbnailMuted img {
-    height: 86px;
-  }
-
-  .loadingThumbnail {
-    height: 86px;
-  }
-
-  .visualTopline {
-    position: static;
-    margin-bottom: 14px;
+  .actionRow {
     flex-direction: column;
-    align-items: flex-start;
-  }
-}
-
-@media (max-width: 480px) {
-  .page {
-    padding: 18px 10px 48px;
   }
 
-  .hero,
-  .infoGrid,
-  .timelineSection {
-    gap: 14px;
-  }
-
-  .visualStage,
-  .commandPanel,
-  .infoCard,
-  .timelineSection,
-  .loadingCard,
-  .notFound {
-    border-radius: 20px;
-  }
-
-  .visualStage,
-  .commandPanel,
-  .infoCard,
-  .timelineSection {
-    padding: 16px;
-  }
-
-  .headingBlock h1 {
-    font-size: 1.85rem;
-    line-height: 1.02;
-  }
-
-  .mainImage,
-  .mainImagePlaceholder {
-    height: 260px;
-    border-radius: 20px;
-  }
-
-  .thumbnailRail {
-    gap: 8px;
-  }
-
-  .thumbnailActive img,
-  .thumbnailMuted img {
-    height: 72px;
-  }
-
-  .statusBadge,
-  .liveBadge,
-  .leadingBadge {
-    min-height: 34px;
-    padding: 0 12px;
-    font-size: 0.72rem;
-  }
-
-  .heroCard,
-  .summaryTile,
-  .descriptionCard,
-  .userDock,
-  .bidPanel {
-    padding: 14px 16px;
-    border-radius: 18px;
-  }
-
-  .quickBidRow,
-  .actionButtons,
-  .deliveryActions {
-    grid-template-columns: 1fr;
-  }
-
-  .quickBidButton,
-  .primaryButton,
-  .secondaryButton {
+  .actionRow .primaryButton,
+  .actionRow .secondaryButton {
     width: 100%;
-    min-height: 48px;
   }
 
-  .field input {
-    height: 50px;
-    padding: 0 14px;
-  }
-
-  .loadingTitle,
-  .loadingTitleShort {
-    height: 34px;
-  }
-
-  .loadingInput {
-    height: 50px;
-  }
-
-  .loadingQuickBid {
-    width: 100%;
-    min-height: 48px;
-  }
-
-  .loadingThumbnail {
-    height: 72px;
-  }
-
-  .timelineItem {
-    gap: 10px;
+  .mobileBidBar {
+    display: flex;
   }
 }
