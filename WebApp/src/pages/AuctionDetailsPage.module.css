@@ -416,6 +416,16 @@
   gap: 18px;
 }
 
+.bidCardDisabled {
+  border-color: color-mix(in srgb, var(--text-primary) 14%, transparent);
+  background:
+    linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--details-surface-strong) 94%, transparent),
+      color-mix(in srgb, var(--details-surface) 98%, transparent)
+    );
+}
+
 .bidCardRaise {
   animation: bidRaise 0.9s ease;
 }
@@ -466,6 +476,12 @@
 .field input:focus {
   border-color: color-mix(in srgb, var(--accent) 38%, transparent);
   box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent) 12%, transparent);
+}
+
+.field input:disabled {
+  cursor: not-allowed;
+  color: var(--details-muted);
+  background: color-mix(in srgb, var(--details-surface-strong) 86%, var(--text-primary) 3%);
 }
 
 .statePillleader {
@@ -519,6 +535,24 @@
   font-size: 0.9rem;
 }
 
+.quickBidButton:disabled,
+.primaryButton:disabled {
+  cursor: not-allowed;
+  opacity: 0.56;
+  transform: none;
+  box-shadow: none;
+}
+
+.quickBidButton:disabled {
+  border-color: var(--details-border);
+  background: color-mix(in srgb, var(--details-surface-strong) 88%, transparent);
+  color: var(--details-muted);
+}
+
+.quickBidButton:disabled span {
+  color: var(--details-muted);
+}
+
 .primaryButton,
 .secondaryButton {
   min-height: 52px;
@@ -533,6 +567,15 @@
 .primaryButton {
   background: linear-gradient(135deg, var(--details-accent), var(--details-accent-soft));
   color: #1a130d;
+}
+
+.primaryButton:disabled {
+  background: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--details-muted) 48%, #d8cfc6 52%),
+    color-mix(in srgb, var(--details-muted) 30%, #eee6dd 70%)
+  );
+  color: color-mix(in srgb, var(--details-text) 56%, white 44%);
 }
 
 .secondaryButton {

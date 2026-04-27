@@ -617,6 +617,19 @@ function AuctionDetailsPage() {
     requestedBidAmount,
   ]);
 
+  const isBidUnavailable = !isAuthenticated || auction?.canCurrentUserBid === false || !isAuctionActive;
+  const bidActionLabel = !isAuthenticated
+    ? "Увійди, щоб ставити"
+    : isAuctionClosed
+      ? "Торги завершено"
+      : isAuctionPlanned
+        ? "Очікує старту"
+        : auction?.canCurrentUserBid === false
+          ? "Ставка недоступна"
+          : bidLoading
+            ? "Відправка..."
+            : "Зробити ставку";
+
   const handleFavoriteToggle = async () => {
     if (!isAuthenticated || !auction) {
       setError("Щоб додати лот в обране, потрібно увійти в акаунт.");
@@ -920,7 +933,7 @@ function AuctionDetailsPage() {
                 : bidFlash === "outbid"
                   ? styles.bidCardOutbid
                   : ""
-            }`}
+            } ${isBidUnavailable ? styles.bidCardDisabled : ""}`}
           >
             <div className={styles.sectionHeader}>
               <div>
@@ -972,6 +985,7 @@ function AuctionDetailsPage() {
                   value={bidAmount}
                   onChange={(event) => setBidAmount(event.target.value)}
                   placeholder={`Мінімум ${formatMoneyWithCurrency(minimumBid, auction.currency || currency)}`}
+                  disabled={isBidUnavailable}
                 />
               </label>
 
@@ -982,6 +996,7 @@ function AuctionDetailsPage() {
                     type="button"
                     className={styles.quickBidButton}
                     onClick={() => setBidAmount(String(option.total))}
+                    disabled={isBidUnavailable}
                   >
                     <strong>+{formatMoney(option.increase)}</strong>
                     <span>{formatMoneyWithCurrency(option.total, auction.currency || currency)}</span>
@@ -995,12 +1010,13 @@ function AuctionDetailsPage() {
                   className={styles.primaryButton}
                   disabled={
                     bidLoading ||
+                    !isAuthenticated ||
                     auction?.canCurrentUserBid === false ||
                     isAuctionClosed ||
                     isAuctionPlanned
                   }
                 >
-                  {bidLoading ? "Відправка..." : "Зробити ставку"}
+                  {bidActionLabel}
                 </button>
                 <Link to={isAuthenticated ? "/profile" : "/auth"} className={styles.secondaryButton}>
                   {isAuthenticated ? "Мій профіль" : "Увійти"}
@@ -1179,9 +1195,9 @@ function AuctionDetailsPage() {
           type="submit"
           form="auction-bid-form"
           className={styles.primaryButton}
-          disabled={bidLoading || auction?.canCurrentUserBid === false || !isAuctionActive}
+          disabled={bidLoading || !isAuthenticated || auction?.canCurrentUserBid === false || !isAuctionActive}
         >
-          {bidLoading ? "Відправка..." : "Зробити ставку"}
+          {bidActionLabel}
         </button>
       </div>
     </div>
